@@ -56,7 +56,7 @@ namespace SystemTrayMenu.Utilities
     /// <summary>
     /// Loads an image (Bitmap) from local resources (avares://).
     /// </summary>
-    internal class LocalResourceBitmap : Bitmap
+    internal class LocalResourceBitmap : BitmapSource
     {
         public LocalResourceBitmap(string path)
             : base(

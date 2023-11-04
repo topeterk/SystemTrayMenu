@@ -36,7 +36,9 @@ namespace SystemTrayMenu
 #endif
 #endif
 
+#if !AVALONIA || !DEBUG
             try
+#endif
             {
                 Log.Initialize();
                 Translator.Initialize();
@@ -60,8 +62,10 @@ namespace SystemTrayMenu
                 if (SingleAppInstance.Initialize())
                 {
                     AppDomain currentDomain = AppDomain.CurrentDomain;
+#if !AVALONIA || !DEBUG
                     currentDomain.UnhandledException += (sender, args)
                         => AskUserSendError((Exception)args.ExceptionObject);
+#endif
 
                     Scaling.Initialize();
                     FolderOptions.Initialize();
@@ -84,11 +88,13 @@ namespace SystemTrayMenu
 #endif
                 }
             }
+#if !AVALONIA || !DEBUG
             catch (Exception ex)
             {
                 AskUserSendError(ex);
             }
             finally
+#endif
             {
                 SingleAppInstance.Unload();
                 Log.Close();

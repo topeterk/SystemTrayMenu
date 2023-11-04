@@ -11,7 +11,7 @@ namespace SystemTrayMenu.DllImports
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
 #else
     using Avalonia;
@@ -27,13 +27,13 @@ namespace SystemTrayMenu.DllImports
     /// </summary>
     internal static partial class NativeMethods
     {
-#if !WINDOWS
+#if AVALONIA
         internal static bool Contains(this Rect rect, Point pt) => rect.Contains((int)pt.X, (int)pt.Y);
 #endif
 
         internal static bool IsTouchEnabled()
         {
-#if WINDOWS
+#if TODO_LINUX
             const int MAXTOUCHES_INDEX = 95;
             int maxTouches = GetSystemMetrics(MAXTOUCHES_INDEX);
 
@@ -52,7 +52,7 @@ namespace SystemTrayMenu.DllImports
         {
             private static List<Rect>? screens;
 
-#if WINDOWS
+#if !AVALONIA
             private static Point LastCursorPosition = default(Point);
 #else
             internal static Screens? DesktopScreens { get; set; }
@@ -62,7 +62,7 @@ namespace SystemTrayMenu.DllImports
             {
                 get
                 {
-#if WINDOWS
+#if !AVALONIA
                     if ((screens == null) || (screens.Count == 0))
                     {
                         FetchScreens();
@@ -104,7 +104,7 @@ namespace SystemTrayMenu.DllImports
                 }
             }
 
-#if WINDOWS
+#if !AVALONIA
             // The primary screen will have x = 0, y = 0 coordinates
             internal static Rect PrimaryScreen => Screens.FirstOrDefault((screen) => screen.Left == 0 && screen.Top == 0, Screens[0]);
 #else
@@ -115,7 +115,7 @@ namespace SystemTrayMenu.DllImports
             {
                 get
                 {
-#if WINDOWS
+#if !AVALONIA
 #if TODO // Maybe use Windows.Desktop instead of Win32 API?
          // See: https://learn.microsoft.com/en-us/dotnet/api/system.windows.input.mouse.getposition?view=windowsdesktop-8.0
                     if (Mouse.Capture(menu))
@@ -151,7 +151,7 @@ namespace SystemTrayMenu.DllImports
                 return PrimaryScreen;
             }
 
-#if WINDOWS
+#if !AVALONIA
             internal static void FetchScreens()
             {
                 var backup = screens;

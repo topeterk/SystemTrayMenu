@@ -8,7 +8,7 @@ namespace SystemTrayMenu.UserInterface
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.IO;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
@@ -44,7 +44,7 @@ namespace SystemTrayMenu.UserInterface
     public partial class Menu : Window
     {
         private const int CornerRadiusConstant = 10;
-#if TODO_LINUX
+#if TODO_AVALONIA
         private static readonly RoutedEvent FadeToTransparentEvent = EventManager.RegisterRoutedEvent(
             nameof(FadeToTransparent), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Menu));
 
@@ -169,7 +169,7 @@ namespace SystemTrayMenu.UserInterface
             labelTitle.FontSize = Scaling.ScaleFontByPoints(8.25F);
             textBoxSearch.FontSize = Scaling.ScaleFontByPoints(8.25F);
             labelStatus.FontSize = Scaling.ScaleFontByPoints(7F);
-#if TODO_LINUX
+#if TODO_AVALONIA
             dgv.FontSize = Scaling.ScaleFontByPoints(9F);
 #endif
 
@@ -186,7 +186,7 @@ namespace SystemTrayMenu.UserInterface
             textBoxSearch.ContextMenu.Items.Add(new MenuItem()
             {
                 Header = Translator.GetText("Copy"),
-#if WINDOWS
+#if !AVALONIA
                 Command = new ActionCommand((_) => Clipboard.SetData(DataFormats.Text, textBoxSearch.SelectedText)),
 #else
                 Command = ReactiveCommand.CreateFromTask(async () =>
@@ -201,7 +201,7 @@ namespace SystemTrayMenu.UserInterface
             textBoxSearch.ContextMenu.Items.Add(new MenuItem()
             {
                 Header = Translator.GetText("To paste"),
-#if WINDOWS
+#if !AVALONIA
                 Command = new ActionCommand((_) =>
                     {
                         if (Clipboard.ContainsText(TextDataFormat.Text))
@@ -247,7 +247,7 @@ namespace SystemTrayMenu.UserInterface
                     RowDataParent.SubMenu = null;
                 }
 
-#if WINDOWS
+#if !AVALONIA
                 foreach (RowData item in dgv.Items.SourceCollection)
 #else
                 // TODO: SourceCollection
@@ -258,7 +258,7 @@ namespace SystemTrayMenu.UserInterface
                 }
             };
 
-#if WINDOWS
+#if !AVALONIA
             IsVisibleChanged += (_, _) => VisibilityChanged?.Invoke(this);
 #endif
 
@@ -266,7 +266,7 @@ namespace SystemTrayMenu.UserInterface
             if ((isTouchEnabled && Settings.Default.DragDropItemsEnabledTouch) ||
                 (!isTouchEnabled && Settings.Default.DragDropItemsEnabled))
             {
-#if WINDOWS
+#if !AVALONIA
                 AllowDrop = true;
                 DragEnter += DragDropHelper.DragEnter;
                 Drop += DragDropHelper.DragDrop;
@@ -300,7 +300,7 @@ namespace SystemTrayMenu.UserInterface
 
         internal event Action<Menu>? VisibilityChanged;
 
-#if TODO_LINUX
+#if TODO_AVALONIA
         internal event RoutedEventHandler FadeToTransparent
         {
             add { AddHandler(FadeToTransparentEvent, value); }
@@ -349,7 +349,7 @@ namespace SystemTrayMenu.UserInterface
         {
             get
             {
-#if WINDOWS
+#if !AVALONIA
                 foreach (RowData rowData in dgv.Items.SourceCollection)
 #else
                 // TODO: SourceCollection
@@ -372,7 +372,7 @@ namespace SystemTrayMenu.UserInterface
 
         internal void RiseItemExecuted(RowData rowData)
         {
-#if TODO_LINUX
+#if TODO_AVALONIA
             ListViewItem? lvi;
             int i = 0;
             while ((lvi = dgv.FindVisualChildOfType<ListViewItem>(i++)) != null)
@@ -398,7 +398,7 @@ namespace SystemTrayMenu.UserInterface
             textBoxSearch.Text = string.Empty;
             if (dgv.Items.Count > 0)
             {
-#if WINDOWS
+#if !AVALONIA
                 dgv.ScrollIntoView(dgv.Items[0]);
 #else
                 dgv.ScrollIntoView(0);
@@ -411,7 +411,7 @@ namespace SystemTrayMenu.UserInterface
             TextBoxSearch_TextChanged(true);
             if (dgv.Items.Count > 0)
             {
-#if WINDOWS
+#if !AVALONIA
                 dgv.ScrollIntoView(dgv.Items[0]);
 #else
                 dgv.ScrollIntoView(0);
@@ -434,7 +434,7 @@ namespace SystemTrayMenu.UserInterface
         }
 
         // TODO: Check if we can just use original IsMouseOver instead?  (Check if it requires Mouse.Capture(this))
-#if WINDOWS
+#if !AVALONIA
         internal new bool IsMouseOver()
 #else
         internal bool IsMouseOver()
@@ -453,7 +453,7 @@ namespace SystemTrayMenu.UserInterface
         // TODO: As long as WPF transition from Forms is incomplete, keep it for testing.
         internal void RefreshDataGridView()
         {
-#if TODO_LINUX // maybe not required any more?
+#if TODO_AVALONIA // maybe not required any more?
             ((CollectionView)CollectionViewSource.GetDefaultView(dgv.ItemsSource)).Refresh();
 #endif
         }
@@ -472,7 +472,7 @@ namespace SystemTrayMenu.UserInterface
             else if (indexAlternative >= 0 && dgv.Items.Count > indexAlternative)
             {
                 itemData = (RowData)dgv.Items[indexAlternative];
-#if !WINDOWS
+#if AVALONIA
                 index = indexAlternative;
 #endif
             }
@@ -482,7 +482,7 @@ namespace SystemTrayMenu.UserInterface
             }
 
             dgv.SelectedItem = itemData;
-#if WINDOWS
+#if !AVALONIA
             dgv.ScrollIntoView(itemData);
 #else
             dgv.ScrollIntoView(index);
@@ -508,7 +508,7 @@ namespace SystemTrayMenu.UserInterface
             // TODO: Replace filter logic?
             // See: https://learn.microsoft.com/en-us/windows/apps/design/controls/items-repeater#sorting-filtering-and-resetting-the-data
             // See: https://www.answeroverflow.com/m/1090360510458888252
-#if TODO_LINUX
+#if TODO_AVALONIA
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(dgv.ItemsSource);
             view.Filter = (object item) => Filter_Default((RowData)item);
 #endif
@@ -618,7 +618,7 @@ namespace SystemTrayMenu.UserInterface
         /// <param name="startLocation">Defines where the first menu is drawn (when no predecessor is set).</param>
         /// <param name="useCustomLocation">Use CustomLocation as start position.</param>
         internal void AdjustSizeAndLocation(
-#if WINDOWS
+#if !AVALONIA
             Rect bounds,
 #else
             Rectangle bounds,
@@ -687,7 +687,7 @@ namespace SystemTrayMenu.UserInterface
                 // Make sure we have latest values of own window size
                 UpdateLayout();
 
-#if WINDOWS
+#if !AVALONIA
                 double menuFrameWidth = windowFrame.ActualWidth;
                 double menuFrameHeight = windowFrame.ActualHeight;
 #else
@@ -709,7 +709,7 @@ namespace SystemTrayMenu.UserInterface
                     // After updating the layout the location should be available again.
                     menuPredecessor.UpdateLayout();
 
-#if WINDOWS
+#if !AVALONIA
                     predecessorFrameWidth = menuPredecessor.windowFrame.ActualWidth;
 #else
                     predecessorFrameWidth = menuPredecessor.windowFrame.Width;
@@ -826,7 +826,7 @@ namespace SystemTrayMenu.UserInterface
                         y = originLocation.Y;
                         if (Settings.Default.AppearAtMouseLocation)
                         {
-#if WINDOWS
+#if !AVALONIA
                             y -= labelTitle.ActualHeight; // Mouse should point below title
 #else
                             y -= labelTitle.Height; // Mouse should point below title
@@ -871,7 +871,7 @@ namespace SystemTrayMenu.UserInterface
 
                         if (searchPanel.GetVisibility() == Visibility.Collapsed)
                         {
-#if WINDOWS
+#if !AVALONIA
                             y += menuPredecessor.searchPanel.ActualHeight;
 #else
                             y += menuPredecessor.searchPanel.Height;
@@ -915,7 +915,7 @@ namespace SystemTrayMenu.UserInterface
 
         internal Rect GetDataGridViewChildRect(RowData rowData)
         {
-#if TODO_LINUX
+#if TODO_AVALONIA
             // When scrolled, we have to reduce the index number as we calculate based on visual tree
             int rowIndex = rowData.RowIndex;
             int startIndex = 0;
@@ -964,7 +964,7 @@ namespace SystemTrayMenu.UserInterface
             return new(0D, offsetY, dgv.ActualWidth, (double)Resources["RowHeight"]);
         }
 
-#if !WINDOWS
+#if AVALONIA
         protected override void IsVisibleChanged(AvaloniaPropertyChangedEventArgs e)
         {
             VisibilityChanged?.Invoke(this);
@@ -973,7 +973,7 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
-#if TODO_LINUX
+#if TODO_AVALONIA
         private static bool Filter_Default(RowData itemData)
         {
             if (Settings.Default.ShowOnlyAsSearchResult && itemData.IsAdditionalItem)
@@ -1042,7 +1042,7 @@ namespace SystemTrayMenu.UserInterface
         {
             searchPanel.SetVisibility(Visibility.Visible);
 
-#if WINDOWS
+#if !AVALONIA
             ModifierKeys modifiers = Keyboard.Modifiers;
 #else
             ModifierKeys modifiers = e.KeyModifiers; // TODO: Check if ok?
@@ -1162,7 +1162,7 @@ namespace SystemTrayMenu.UserInterface
             SearchTextChanging?.Invoke();
 
             string? userPattern = textBoxSearch.Text?.Replace("%", " ").Replace("*", " ").ToLower();
-#if TODO_LINUX
+#if TODO_AVALONIA
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(dgv.ItemsSource);
             if (string.IsNullOrEmpty(userPattern))
             {
@@ -1219,7 +1219,7 @@ namespace SystemTrayMenu.UserInterface
             MouseMove += MainMenu_MoveRelocate;
             MouseUp += MainMenu_MoveEnd;
             Deactivated += MainMenu_MoveEnd;
-#if TODO_LINUX
+#if TODO_AVALONIA
             Mouse.Capture(this);
 #endif
         }
@@ -1237,7 +1237,7 @@ namespace SystemTrayMenu.UserInterface
 
         private void MainMenu_MoveEnd(object? sender, EventArgs? e)
         {
-#if TODO_LINUX
+#if TODO_AVALONIA
             Mouse.Capture(null);
 #endif
             MouseMove -= MainMenu_MoveRelocate;
@@ -1271,7 +1271,7 @@ namespace SystemTrayMenu.UserInterface
             {
                 // TODO: Refactor item selection to prevent running this loop
                 ListView lv = (ListView)sender;
-#if WINDOWS
+#if !AVALONIA
                 foreach (RowData itemData in lv.Items.SourceCollection)
 #else
                 // TODO: SourceCollection
@@ -1311,7 +1311,7 @@ namespace SystemTrayMenu.UserInterface
                 if (!isShellContextMenuOpen)
                 {
                     CellMouseLeave?.Invoke();
-#if TODO_LINUX
+#if TODO_AVALONIA
                     if (e.LeftButton == MouseButtonState.Pressed)
                     {
                         string[] files = new string[] { rowData.Path };
@@ -1337,7 +1337,7 @@ namespace SystemTrayMenu.UserInterface
             if (((ListViewItem)sender).Content is RowData rowData)
             {
                 rowData.IsClicked = true;
-#if TODO_LINUX
+#if TODO_AVALONIA
                 countLeftMouseButtonClicked = e.ClickCount;
 #else
                 countLeftMouseButtonClicked = 1; // TODO: Fix double click

@@ -6,7 +6,7 @@
 
 namespace SystemTrayMenu.UserInterface
 {
-#if WINDOWS
+#if !AVALONIA
     using System;
     using System.Windows;
     using System.Windows.Media;
@@ -24,7 +24,7 @@ namespace SystemTrayMenu.UserInterface
         internal ColorPickerWindow(string description, Color initialColor)
         {
             InitializeComponent();
-#if WINDOWS
+#if TODO_AVALONIA
             if (Config.IsDarkMode())
             {
                 ResourceDictionary resDict = new ();
@@ -51,7 +51,7 @@ namespace SystemTrayMenu.UserInterface
                 }
             };
 
-#if WINDOWS
+#if !AVALONIA
             picker.SelectedColor = picker.SecondaryColor = initialColor;
 #else
             picker.Color = initialColor;
@@ -59,7 +59,7 @@ namespace SystemTrayMenu.UserInterface
             lblDescription.Content = description;
         }
 
-#if WINDOWS
+#if !AVALONIA
         public Color SelectedColor => picker.SelectedColor;
 #else
         public Color SelectedColor => picker.Color;

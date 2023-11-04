@@ -5,7 +5,7 @@
 namespace SystemTrayMenu.Business
 {
     using System;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Threading;
 #else
     using Avalonia.Threading;

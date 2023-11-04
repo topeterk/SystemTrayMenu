@@ -26,7 +26,7 @@
 
 #pragma warning disable SA1402 // File may only contain a single type
 
-#if !WINDOWS
+#if AVALONIA
 namespace SystemTrayMenu.Utilities
 {
     using System;
@@ -66,7 +66,7 @@ namespace SystemTrayMenu.Utilities
         }
     }
 
-#if TODO_LINUX // TODO: Delete?
+#if TODO_AVALONIA // TODO: Delete?
     /// <summary>
     /// Should be replaced with DynamicResource.
     /// Workaround: Avalonia DataTriggerBehavior does not always work when page is loaded.

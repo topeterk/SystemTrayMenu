@@ -9,7 +9,7 @@ namespace SystemTrayMenu.Helpers
     using System.Net.Http;
     using System.Text;
     using System.Threading;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
 #else
     using Avalonia.Input;
@@ -30,7 +30,7 @@ namespace SystemTrayMenu.Helpers
                 string url = encod.GetString(bytes);
                 if (!string.IsNullOrEmpty(url))
                 {
-#if WINDOWS
+#if !AVALONIA
                     e.Effects = DragDropEffects.Copy;
 #else
                     e.DragEffects = DragDropEffects.Copy;

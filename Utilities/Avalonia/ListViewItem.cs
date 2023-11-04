@@ -4,7 +4,7 @@
 //
 // Copyright (c) 2023-2023 Peter Kirmeier
 
-#if !WINDOWS
+#if AVALONIA
 namespace SystemTrayMenu.Utilities
 {
     using SystemTrayMenu.DataClasses;

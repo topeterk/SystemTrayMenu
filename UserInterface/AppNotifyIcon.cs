@@ -6,7 +6,7 @@ namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Drawing;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Threading;
 #else
     using Avalonia.Threading;

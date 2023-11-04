@@ -9,24 +9,28 @@ namespace SystemTrayMenu.UserInterface
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
-    using System.ComponentModel;
     using System.Globalization;
     using System.IO;
     using System.Reflection;
     using System.Text.RegularExpressions;
 #if WINDOWS
-    using System.Linq;
     using System.Windows;
+    using Microsoft.Win32;
+#endif
+#if !AVALONIA
+    using System.ComponentModel;
+    using System.Linq;
     using System.Windows.Controls;
     using System.Windows.Documents;
     using System.Windows.Input;
     using System.Windows.Threading;
-    using Microsoft.Win32;
 #else
     using Avalonia.Controls;
     using Avalonia.Input;
-    using Avalonia.Interactivity;
     using Avalonia.Threading;
+    using RoutedEventArgs = Avalonia.Interactivity.RoutedEventArgs;
+    using SizeToContent = Avalonia.Controls.SizeToContent;
+    using Visibility = SystemTrayMenu.Utilities.Visibility;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
     using SystemTrayMenu.Utilities;
@@ -150,7 +154,7 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppMoreInfo
         {
-#if TODO_LINUX
+#if TODO_AVALONIA
             get => new TextRange(MoreRichTextBox.Document.ContentStart, MoreRichTextBox.Document.ContentEnd).Text;
 #else
             get => MoreRichTextBox.Text ?? string.Empty;
@@ -164,7 +168,7 @@ namespace SystemTrayMenu.UserInterface
                 else
                 {
                     MoreRichTextBox.SetVisibility(Visibility.Visible);
-#if TODO_LINUX
+#if TODO_AVALONIA
                     MoreRichTextBox.Document.Blocks.Clear();
 
                     Paragraph para = new ();
@@ -450,7 +454,7 @@ namespace SystemTrayMenu.UserInterface
         // <summary>
         // populate details for a single assembly
         // </summary>
-#if WINDOWS
+#if !AVALONIA
         private static void PopulateAssemblyDetails(Assembly? a, ListView lvw)
 #else
         private static void PopulateAssemblyDetails(Assembly? a, DataGrid lvw)
@@ -713,13 +717,13 @@ namespace SystemTrayMenu.UserInterface
                 DispatcherPriority.Loaded,
                 new Action(delegate
                 {
-#if WINDOWS
+#if !AVALONIA
                     Cursor = Cursors.Wait;
 #else
                     Cursor = new Cursor(StandardCursorType.Wait);
 #endif
                     PopulateLabels();
-#if WINDOWS
+#if !AVALONIA
                     Cursor = null;
 #else
                     Cursor = Cursor.Default;
@@ -732,7 +736,7 @@ namespace SystemTrayMenu.UserInterface
         // </summary>
         private void DetailsButton_Click(object sender, RoutedEventArgs e)
         {
-#if WINDOWS
+#if !AVALONIA
             Cursor = Cursors.Wait;
 #else
             Cursor = new Cursor(StandardCursorType.Wait);
@@ -743,7 +747,7 @@ namespace SystemTrayMenu.UserInterface
             buttonDetails.SetVisibility(Visibility.Collapsed);
             UpdateLayout(); // Force AutoSize to update the height before switching to manual mode
             SizeToContent = SizeToContent.Manual;
-#if WINDOWS
+#if !AVALONIA
             ResizeMode = ResizeMode.CanResizeWithGrip;
 #else
             CanResize = true;
@@ -756,7 +760,7 @@ namespace SystemTrayMenu.UserInterface
 
             PopulateAssemblies();
             PopulateAppInfo();
-#if WINDOWS
+#if !AVALONIA
             Cursor = null;
 #else
             Cursor = Cursor.Default;
@@ -812,7 +816,7 @@ namespace SystemTrayMenu.UserInterface
         // </summary>
         private void AssemblyInfoListView_ColumnClick(object sender, RoutedEventArgs e)
         {
-#if TODO_LINUX
+#if TODO_AVALONIA
             AssemblyInfoListView.Items.SortDescriptions.Clear();
             AssemblyInfoListView.Items.SortDescriptions.Add(new SortDescription(
                 ((GridViewColumnHeader)e.OriginalSource).Column.Header.ToString(),
@@ -821,7 +825,7 @@ namespace SystemTrayMenu.UserInterface
 #endif
         }
 
-#if TODO_LINUX
+#if TODO_AVALONIA
         // <summary>
         // launch any http:// or mailto: links clicked in the body of the rich text box
         // </summary>

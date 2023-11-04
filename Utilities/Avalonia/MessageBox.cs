@@ -5,10 +5,10 @@
 // Copyright (c) 2023-2023 Peter Kirmeier
 
 #if !WINDOWS
-using System;
-
 namespace SystemTrayMenu.Utilities
 {
+    using System;
+
     internal enum MessageBoxResult
     {
         None = 0,
@@ -41,18 +41,18 @@ namespace SystemTrayMenu.Utilities
 
     internal class MessageBox
     {
+        internal static MessageBoxResult Show(string messageBoxText) => DoLogOnly(messageBoxText);
+
+        internal static MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button) => DoLogOnly(messageBoxText, caption);
+
+        internal static MessageBoxResult Show(string messageBoxText, string? caption, MessageBoxButton button, MessageBoxImage icon) => DoLogOnly(messageBoxText, caption);
+
         private static MessageBoxResult DoLogOnly(string text, string? caption = null) // TODO: Messagebox
         {
             caption ??= "<null>";
             Console.WriteLine("MSGBOX(" + caption + "): " + text);
             return MessageBoxResult.None;
         }
-
-        internal static MessageBoxResult Show(string messageBoxText) => DoLogOnly(messageBoxText);
-
-        internal static MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button) => DoLogOnly(messageBoxText, caption);
-
-        internal static MessageBoxResult Show(string messageBoxText, string? caption, MessageBoxButton button, MessageBoxImage icon) => DoLogOnly(messageBoxText, caption);
     }
 }
 #endif

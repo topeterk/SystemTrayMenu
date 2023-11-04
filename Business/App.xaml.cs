@@ -7,7 +7,7 @@ namespace SystemTrayMenu
     using System;
     using System.Drawing;
     using System.IO;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Threading;
 #else
@@ -35,7 +35,7 @@ namespace SystemTrayMenu
     {
         private Menus? menus;
         private JoystickHelper? joystickHelper;
-#if !WINDOWS
+#if AVALONIA
         private IDisposable? updateCheckTimer;
 #endif
         private bool isDisposed;
@@ -44,16 +44,16 @@ namespace SystemTrayMenu
         {
             AppContext.SetSwitch("Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering", false);
 
-#if WINDOWS
+#if !AVALONIA
             InitializeComponent();
 #endif
 
             AppRestart.BeforeRestarting += Dispose;
-#if TODO_LINUX
+#if TODO_AVALONIA
             Activated += (_, _) => IsActiveApp = true;
             Deactivated += (_, _) => IsActiveApp = false;
 #endif
-#if WINDOWS
+#if !AVALONIA
             Startup += AppStartupHandler;
 #endif
         }
@@ -66,7 +66,7 @@ namespace SystemTrayMenu
             GC.SuppressFinalize(this);
         }
 
-#if !WINDOWS
+#if AVALONIA
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -106,7 +106,7 @@ namespace SystemTrayMenu
         /// <returns>New Icon object.</returns>
         internal static Icon LoadIconFromResource(string resourceName)
         {
-#if WINDOWS
+#if !AVALONIA
             using (Stream stream = GetResourceStream(new("pack://application:,,,/" + resourceName, UriKind.Absolute)).Stream)
 #else
             using (Stream stream = AvaloniaLocator.Current.GetService<IAssetLoader>()!.Open(
@@ -154,7 +154,7 @@ namespace SystemTrayMenu
 
             if (Settings.Default.CheckForUpdates)
             {
-#if WINDOWS
+#if !AVALONIA
                 _ = Dispatcher.InvokeAsync(
                     () => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: false),
                     DispatcherPriority.ApplicationIdle);
@@ -168,7 +168,7 @@ namespace SystemTrayMenu
             }
         }
 
-#if !WINDOWS
+#if AVALONIA
         private void AppExitHandler(object? sender, ControlledApplicationLifetimeExitEventArgs e)
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

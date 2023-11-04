@@ -5,14 +5,14 @@
 namespace SystemTrayMenu.Utilities
 {
     using System;
-#if WINDOWS
+#if TODO_AVALONIA
     using System.Windows;
     using System.Windows.Media;
 #endif
 
     internal static class Scaling
     {
-#if WINDOWS
+#if TODO_AVALONIA
         private static readonly FontSizeConverter FontConverter = new ();
 #endif
 
@@ -38,7 +38,7 @@ namespace SystemTrayMenu.Utilities
 
         public static double ScaleFontByPoints(float points)
         {
-#if WINDOWS
+#if TODO_AVALONIA
             return (double)FontConverter.ConvertFrom((points * Factor).ToString() + "pt")!;
 #else
             return points * Factor;
@@ -52,7 +52,7 @@ namespace SystemTrayMenu.Utilities
 
         public static void CalculateFactorByDpi(Window window)
         {
-#if WINDOWS
+#if !AVALONIA
             FactorByDpi = VisualTreeHelper.GetDpi(window).DpiScaleX;
 #else
             FactorByDpi = window.RenderScaling;

@@ -4,7 +4,7 @@
 
 namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
 {
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
 #else
     using SystemTrayMenu.Utilities;

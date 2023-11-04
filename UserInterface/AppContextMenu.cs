@@ -7,7 +7,7 @@ namespace SystemTrayMenu.UserInterface
     using System;
     using System.Diagnostics;
     using System.Reflection;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Threading;
 #else

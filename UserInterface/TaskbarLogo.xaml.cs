@@ -10,9 +10,11 @@ namespace SystemTrayMenu.UserInterface
     using System.Reflection;
 #if WINDOWS
     using System.Windows;
-#else
-    using Avalonia;
+#endif
+#if AVALONIA
     using SystemTrayMenu.Utilities;
+    using Application = Avalonia.Application;
+    using Window = SystemTrayMenu.Utilities.Window;
 #endif
 
     /// <summary>
@@ -42,7 +44,7 @@ namespace SystemTrayMenu.UserInterface
 
             // Move the window out of screen, just for safety
             Top += SystemParameters.VirtualScreenHeight;
-#if WINDOWS
+#if !AVALONIA
             // There is nothing to see, so no need to show this window.
             // Therefore it shall always be in minimized state.
             // Further, we then can rely on every activating event.

@@ -9,7 +9,7 @@ namespace SystemTrayMenu.DllImports
     using System;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Interop;
 #else
@@ -26,7 +26,7 @@ namespace SystemTrayMenu.DllImports
 
         internal static void HideFromAltTab(Window window)
         {
-#if WINDOWS
+#if TODO_AVALONIA
             WindowInteropHelper wndHelper = new WindowInteropHelper(window);
 
             if (Environment.Is64BitProcess)

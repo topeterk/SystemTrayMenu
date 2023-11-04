@@ -10,18 +10,20 @@ namespace SystemTrayMenu.UserInterface
     using System.Reflection;
     using System.Runtime.Versioning;
 #if WINDOWS
+    using Windows.ApplicationModel;
+    using StartupTaskState = Windows.ApplicationModel.StartupTaskState;
+#endif
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
-    using Windows.ApplicationModel;
+    using SystemTrayMenu.Helpers;
 #else
     using Avalonia.Controls;
-    using Avalonia.Input;
     using Avalonia.Interactivity;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
     using Microsoft.Win32;
-    using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
@@ -40,7 +42,7 @@ namespace SystemTrayMenu.UserInterface
         {
             InitializeComponent();
 
-#if WINDOWS
+#if TODO_AVALONIA
             PreviewKeyDown += HandlePreviewKeyDown;
 #endif
 
@@ -79,7 +81,7 @@ namespace SystemTrayMenu.UserInterface
 
             checkBoxCheckForUpdates.IsChecked = Settings.Default.CheckForUpdates;
 
-#if WINDOWS
+#if TODO_AVALONIA
             textBoxHotkey.SetHotkeyRegistration(GlobalHotkeys.GetLastCreatedHotkeyFunction());
 #endif
 
@@ -433,7 +435,7 @@ namespace SystemTrayMenu.UserInterface
             return useStartupTask;
         }
 
-#if WINDOWS
+#if TODO_AVALONIA
         private void HandlePreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape && GlobalHotkeys.IsEnabled)
@@ -495,7 +497,7 @@ namespace SystemTrayMenu.UserInterface
 
             Settings.Default.CheckForUpdates = checkBoxCheckForUpdates.IsChecked ?? false;
 
-#if WINDOWS
+#if TODO_AVALONIA
             if (textBoxHotkey.WasHotkeyChanged)
             {
                 Settings.Default.HotKey = textBoxHotkey.HotkeyFunction?.GetHotkeyInvariantString() ?? string.Empty;
@@ -737,7 +739,7 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
-#if WINDOWS
+#if TODO_AVALONIA
         private void ButtonHotkeyDefault_Click(object sender, RoutedEventArgs e)
         {
             textBoxHotkey.ChangeHotkey((string)Settings.Default.Properties["HotKey"].DefaultValue); // see Settings.Default.HotKey

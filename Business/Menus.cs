@@ -12,16 +12,19 @@ namespace SystemTrayMenu.Business
     using System.Linq;
 #if WINDOWS
     using System.Windows;
+#endif
+#if !AVALONIA
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Threading;
     using Microsoft.Win32;
 #else
-    using Avalonia;
     using Avalonia.Input;
     using Avalonia.Threading;
     using ModifierKeys = Avalonia.Input.KeyModifiers;
+    using Point = Avalonia.Point;
     using Rect = System.Drawing.Rectangle;
+    using Visibility = SystemTrayMenu.Utilities.Visibility;
 #endif
     using SystemTrayMenu.DataClasses;
     using SystemTrayMenu.DllImports;
@@ -63,7 +66,7 @@ namespace SystemTrayMenu.Business
                 Settings.Default.Save();
             }
 
-#if WINDOWS
+#if TODO_AVALONIA
             keyboardInput.HotKeyPressed += SwitchOpenCloseByHotKey;
 #endif
             keyboardInput.RowSelectionChanged += waitToOpenMenu.RowSelectionChanged;
@@ -136,7 +139,7 @@ namespace SystemTrayMenu.Business
                 }
             }
 
-#if TODO_LINUX
+#if TODO_AVALONIA
             SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
 #endif
 
@@ -146,7 +149,7 @@ namespace SystemTrayMenu.Business
         public void Dispose()
         {
             SingleAppInstance.Wakeup -= SwitchOpenCloseByHotKey;
-#if TODO_LINUX
+#if TODO_AVALONIA
             SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
 #endif
             workerMainMenu.Dispose();
@@ -714,7 +717,7 @@ namespace SystemTrayMenu.Business
             try
             {
                 List<RowData> rowDatas = new();
-#if WINDOWS
+#if !AVALONIA
                 foreach (RowData rowData in menu.GetDataGridView().Items.SourceCollection)
 #else
                 // TODO: SourceCollection
@@ -827,7 +830,7 @@ namespace SystemTrayMenu.Business
                 rowData.HiddenEntry = hasHiddenFlag;
                 rowData.LoadIcon(true);
 
-#if WINDOWS
+#if !AVALONIA
                 var items = (List<RowData>)menu.GetDataGridView().Items.SourceCollection;
 #else
                 // TODO: SourceCollection

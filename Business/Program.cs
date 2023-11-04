@@ -8,7 +8,8 @@ namespace SystemTrayMenu
     using System.Reflection;
 #if WINDOWS
     using System.Windows;
-#else
+#endif
+#if AVALONIA
     using Avalonia;
     using Avalonia.ReactiveUI;
 #endif
@@ -21,6 +22,7 @@ namespace SystemTrayMenu
         [STAThread]
         private static void Main(string[] args)
         {
+#if !WINDOWS
 #if !REMOTE_DEBBUGING_STARTUP_BREAK
 #if WAIT_FOREVER
             bool waiting = true;
@@ -30,6 +32,7 @@ namespace SystemTrayMenu
             }
 #else
             System.Threading.Thread.Sleep(6000);
+#endif
 #endif
 #endif
 
@@ -62,7 +65,7 @@ namespace SystemTrayMenu
 
                     Scaling.Initialize();
                     FolderOptions.Initialize();
-#if WINDOWS
+#if !AVALONIA
                     using App app = new ();
                     isStartup = false;
                     Log.WriteApplicationRuns();

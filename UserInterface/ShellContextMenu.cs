@@ -13,6 +13,9 @@ namespace SystemTrayMenu.UserInterface
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Interop;
+#if AVALONIA
+    using Point = Avalonia.Point;
+#endif
 
     [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1124:Do not use regions", Justification = "Mark SystemTrayMenu modifications made to original source.")]
 

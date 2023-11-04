@@ -9,7 +9,7 @@ namespace SystemTrayMenu.DataClasses
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Runtime.CompilerServices;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;

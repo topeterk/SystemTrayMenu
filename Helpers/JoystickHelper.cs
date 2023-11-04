@@ -7,7 +7,7 @@ namespace SystemTrayMenu.Helpers
     using System;
     using System.Threading;
     using System.Timers;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Input;
     using System.Windows.Threading;
 #else

@@ -4,7 +4,7 @@
 //
 // Origin of some parts: http://www.codeproject.com/KB/buttons/hotkeycontrol.aspx
 
-#if WINDOWS
+#if TODO_AVALONIA
 namespace SystemTrayMenu.UserInterface
 {
     using System;

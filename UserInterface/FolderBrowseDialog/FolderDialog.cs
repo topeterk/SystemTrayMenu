@@ -5,7 +5,7 @@
 namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
 {
     using System;
-#if WINDOWS
+#if !AVALONIA
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
     using System.Windows;
@@ -48,12 +48,12 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
         /// </summary>
         /// <param name="owner">The window the dialog is assigned to.</param>
         /// <returns>True is returned on successful user interaction and when not cancelled by the user otherwise false is returned.</returns>
-#if TODO_LINUX
+#if TODO_AVALONIA
         [SupportedOSPlatform("windows")]
 #endif
         public bool ShowDialog(Window? owner)
         {
-#if WINDOWS
+#if TODO_AVALONIA
             NativeMethods.IFileDialog frm = (NativeMethods.IFileDialog)new NativeMethods.FileOpenDialogRCW();
             frm.GetOptions(out uint options);
             options |= NativeMethods.FOS_PICKFOLDERS |

@@ -4,7 +4,7 @@
 
 namespace SystemTrayMenu
 {
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Media;
 #else
     using Avalonia.Media;

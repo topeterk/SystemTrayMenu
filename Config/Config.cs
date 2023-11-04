@@ -8,9 +8,12 @@ namespace SystemTrayMenu
     using System.IO;
 #if WINDOWS
     using System.Windows;
+#endif
+#if !AVALONIA
     using System.Windows.Media;
 #else
     using Avalonia.Media;
+    using Window = SystemTrayMenu.Utilities.Window;
 #endif
     using Microsoft.Win32;
     using SystemTrayMenu.DllImports;

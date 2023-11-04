@@ -5,7 +5,7 @@
 namespace SystemTrayMenu.UserInterface
 {
     using System;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Media;
@@ -72,13 +72,13 @@ namespace SystemTrayMenu.UserInterface
             ColorChanged?.Invoke(this);
         }
 
-#if WINDOWS
+#if !AVALONIA
         private void Shape_MouseDown(object sender, MouseButtonEventArgs e)
 #else
         private void Shape_PointerReleased(object sender, PointerReleasedEventArgs e)
 #endif
         {
-#if WINDOWS
+#if !AVALONIA
             if (e.LeftButton == MouseButtonState.Pressed)
 #else
             if (e.InitialPressMouseButton == MouseButton.Left)

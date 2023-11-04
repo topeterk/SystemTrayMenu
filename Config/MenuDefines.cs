@@ -4,7 +4,7 @@
 
 namespace SystemTrayMenu
 {
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Media;
 #else
@@ -20,10 +20,10 @@ namespace SystemTrayMenu
         /* -- General -- */
 
         public static SolidColorBrush ColorSystemControlDefault =>
-#if WINDOWS
+#if !AVALONIA
             SystemColors.ControlBrush;
 #else
-            new (Avalonia.Media.Color.FromArgb(SystemColors.Control.A, SystemColors.Control.R, SystemColors.Control.G, SystemColors.Control.B).ToUInt32());
+            new(Avalonia.Media.Color.FromArgb(SystemColors.Control.A, SystemColors.Control.R, SystemColors.Control.G, SystemColors.Control.B).ToUInt32());
 #endif
 
         public static SolidColorBrush ColorForeground =>

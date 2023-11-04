@@ -6,7 +6,7 @@ namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Text.RegularExpressions;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
@@ -58,7 +58,7 @@ namespace SystemTrayMenu.UserInterface
             e.Handled = !IsTextAllowed(e.Text);
         }
 
-#if WINDOWS
+#if !AVALONIA
         private void Txtbox_Pasting(object sender, DataObjectPastingEventArgs e)
         {
             if (e.DataObject.GetDataPresent(typeof(string)))
@@ -92,7 +92,7 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
-#if WINDOWS
+#if !AVALONIA
         private void Txtbox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             int deltaY = e.Delta;

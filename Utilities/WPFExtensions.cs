@@ -7,7 +7,7 @@
 namespace SystemTrayMenu.Utilities
 {
     using System;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Threading;
@@ -22,7 +22,7 @@ namespace SystemTrayMenu.Utilities
 
     internal static class WPFExtensions
     {
-#if WINDOWS
+#if !AVALONIA
         internal static Dispatcher CurrentDispatcher => Dispatcher.CurrentDispatcher;
 #else
         internal static Dispatcher CurrentDispatcher => Dispatcher.UIThread;
@@ -59,7 +59,7 @@ namespace SystemTrayMenu.Utilities
         internal static T? FindVisualChildOfType<T>(this DependencyObject depObj, int index = 0)
             where T : DependencyObject
         {
-#if WINDOWS
+#if !AVALONIA
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
             {
                 DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
@@ -94,20 +94,20 @@ namespace SystemTrayMenu.Utilities
 
         internal static Point GetRelativeChildPositionTo(this Visual parent, Visual? child)
         {
-#if WINDOWS
+#if !AVALONIA
             return child == null ? default : child.TransformToAncestor(parent).Transform(default);
 #else
             return default; // TODO: ??? https://github.com/AvaloniaUI/Avalonia/discussions/11969
 #endif
         }
 
-#if WINDOWS
+#if !AVALONIA
         internal static Visibility GetVisibility(this UIElement uIElement) => uIElement.Visibility;
 #else
         internal static Visibility GetVisibility(this Visual visual) => visual.IsVisible ? Visibility.Visible : Visibility.Hidden;
 #endif
 
-#if WINDOWS
+#if !AVALONIA
         internal static void SetVisibility(this UIElement uIElement, Visibility visibility) => uIElement.Visibility = visibility;
 #else
         internal static void SetVisibility(this Visual visual, Visibility visibility) => visual.IsVisible = visibility == Visibility.Visible;

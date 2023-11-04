@@ -7,7 +7,7 @@ namespace SystemTrayMenu.Helpers
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
 #else
@@ -132,7 +132,7 @@ namespace SystemTrayMenu.Helpers
         /// <returns>Rendered image.</returns>
         internal static RenderTargetBitmap CreateIconWithOverlay(BitmapSource originalBitmap, BitmapSource overlayBitmap)
         {
-#if WINDOWS
+#if !AVALONIA
             DrawingVisual dVisual = new ();
             using (DrawingContext dc = dVisual.RenderOpen())
 #else
@@ -146,7 +146,7 @@ namespace SystemTrayMenu.Helpers
                 dc.DrawImage(overlayBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
             }
 
-#if WINDOWS
+#if !AVALONIA
             RenderTargetBitmap targetBitmap = new (originalBitmap.PixelWidth, originalBitmap.PixelHeight, originalBitmap.DpiX, originalBitmap.DpiY, PixelFormats.Default);
 #endif
             targetBitmap.Render(dVisual);
@@ -161,7 +161,7 @@ namespace SystemTrayMenu.Helpers
         /// <returns>Rendered image.</returns>
         internal static RenderTargetBitmap ApplyOpactiy(BitmapSource originalBitmap, double opacity)
         {
-#if WINDOWS
+#if !AVALONIA
             DrawingVisual dVisual = new ();
             using (DrawingContext dc = dVisual.RenderOpen())
 #else
@@ -175,7 +175,7 @@ namespace SystemTrayMenu.Helpers
                 dc.DrawImage(originalBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
             }
 
-#if WINDOWS
+#if !AVALONIA
             RenderTargetBitmap targetBitmap = new(originalBitmap.PixelWidth, originalBitmap.PixelHeight, originalBitmap.DpiX, originalBitmap.DpiY, PixelFormats.Default);
 #endif
             targetBitmap.Render(dVisual);

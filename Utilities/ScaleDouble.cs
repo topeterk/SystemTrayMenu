@@ -7,7 +7,7 @@
 namespace SystemTrayMenu.Utilities
 {
     using System;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Markup;
 #else
     using Avalonia.Markup.Xaml;

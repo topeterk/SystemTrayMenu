@@ -5,7 +5,7 @@
 namespace SystemTrayMenu.Business
 {
     using System;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows.Input;
     using SystemTrayMenu.Utilities;
     using static SystemTrayMenu.Helpers.GlobalHotkeys;
@@ -18,13 +18,13 @@ namespace SystemTrayMenu.Business
 
     internal class KeyboardInput : IDisposable
     {
-#if WINDOWS
+#if TODO_AVALONIA
         private readonly IHotkeyFunction hotkeyFunction = Create();
 #endif
 
         private Menu? focussedMenu;
 
-#if WINDOWS
+#if TODO_AVALONIA
         public KeyboardInput()
         {
             hotkeyFunction.KeyPressed += (_) => HotKeyPressed?.Invoke();
@@ -41,14 +41,14 @@ namespace SystemTrayMenu.Business
 
         public void Dispose()
         {
-#if WINDOWS
+#if TODO_AVALONIA
             hotkeyFunction.Unregister();
 #endif
         }
 
         internal bool RegisterHotKey(string hotKeyString)
         {
-#if WINDOWS
+#if TODO_AVALONIA
             if (!string.IsNullOrEmpty(hotKeyString))
             {
                 try

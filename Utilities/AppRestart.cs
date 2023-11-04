@@ -8,7 +8,11 @@ namespace SystemTrayMenu.Utilities
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
+#if WINDOWS
     using System.Windows;
+#else
+    using Avalonia;
+#endif
 
     internal class AppRestart
     {

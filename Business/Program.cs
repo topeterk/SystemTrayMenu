@@ -6,7 +6,12 @@ namespace SystemTrayMenu
 {
     using System;
     using System.Reflection;
+#if WINDOWS
     using System.Windows;
+#else
+    using Avalonia;
+    using Avalonia.ReactiveUI;
+#endif
     using SystemTrayMenu.Utilities;
 
     internal static class Program
@@ -16,6 +21,18 @@ namespace SystemTrayMenu
         [STAThread]
         private static void Main(string[] args)
         {
+#if !REMOTE_DEBBUGING_STARTUP_BREAK
+#if WAIT_FOREVER
+            bool waiting = true;
+            while (waiting)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+#else
+            System.Threading.Thread.Sleep(6000);
+#endif
+#endif
+
             try
             {
                 Log.Initialize();
@@ -23,7 +40,9 @@ namespace SystemTrayMenu
                 Config.SetFolderByWindowsContextMenu(args);
                 Config.LoadOrSetByUser();
                 Config.Initialize();
+#if WINDOWS
                 PrivilegeChecker.Initialize();
+#endif
 
                 // Without a valid path we cannot do anything, just close application
                 if (string.IsNullOrEmpty(Config.Path))
@@ -43,11 +62,23 @@ namespace SystemTrayMenu
 
                     Scaling.Initialize();
                     FolderOptions.Initialize();
-
+#if WINDOWS
                     using App app = new ();
                     isStartup = false;
                     Log.WriteApplicationRuns();
                     app.Run();
+#else
+                    // Initialization code. Don't use any Avalonia, third-party APIs or any
+                    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+                    // yet and stuff might break.
+                    AppBuilder app = AppBuilder.Configure<App>();
+                    isStartup = false;
+                    app.UsePlatformDetect();
+                    app.LogToTrace();
+                    app.UseReactiveUI();
+                    Log.WriteApplicationRuns();
+                    app.StartWithClassicDesktopLifetime(args);
+#endif
                 }
             }
             catch (Exception ex)

@@ -4,6 +4,7 @@
 //
 // Origin of some parts: http://www.codeproject.com/KB/buttons/hotkeycontrol.aspx
 
+#if WINDOWS
 namespace SystemTrayMenu.UserInterface
 {
     using System;
@@ -343,3 +344,4 @@ namespace SystemTrayMenu.UserInterface
         private void HandlePreviewTextInput(object sender, TextCompositionEventArgs e) => e.Handled = true;
     }
 }
+#endif

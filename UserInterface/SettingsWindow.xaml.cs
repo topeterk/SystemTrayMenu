@@ -9,15 +9,22 @@ namespace SystemTrayMenu.UserInterface
     using System.IO;
     using System.Reflection;
     using System.Runtime.Versioning;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using Windows.ApplicationModel;
+#else
+    using Avalonia.Controls;
+    using Avalonia.Input;
+    using Avalonia.Interactivity;
+    using Window = SystemTrayMenu.Utilities.Window;
+#endif
     using Microsoft.Win32;
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
-    using Windows.ApplicationModel;
 
     /// <summary>
     /// Logic of SettingsWindow.xaml .
@@ -33,7 +40,9 @@ namespace SystemTrayMenu.UserInterface
         {
             InitializeComponent();
 
+#if WINDOWS
             PreviewKeyDown += HandlePreviewKeyDown;
+#endif
 
             Translate();
             void Translate()
@@ -58,19 +67,21 @@ namespace SystemTrayMenu.UserInterface
 
             if (IsStartupTask())
             {
-                checkBoxAutostart.Visibility = Visibility.Collapsed;
+                checkBoxAutostart.SetVisibility(Visibility.Collapsed);
                 labelStartupStatus.Content = string.Empty;
             }
             else
             {
-                buttonAddStartup.Visibility = Visibility.Collapsed;
-                labelStartupStatus.Visibility = Visibility.Collapsed;
+                buttonAddStartup.SetVisibility(Visibility.Collapsed);
+                labelStartupStatus.SetVisibility(Visibility.Collapsed);
                 checkBoxAutostart.IsChecked = Settings.Default.IsAutostartActivated;
             }
 
             checkBoxCheckForUpdates.IsChecked = Settings.Default.CheckForUpdates;
 
+#if WINDOWS
             textBoxHotkey.SetHotkeyRegistration(GlobalHotkeys.GetLastCreatedHotkeyFunction());
+#endif
 
             InitializeLanguage();
             void InitializeLanguage()
@@ -422,6 +433,7 @@ namespace SystemTrayMenu.UserInterface
             return useStartupTask;
         }
 
+#if WINDOWS
         private void HandlePreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape && GlobalHotkeys.IsEnabled)
@@ -429,6 +441,7 @@ namespace SystemTrayMenu.UserInterface
                 Close();
             }
         }
+#endif
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e)
         {
@@ -482,10 +495,12 @@ namespace SystemTrayMenu.UserInterface
 
             Settings.Default.CheckForUpdates = checkBoxCheckForUpdates.IsChecked ?? false;
 
+#if WINDOWS
             if (textBoxHotkey.WasHotkeyChanged)
             {
                 Settings.Default.HotKey = textBoxHotkey.HotkeyFunction?.GetHotkeyInvariantString() ?? string.Empty;
             }
+#endif
 
             Settings.Default.CurrentCultureInfoName = comboBoxLanguage.SelectedValue.ToString();
             Settings.Default.SizeInPercent = numericUpDownSizeInPercent.Value;
@@ -629,6 +644,7 @@ namespace SystemTrayMenu.UserInterface
             Close();
         }
 
+#if TODO_LINUX
         private async void ButtonAddStartup_Click(object sender, RoutedEventArgs e)
         {
             // Pass the task ID you specified in the appxmanifest file
@@ -674,6 +690,11 @@ namespace SystemTrayMenu.UserInterface
                     break;
             }
         }
+#else
+        private void ButtonAddStartup_Click(object sender, RoutedEventArgs e)
+        {
+        }
+#endif
 
         private void ButtonChange_Click(object sender, RoutedEventArgs e)
         {
@@ -716,10 +737,12 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
+#if WINDOWS
         private void ButtonHotkeyDefault_Click(object sender, RoutedEventArgs e)
         {
             textBoxHotkey.ChangeHotkey((string)Settings.Default.Properties["HotKey"].DefaultValue); // see Settings.Default.HotKey
         }
+#endif
 
         private void ButtonGeneralDefault_Click(object sender, RoutedEventArgs e)
         {
@@ -884,7 +907,7 @@ namespace SystemTrayMenu.UserInterface
 
         private void SaveColorsTemporarily()
         {
-            if (Visibility == Visibility.Visible)
+            if (this.GetVisibility() == Visibility.Visible)
             {
                 Settings.Default.ColorSelectedItem = textBoxColorSelectedItem.Text;
                 Settings.Default.ColorDarkModeSelecetedItem = textBoxColorSelectedItemDarkMode.Text;

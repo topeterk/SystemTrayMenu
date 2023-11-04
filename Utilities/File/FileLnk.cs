@@ -5,9 +5,11 @@
 namespace SystemTrayMenu.Utilities
 {
     using System;
-    using System.IO;
     using System.Threading;
+#if WINDOWS
+    using System.IO;
     using Shell32;
+#endif
 
     internal class FileLnk
     {
@@ -54,6 +56,7 @@ namespace SystemTrayMenu.Utilities
         {
             string resolvedFilename = string.Empty;
             isFolder = false;
+#if TODO_LINUX
             try
             {
                 string? pathOnly = Path.GetDirectoryName((string)shortcutFilename);
@@ -99,7 +102,7 @@ namespace SystemTrayMenu.Utilities
             {
                 Log.Warn($"shortcutFilename:'{shortcutFilename}'", ex);
             }
-
+#endif
             return resolvedFilename;
         }
     }

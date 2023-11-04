@@ -6,9 +6,15 @@
 
 namespace SystemTrayMenu.UserInterface
 {
+#if WINDOWS
     using System;
     using System.Windows;
     using System.Windows.Media;
+#else
+    using Avalonia.Interactivity;
+    using Avalonia.Media;
+    using Window = SystemTrayMenu.Utilities.Window;
+#endif
 
     /// <summary>
     /// Logic of ColorPickerWindow.xaml .
@@ -18,13 +24,14 @@ namespace SystemTrayMenu.UserInterface
         internal ColorPickerWindow(string description, Color initialColor)
         {
             InitializeComponent();
-
+#if WINDOWS
             if (Config.IsDarkMode())
             {
                 ResourceDictionary resDict = new ();
                 resDict.Source = new Uri("pack://application:,,,/ColorPicker;component/Styles/DefaultColorPickerStyle.xaml", UriKind.RelativeOrAbsolute);
                 picker.Style = (Style)resDict["DefaultColorPickerStyle"];
             }
+#endif
 
             Loaded += (_, _) =>
             {
@@ -44,11 +51,19 @@ namespace SystemTrayMenu.UserInterface
                 }
             };
 
+#if WINDOWS
             picker.SelectedColor = picker.SecondaryColor = initialColor;
+#else
+            picker.Color = initialColor;
+#endif
             lblDescription.Content = description;
         }
 
+#if WINDOWS
         public Color SelectedColor => picker.SelectedColor;
+#else
+        public Color SelectedColor => picker.Color;
+#endif
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e)
         {

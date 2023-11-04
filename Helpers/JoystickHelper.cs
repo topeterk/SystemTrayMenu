@@ -7,14 +7,21 @@ namespace SystemTrayMenu.Helpers
     using System;
     using System.Threading;
     using System.Timers;
+#if WINDOWS
     using System.Windows.Input;
     using System.Windows.Threading;
+#else
+    using Avalonia.Input;
+    using Avalonia.Threading;
+    using ModifierKeys = Avalonia.Input.KeyModifiers;
+#endif
     using HidSharp;
     using HidSharp.Reports;
+    using SystemTrayMenu.Utilities;
 
     public class JoystickHelper : IDisposable
     {
-        private readonly Dispatcher dispatchter = Dispatcher.CurrentDispatcher;
+        private readonly Dispatcher dispatchter = WPFExtensions.CurrentDispatcher;
 #if COLLECTUSAGES
         private readonly System.Collections.Generic.Dictionary<Usage, int> usagesCollection = new();
 #endif

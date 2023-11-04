@@ -8,7 +8,12 @@ namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Reflection;
+#if WINDOWS
     using System.Windows;
+#else
+    using Avalonia;
+    using SystemTrayMenu.Utilities;
+#endif
 
     /// <summary>
     /// Logic of Taskbar window.
@@ -37,12 +42,13 @@ namespace SystemTrayMenu.UserInterface
 
             // Move the window out of screen, just for safety
             Top += SystemParameters.VirtualScreenHeight;
-
+#if WINDOWS
             // There is nothing to see, so no need to show this window.
             // Therefore it shall always be in minimized state.
             // Further, we then can rely on every activating event.
             WindowState = WindowState.Minimized;
             StateChanged += (_, _) => WindowState = WindowState.Minimized;
+#endif
         }
     }
 }

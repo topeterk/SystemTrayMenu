@@ -2,12 +2,16 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2022-2022 Peter Kirmeier
+// Copyright (c) 2022-2023 Peter Kirmeier
 
 namespace SystemTrayMenu.Utilities
 {
     using System;
+#if WINDOWS
     using System.Windows.Markup;
+#else
+    using Avalonia.Markup.Xaml;
+#endif
 
     public class Translate : MarkupExtension
     {

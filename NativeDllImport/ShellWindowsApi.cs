@@ -12,7 +12,7 @@ namespace SystemTrayMenu.DllImports
     /// <summary>
     /// wraps the methodcalls to native windows dll's.
     /// </summary>
-    public static partial class NativeMethods
+    internal static partial class NativeMethods
     {
         [SupportedOSPlatform("windows")]
         [DllImport("Shell32.dll", EntryPoint = "SHGetFileInfo", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]

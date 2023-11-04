@@ -12,7 +12,7 @@ namespace SystemTrayMenu.DllImports
     /// <summary>
     /// wraps the methodcalls to native windows dll's.
     /// </summary>
-    public static partial class NativeMethods
+    internal static partial class NativeMethods
     {
         internal static string GetLastErrorHint()
         {

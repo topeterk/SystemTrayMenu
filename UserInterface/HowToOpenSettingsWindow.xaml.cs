@@ -6,7 +6,11 @@
 
 namespace SystemTrayMenu.UserInterface
 {
+#if WINDOWS
     using System.Windows;
+#else
+    using Avalonia.Interactivity;
+#endif
     using SystemTrayMenu.Utilities;
 
     /// <summary>

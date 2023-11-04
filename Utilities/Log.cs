@@ -11,9 +11,11 @@ namespace SystemTrayMenu.Utilities
     using System.IO;
     using System.Reflection;
     using System.Threading;
+#if WINDOWS
     using System.Windows;
-    using Clearcove.Logging;
     using IWshRuntimeLibrary;
+#endif
+    using Clearcove.Logging;
     using File = System.IO.File;
 
     internal static class Log
@@ -163,6 +165,7 @@ namespace SystemTrayMenu.Utilities
             try
             {
                 string verb = string.Empty;
+#if WINDOWS
                 if (!PrivilegeChecker.IsCurrentUserInAdminGroup)
                 {
                     bool isLink = Path.GetExtension(fileName)
@@ -178,6 +181,7 @@ namespace SystemTrayMenu.Utilities
                         }
                     }
                 }
+#endif
 
                 using Process p = new()
                 {

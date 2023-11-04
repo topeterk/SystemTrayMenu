@@ -7,19 +7,28 @@
 namespace SystemTrayMenu.UserInterface
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
+#if WINDOWS
+    using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Documents;
     using System.Windows.Input;
     using System.Windows.Threading;
     using Microsoft.Win32;
+#else
+    using Avalonia.Controls;
+    using Avalonia.Input;
+    using Avalonia.Interactivity;
+    using Avalonia.Threading;
+    using Window = SystemTrayMenu.Utilities.Window;
+#endif
     using SystemTrayMenu.Utilities;
 
     /// <summary>
@@ -40,8 +49,8 @@ namespace SystemTrayMenu.UserInterface
 
             Loaded += AboutBox_Load;
 
-            TabPanelDetails.Visibility = Visibility.Collapsed;
-            buttonSystemInfo.Visibility = Visibility.Collapsed;
+            TabPanelDetails.SetVisibility(Visibility.Collapsed);
+            buttonSystemInfo.SetVisibility(Visibility.Collapsed);
         }
 
         // <summary>
@@ -71,11 +80,11 @@ namespace SystemTrayMenu.UserInterface
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    AppDescriptionLabel.Visibility = Visibility.Collapsed;
+                    AppDescriptionLabel.SetVisibility(Visibility.Collapsed);
                 }
                 else
                 {
-                    AppDescriptionLabel.Visibility = Visibility.Visible;
+                    AppDescriptionLabel.SetVisibility(Visibility.Visible);
                     AppDescriptionLabel.Content = value;
                 }
             }
@@ -95,11 +104,11 @@ namespace SystemTrayMenu.UserInterface
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    AppVersionLabel.Visibility = Visibility.Collapsed;
+                    AppVersionLabel.SetVisibility(Visibility.Collapsed);
                 }
                 else
                 {
-                    AppVersionLabel.Visibility = Visibility.Visible;
+                    AppVersionLabel.SetVisibility(Visibility.Visible);
                     AppVersionLabel.Content = value;
                 }
             }
@@ -120,11 +129,11 @@ namespace SystemTrayMenu.UserInterface
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    AppCopyrightLabel.Visibility = Visibility.Collapsed;
+                    AppCopyrightLabel.SetVisibility(Visibility.Collapsed);
                 }
                 else
                 {
-                    AppCopyrightLabel.Visibility = Visibility.Visible;
+                    AppCopyrightLabel.SetVisibility(Visibility.Visible);
                     AppCopyrightLabel.Content = value;
                 }
             }
@@ -141,16 +150,21 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppMoreInfo
         {
+#if TODO_LINUX
             get => new TextRange(MoreRichTextBox.Document.ContentStart, MoreRichTextBox.Document.ContentEnd).Text;
+#else
+            get => MoreRichTextBox.Text ?? string.Empty;
+#endif
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    MoreRichTextBox.Visibility = Visibility.Collapsed;
+                    MoreRichTextBox.SetVisibility(Visibility.Collapsed);
                 }
                 else
                 {
-                    MoreRichTextBox.Visibility = Visibility.Visible;
+                    MoreRichTextBox.SetVisibility(Visibility.Visible);
+#if TODO_LINUX
                     MoreRichTextBox.Document.Blocks.Clear();
 
                     Paragraph para = new ();
@@ -182,6 +196,9 @@ namespace SystemTrayMenu.UserInterface
                     }
 
                     MoreRichTextBox.Document.Blocks.Add(para);
+#else
+                    MoreRichTextBox.Text = value;
+#endif
                 }
             }
         }
@@ -409,6 +426,7 @@ namespace SystemTrayMenu.UserInterface
         // </summary>
         private static string RegistryHklmValue(string keyName, string subKeyRef)
         {
+#if WINDOWS
             string strSysInfoPath = string.Empty;
             try
             {
@@ -424,39 +442,48 @@ namespace SystemTrayMenu.UserInterface
             }
 
             return strSysInfoPath;
-        }
-
-        // <summary>
-        // populate a listview with the specified key and value strings
-        // </summary>
-        private static void Populate(ListView lvw, string key, string? value)
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                lvw.Items.Add(new AssemblyDetailsListViewItem
-                {
-                    Key = key,
-                    Value = value,
-                });
-            }
+#else
+            return string.Empty;
+#endif
         }
 
         // <summary>
         // populate details for a single assembly
         // </summary>
+#if WINDOWS
         private static void PopulateAssemblyDetails(Assembly? a, ListView lvw)
+#else
+        private static void PopulateAssemblyDetails(Assembly? a, DataGrid lvw)
+#endif
         {
-            lvw.Items.Clear();
+            lvw.ItemsSource = null;
 
             if (a != null)
             {
-                Populate(lvw, "Image Runtime Version", a.ImageRuntimeVersion);
-
                 NameValueCollection nvc = AssemblyAttribs(a);
+                List<AssemblyDetailsListViewItem> items = new(nvc.Count + 1)
+                {
+                    new ()
+                    {
+                        Key = "Image Runtime Version",
+                        Value = a.ImageRuntimeVersion,
+                    },
+                };
+
                 foreach (string strKey in nvc)
                 {
-                    Populate(lvw, strKey, nvc[strKey]);
+                    string? value = nvc[strKey];
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        items.Add(new()
+                        {
+                            Key = strKey,
+                            Value = value,
+                        });
+                    }
                 }
+
+                lvw.ItemsSource = items;
             }
         }
 
@@ -516,13 +543,30 @@ namespace SystemTrayMenu.UserInterface
         private void PopulateAppInfo()
         {
             AppDomain d = AppDomain.CurrentDomain;
-            Populate(AppInfoListView, "Application ColumnText", Assembly.GetEntryAssembly()?.GetName().Name);
-            Populate(AppInfoListView, "Application Base", d.SetupInformation.ApplicationBase);
-            Populate(AppInfoListView, "Friendly ColumnText", d.FriendlyName);
-            Populate(AppInfoListView, " ", " ");
-            Populate(AppInfoListView, "Entry Assembly", entryAssemblyName);
-            Populate(AppInfoListView, "Executing Assembly", executingAssemblyName);
-            Populate(AppInfoListView, "Calling Assembly", callingAssemblyName);
+            List<AssemblyDetailsListViewItem> items = new ();
+
+            foreach ((string key, string? value) in new List<KeyValuePair<string, string?>>()
+            {
+                new ("Application ColumnText", Assembly.GetEntryAssembly()?.GetName().Name),
+                new ("Application Base", d.SetupInformation.ApplicationBase),
+                new ("Friendly ColumnText", d.FriendlyName),
+                new (" ", " "),
+                new ("Entry Assembly", entryAssemblyName),
+                new ("Executing Assembly", executingAssemblyName),
+                new ("Calling Assembly", callingAssemblyName),
+            })
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    items.Add(new ()
+                    {
+                        Key = key,
+                        Value = value,
+                    });
+                }
+            }
+
+            AppInfoListView.ItemsSource = items;
         }
 
         // <summary>
@@ -530,18 +574,24 @@ namespace SystemTrayMenu.UserInterface
         // </summary>
         private void PopulateAssemblies()
         {
-            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<AssemblyInfoListViewItem> items = new List<AssemblyInfoListViewItem>(assemblies.Length);
+
+            foreach (Assembly a in assemblies)
             {
-                PopulateAssemblySummary(a);
+                AssemblyInfoListViewItem item = CreateAssemblySummaryEntry(a);
+                items.Add(item);
+                AssemblyNamesComboBox.Items.Add(item.Tag);
             }
 
+            AssemblyInfoListView.ItemsSource = items;
             AssemblyNamesComboBox.SelectedIndex = AssemblyNamesComboBox.Items.IndexOf(entryAssemblyName);
         }
 
         // <summary>
         // populate Assembly Information listview with summary view for a specific assembly
         // </summary>
-        private void PopulateAssemblySummary(Assembly a)
+        private AssemblyInfoListViewItem CreateAssemblySummaryEntry(Assembly a)
         {
             NameValueCollection nvc = AssemblyAttribs(a);
 
@@ -560,15 +610,14 @@ namespace SystemTrayMenu.UserInterface
                 strAssemblyNameFull += " (entry)";
             }
 
-            AssemblyInfoListView.Items.Add(new AssemblyInfoListViewItem
+            return new ()
             {
                 Name = strAssemblyNameFull,
                 Version = nvc["version"] ?? string.Empty,
                 Built = nvc["builddate"] ?? string.Empty,
                 CodeBase = nvc["codebase"] ?? string.Empty,
                 Tag = strAssemblyName,
-            });
-            AssemblyNamesComboBox.Items.Add(strAssemblyName);
+            };
         }
 
         // <summary>
@@ -597,27 +646,27 @@ namespace SystemTrayMenu.UserInterface
             // replace all labels and window title
             Title = ReplaceTokens(Title);
             AppTitle = ReplaceTokens(AppTitle);
-            if (AppDescriptionLabel.Visibility == Visibility.Visible)
+            if (AppDescriptionLabel.GetVisibility() == Visibility.Visible)
             {
                 AppDescription = ReplaceTokens(AppDescription);
             }
 
-            if (AppCopyrightLabel.Visibility == Visibility.Visible)
+            if (AppCopyrightLabel.GetVisibility() == Visibility.Visible)
             {
                 AppCopyright = ReplaceTokens(AppCopyright);
             }
 
-            if (AppVersionLabel.Visibility == Visibility.Visible)
+            if (AppVersionLabel.GetVisibility() == Visibility.Visible)
             {
                 AppVersion = ReplaceTokens(AppVersion);
             }
 
-            if (AppDateLabel.Visibility == Visibility.Visible)
+            if (AppDateLabel.GetVisibility() == Visibility.Visible)
             {
                 AppDateLabel.Content = ReplaceTokens((string)AppDateLabel.Content);
             }
 
-            if (MoreRichTextBox.Visibility == Visibility.Visible)
+            if (MoreRichTextBox.GetVisibility() == Visibility.Visible)
             {
                 AppMoreInfo = ReplaceTokens(AppMoreInfo);
             }
@@ -654,19 +703,27 @@ namespace SystemTrayMenu.UserInterface
             // for web hosted apps, GetEntryAssembly = nothing
             entryAssemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
 
-            TabPanelDetails.Visibility = Visibility.Collapsed;
-            if (MoreRichTextBox.Visibility != Visibility.Visible)
+            TabPanelDetails.SetVisibility(Visibility.Collapsed);
+            if (MoreRichTextBox.GetVisibility() != Visibility.Visible)
             {
                 Height -= MoreRichTextBox.Height;
             }
 
-            Dispatcher.Invoke(
+            WPFExtensions.CurrentDispatcher.Invoke(
                 DispatcherPriority.Loaded,
                 new Action(delegate
                 {
+#if WINDOWS
                     Cursor = Cursors.Wait;
+#else
+                    Cursor = new Cursor(StandardCursorType.Wait);
+#endif
                     PopulateLabels();
+#if WINDOWS
                     Cursor = null;
+#else
+                    Cursor = Cursor.Default;
+#endif
                 }));
         }
 
@@ -675,14 +732,22 @@ namespace SystemTrayMenu.UserInterface
         // </summary>
         private void DetailsButton_Click(object sender, RoutedEventArgs e)
         {
+#if WINDOWS
             Cursor = Cursors.Wait;
-            MoreRichTextBox.Visibility = Visibility.Collapsed;
-            TabPanelDetails.Visibility = Visibility.Visible;
-            buttonSystemInfo.Visibility = Visibility.Visible;
-            buttonDetails.Visibility = Visibility.Collapsed;
+#else
+            Cursor = new Cursor(StandardCursorType.Wait);
+#endif
+            MoreRichTextBox.SetVisibility(Visibility.Collapsed);
+            TabPanelDetails.SetVisibility(Visibility.Visible);
+            buttonSystemInfo.SetVisibility(Visibility.Visible);
+            buttonDetails.SetVisibility(Visibility.Collapsed);
             UpdateLayout(); // Force AutoSize to update the height before switching to manual mode
             SizeToContent = SizeToContent.Manual;
+#if WINDOWS
             ResizeMode = ResizeMode.CanResizeWithGrip;
+#else
+            CanResize = true;
+#endif
             TabPanelDetails.Height = double.NaN;
             if (Width < 580)
             {
@@ -691,7 +756,11 @@ namespace SystemTrayMenu.UserInterface
 
             PopulateAssemblies();
             PopulateAppInfo();
+#if WINDOWS
             Cursor = null;
+#else
+            Cursor = Cursor.Default;
+#endif
         }
 
         // <summary>
@@ -743,13 +812,16 @@ namespace SystemTrayMenu.UserInterface
         // </summary>
         private void AssemblyInfoListView_ColumnClick(object sender, RoutedEventArgs e)
         {
+#if TODO_LINUX
             AssemblyInfoListView.Items.SortDescriptions.Clear();
             AssemblyInfoListView.Items.SortDescriptions.Add(new SortDescription(
                 ((GridViewColumnHeader)e.OriginalSource).Column.Header.ToString(),
                 ListSortDirection.Ascending));
             AssemblyInfoListView.Items.Refresh();
+#endif
         }
 
+#if TODO_LINUX
         // <summary>
         // launch any http:// or mailto: links clicked in the body of the rich text box
         // </summary>
@@ -757,6 +829,7 @@ namespace SystemTrayMenu.UserInterface
         {
             Log.ProcessStart(((Hyperlink)sender).NavigateUri.ToString());
         }
+#endif
 
         /// <summary>
         /// Type for ListView items.

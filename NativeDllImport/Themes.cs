@@ -14,7 +14,7 @@ namespace SystemTrayMenu.DllImports
     /// See: https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/e36eb4c0-4370-4933-943d-b6fe22677e6c/dark-mode-apis?forum=windowssdk
     /// Wraps the method calls to native Windows DLLs.
     /// </summary>
-    public static partial class NativeMethods
+    internal static partial class NativeMethods
     {
         internal enum PreferredAppMode : int
         {

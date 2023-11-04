@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2022-2023 Peter Kirmeier -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:u="clr-namespace:SystemTrayMenu.Utilities"
+        xmlns:stm="clr-namespace:SystemTrayMenu"
+        x:Class="SystemTrayMenu.UserInterface.AboutBox"
+        mc:Ignorable="d" d:Background="{x:Static stm:MenuDefines.ColorBackground}"
+        Title="{u:Translate 'About SystemTrayMenu'}" Height="513" Width="418" CanResize="False" SizeToContent="Height">
+    <DockPanel>
+        <StackPanel VerticalAlignment="Center" Orientation="Horizontal" DockPanel.Dock="Top">
+            <Image Width="32" Height="32" Margin="3" Source="{StaticResource ApplicationImage}" />
+            <StackPanel VerticalAlignment="Center">
+                <Label x:Name="AppTitleLabel" Content="%title%" Padding="0" Margin="3"/>
+                <Label x:Name="AppDescriptionLabel" Content="%description%" Padding="0" Margin="3"/>
+            </StackPanel>
+        </StackPanel>
+        <Separator Height="6" Margin="0" DockPanel.Dock="Top"/>
+        <Label x:Name="AppVersionLabel" Content="Version %title%" Padding="0" Margin="3" DockPanel.Dock="Top"/>
+        <Label x:Name="AppDateLabel" Content="Built on %builddate%" Padding="0" Margin="3" DockPanel.Dock="Top"/>
+        <Label x:Name="AppCopyrightLabel" Content="Copyright © %year%, %company%" Padding="0" Margin="3" DockPanel.Dock="Top"/>
+
+        <StackPanel VerticalAlignment="Center" Orientation="Horizontal" DockPanel.Dock="Bottom">
+            <Button x:Name="buttonSystemInfo" Content="{u:Translate 'System Info'}" Click="SysInfoButton_Click"/>
+            <Button x:Name="buttonDetails" Content="{u:Translate 'Details'}" Click="DetailsButton_Click"/>
+            <Button x:Name="buttonOk" Content="{u:Translate 'OK'}" Click="OkButton_Click"/>
+        </StackPanel>
+
+        <u:RichTextBox x:Name="MoreRichTextBox" Height="100" DockPanel.Dock="Top" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+			<u:RichTextBox.Text>%product% is %copyright%, %trademark%"</u:RichTextBox.Text>
+        </u:RichTextBox>
+        <TabControl x:Name="TabPanelDetails" Height="149" DockPanel.Dock="Top" SelectionChanged="TabPanelDetails_SelectedIndexChanged">
+            <TabItem x:Name="TabPageApplication" Header="Application">
+				<DataGrid x:Name="AppInfoListView">
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="Application Key" Binding="{Binding Key}"/>
+						<DataGridTextColumn Header="Value" Binding="{Binding Value}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem x:Name="TabPageAssemblies" Header="Assemblies">
+				<DataGrid x:Name="AssemblyInfoListView"> <!-- TODO: MouseDoubleClick="AssemblyInfoListView_DoubleClick" -->
+					<!-- TODO: GridViewColumnHeader.Click="AssemblyInfoListView_ColumnClick" -->
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="Assembly" Binding="{Binding Name}"/>
+						<DataGridTextColumn Header="Version" Binding="{Binding Version}"/>
+						<DataGridTextColumn Header="Built" Binding="{Binding Built}"/>
+						<DataGridTextColumn Header="CodeBase" Binding="{Binding CodeBase}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem x:Name="TabPageAssemblyDetails" Header="Assembly Details">
+                <DockPanel>
+                    <ComboBox x:Name="AssemblyNamesComboBox" DockPanel.Dock="Top" SelectionChanged="AssemblyNamesComboBox_SelectedIndexChanged"/>
+					<DataGrid x:Name="AssemblyDetailsListView">
+						<DataGrid.Columns>
+							<DataGridTextColumn Header="Assembly Key" Binding="{Binding Key}"/>
+							<DataGridTextColumn Header="Value" Binding="{Binding Value}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

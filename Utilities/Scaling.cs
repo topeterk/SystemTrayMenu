@@ -5,12 +5,16 @@
 namespace SystemTrayMenu.Utilities
 {
     using System;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Media;
+#endif
 
     internal static class Scaling
     {
+#if WINDOWS
         private static readonly FontSizeConverter FontConverter = new ();
+#endif
 
         public static float Factor { get; private set; } = 1;
 
@@ -34,7 +38,11 @@ namespace SystemTrayMenu.Utilities
 
         public static double ScaleFontByPoints(float points)
         {
+#if WINDOWS
             return (double)FontConverter.ConvertFrom((points * Factor).ToString() + "pt")!;
+#else
+            return points * Factor;
+#endif
         }
 
         public static double ScaleFontByPixels(float pixels)
@@ -44,7 +52,11 @@ namespace SystemTrayMenu.Utilities
 
         public static void CalculateFactorByDpi(Window window)
         {
+#if WINDOWS
             FactorByDpi = VisualTreeHelper.GetDpi(window).DpiScaleX;
+#else
+            FactorByDpi = window.RenderScaling;
+#endif
         }
     }
 }

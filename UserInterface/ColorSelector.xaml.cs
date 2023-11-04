@@ -5,9 +5,17 @@
 namespace SystemTrayMenu.UserInterface
 {
     using System;
+#if WINDOWS
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Media;
+#else
+    using Avalonia.Controls;
+    using Avalonia.Input;
+    using Avalonia.Media;
+    using SystemTrayMenu.Utilities;
+    using UserControl = SystemTrayMenu.Utilities.UserControl;
+#endif
 
     /// <summary>
     /// Logic of ColorSelector .
@@ -64,9 +72,17 @@ namespace SystemTrayMenu.UserInterface
             ColorChanged?.Invoke(this);
         }
 
+#if WINDOWS
         private void Shape_MouseDown(object sender, MouseButtonEventArgs e)
+#else
+        private void Shape_PointerReleased(object sender, PointerReleasedEventArgs e)
+#endif
         {
+#if WINDOWS
             if (e.LeftButton == MouseButtonState.Pressed)
+#else
+            if (e.InitialPressMouseButton == MouseButton.Left)
+#endif
             {
                 ColorPickerWindow dialog = new(Description, Colors.LightYellow);
                 if (dialog.ShowDialog() ?? false)

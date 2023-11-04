@@ -7,7 +7,11 @@
 namespace SystemTrayMenu.Utilities
 {
     using System;
+#if WINDOWS
     using System.Windows.Markup;
+#else
+    using Avalonia.Markup.Xaml;
+#endif
 
     internal class ScaleDouble : MarkupExtension
     {

@@ -5,11 +5,20 @@
 namespace SystemTrayMenu.UserInterface
 {
     using System;
-    using System.Diagnostics;
     using System.Text.RegularExpressions;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+#else
+    using System.Threading.Tasks;
+    using Avalonia.Controls;
+    using Avalonia.Input;
+    using Avalonia.Interactivity;
+    using SystemTrayMenu.Utilities;
+    using TextChangedEventArgs = Avalonia.Controls.TextChangedEventArgs;
+    using UserControl = SystemTrayMenu.Utilities.UserControl;
+#endif
 
     /// <summary>
     /// Logic of NumericUpDown .
@@ -49,6 +58,7 @@ namespace SystemTrayMenu.UserInterface
             e.Handled = !IsTextAllowed(e.Text);
         }
 
+#if WINDOWS
         private void Txtbox_Pasting(object sender, DataObjectPastingEventArgs e)
         {
             if (e.DataObject.GetDataPresent(typeof(string)))
@@ -63,10 +73,35 @@ namespace SystemTrayMenu.UserInterface
                 e.CancelCommand();
             }
         }
+#else
+        private async Task Txtbox_PastingAsync(object sender, RoutedEventArgs e)
+        {
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
 
+            if (clipboard != null)
+            {
+                string? text = await clipboard.GetTextAsync();
+                if (!string.IsNullOrEmpty(text))
+                {
+                    if (!IsTextAllowed(text))
+                    {
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+#endif
+
+#if WINDOWS
         private void Txtbox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (e.Delta > 0)
+            int deltaY = e.Delta;
+#else
+        private void Txtbox_PreviewMouseWheel(object sender, PointerWheelEventArgs e)
+        {
+            double deltaY = e.Delta.Y;
+#endif
+            if (deltaY > 0)
             {
                 Value = Math.Min(Value + Increment, Maximum);
             }

@@ -4,7 +4,11 @@
 
 namespace SystemTrayMenu
 {
+#if WINDOWS
     using System.Windows.Media;
+#else
+    using Avalonia.Media;
+#endif
 
     internal static class AppColors
     {

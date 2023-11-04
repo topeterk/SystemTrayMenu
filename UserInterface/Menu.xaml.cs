@@ -8,12 +8,29 @@ namespace SystemTrayMenu.UserInterface
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.IO;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
     using System.Windows.Input;
     using System.Windows.Media;
     using System.Windows.Media.Animation;
+#else
+    using System.Drawing;
+    using Avalonia;
+    using Avalonia.Controls;
+    using Avalonia.Input;
+    using Avalonia.Interactivity;
+    using Avalonia.Media;
+    using ReactiveUI;
+    using FrameworkElement = Avalonia.Controls.Control;
+    using ModifierKeys = Avalonia.Input.KeyModifiers;
+    using MouseEventArgs = Avalonia.Input.PointerEventArgs;
+    using Point = Avalonia.Point;
+    using RoutingStrategy = Avalonia.Interactivity.RoutingStrategies;
+    using Size = Avalonia.Size;
+    using Window = SystemTrayMenu.Utilities.Window;
+#endif
     using SystemTrayMenu.Business;
     using SystemTrayMenu.DataClasses;
     using SystemTrayMenu.DllImports;
@@ -26,8 +43,8 @@ namespace SystemTrayMenu.UserInterface
     /// </summary>
     public partial class Menu : Window
     {
-        private const int CornerRadius = 10;
-
+        private const int CornerRadiusConstant = 10;
+#if TODO_LINUX
         private static readonly RoutedEvent FadeToTransparentEvent = EventManager.RegisterRoutedEvent(
             nameof(FadeToTransparent), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Menu));
 
@@ -36,6 +53,13 @@ namespace SystemTrayMenu.UserInterface
 
         private static readonly RoutedEvent FadeOutEvent = EventManager.RegisterRoutedEvent(
             nameof(FadeOut), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Menu));
+#else
+        private static readonly RoutedEvent FadeToTransparentEvent;
+
+        private static readonly RoutedEvent FadeInEvent;
+
+        private static readonly RoutedEvent FadeOutEvent;
+#endif
 
         private readonly string folderPath;
 
@@ -50,24 +74,24 @@ namespace SystemTrayMenu.UserInterface
 
             if (!Config.ShowDirectoryTitleAtTop)
             {
-                txtTitle.Visibility = Visibility.Collapsed;
+                txtTitle.SetVisibility(Visibility.Collapsed);
             }
 
             if (!Config.ShowSearchBar)
             {
-                searchPanel.Visibility = Visibility.Collapsed;
+                searchPanel.SetVisibility(Visibility.Collapsed);
             }
 
-            buttonOpenFolder.Visibility = Visibility.Collapsed;
+            buttonOpenFolder.SetVisibility(Visibility.Collapsed);
 
             if (!Config.ShowFunctionKeySettings)
             {
-                buttonSettings.Visibility = Visibility.Collapsed;
+                buttonSettings.SetVisibility(Visibility.Collapsed);
             }
 
             if (!Config.ShowFunctionKeyRestart)
             {
-                buttonRestart.Visibility = Visibility.Collapsed;
+                buttonRestart.SetVisibility(Visibility.Collapsed);
             }
 
             folderPath = path;
@@ -86,7 +110,7 @@ namespace SystemTrayMenu.UserInterface
 
                 if (!Config.ShowFunctionKeyPinMenu)
                 {
-                    buttonMenuAlwaysOpen.Visibility = Visibility.Collapsed;
+                    buttonMenuAlwaysOpen.SetVisibility(Visibility.Collapsed);
                 }
             }
             else
@@ -102,9 +126,9 @@ namespace SystemTrayMenu.UserInterface
                 MainMenu = ParentMenu.MainMenu;
                 RowDataParent.SubMenu = this;
 
-                buttonMenuAlwaysOpen.Visibility = Visibility.Collapsed;
-                buttonSettings.Visibility = Visibility.Collapsed;
-                buttonRestart.Visibility = Visibility.Collapsed;
+                buttonMenuAlwaysOpen.SetVisibility(Visibility.Collapsed);
+                buttonSettings.SetVisibility(Visibility.Collapsed);
+                buttonRestart.SetVisibility(Visibility.Collapsed);
             }
 
             string title = new DirectoryInfo(path).Name;
@@ -145,12 +169,14 @@ namespace SystemTrayMenu.UserInterface
             labelTitle.FontSize = Scaling.ScaleFontByPoints(8.25F);
             textBoxSearch.FontSize = Scaling.ScaleFontByPoints(8.25F);
             labelStatus.FontSize = Scaling.ScaleFontByPoints(7F);
+#if TODO_LINUX
             dgv.FontSize = Scaling.ScaleFontByPoints(9F);
+#endif
 
             textBoxSearch.TextChanged += (_, _) => TextBoxSearch_TextChanged(false);
             textBoxSearch.ContextMenu = new()
             {
-                Background = SystemColors.ControlBrush,
+                Background = MenuDefines.ColorSystemControlDefault,
             };
             textBoxSearch.ContextMenu.Items.Add(new MenuItem()
             {
@@ -160,11 +186,22 @@ namespace SystemTrayMenu.UserInterface
             textBoxSearch.ContextMenu.Items.Add(new MenuItem()
             {
                 Header = Translator.GetText("Copy"),
+#if WINDOWS
                 Command = new ActionCommand((_) => Clipboard.SetData(DataFormats.Text, textBoxSearch.SelectedText)),
+#else
+                Command = ReactiveCommand.CreateFromTask(async () =>
+                    {
+                        if (GetTopLevel(this)?.Clipboard is { } clipboard)
+                        {
+                            await clipboard.SetTextAsync(textBoxSearch.SelectedText);
+                        }
+                    }),
+#endif
             });
             textBoxSearch.ContextMenu.Items.Add(new MenuItem()
             {
                 Header = Translator.GetText("To paste"),
+#if WINDOWS
                 Command = new ActionCommand((_) =>
                     {
                         if (Clipboard.ContainsText(TextDataFormat.Text))
@@ -172,6 +209,9 @@ namespace SystemTrayMenu.UserInterface
                             textBoxSearch.SelectedText = Clipboard.GetData(DataFormats.Text).ToString();
                         }
                     }),
+#else
+                Command = new ActionCommand((_) => textBoxSearch.Paste()),
+#endif
             });
             textBoxSearch.ContextMenu.Items.Add(new MenuItem()
             {
@@ -207,19 +247,34 @@ namespace SystemTrayMenu.UserInterface
                     RowDataParent.SubMenu = null;
                 }
 
+#if WINDOWS
                 foreach (RowData item in dgv.Items.SourceCollection)
+#else
+                // TODO: SourceCollection
+                foreach (RowData item in dgv.Items)
+#endif
                 {
                     item.SubMenu?.Close();
                 }
             };
 
+#if WINDOWS
+            IsVisibleChanged += (_, _) => VisibilityChanged?.Invoke(this);
+#endif
+
             bool isTouchEnabled = NativeMethods.IsTouchEnabled();
             if ((isTouchEnabled && Settings.Default.DragDropItemsEnabledTouch) ||
                 (!isTouchEnabled && Settings.Default.DragDropItemsEnabled))
             {
+#if WINDOWS
                 AllowDrop = true;
                 DragEnter += DragDropHelper.DragEnter;
                 Drop += DragDropHelper.DragDrop;
+#else
+                // TODO: AllowDrop = true;
+                AddHandler(DragDrop.DragOverEvent, DragDropHelper.DragEnter);
+                AddHandler(DragDrop.DropEvent, DragDropHelper.DragDrop);
+#endif
             }
         }
 
@@ -243,6 +298,9 @@ namespace SystemTrayMenu.UserInterface
 
         internal event Action<RowData>? CellOpenOnClick;
 
+        internal event Action<Menu>? VisibilityChanged;
+
+#if TODO_LINUX
         internal event RoutedEventHandler FadeToTransparent
         {
             add { AddHandler(FadeToTransparentEvent, value); }
@@ -260,6 +318,7 @@ namespace SystemTrayMenu.UserInterface
             add { AddHandler(FadeOutEvent, value); }
             remove { RemoveHandler(FadeOutEvent, value); }
         }
+#endif
 
         internal enum StartLocation
         {
@@ -290,7 +349,12 @@ namespace SystemTrayMenu.UserInterface
         {
             get
             {
+#if WINDOWS
                 foreach (RowData rowData in dgv.Items.SourceCollection)
+#else
+                // TODO: SourceCollection
+                foreach (RowData rowData in dgv.Items)
+#endif
                 {
                     if (rowData.SubMenu != null)
                     {
@@ -308,6 +372,7 @@ namespace SystemTrayMenu.UserInterface
 
         internal void RiseItemExecuted(RowData rowData)
         {
+#if TODO_LINUX
             ListViewItem? lvi;
             int i = 0;
             while ((lvi = dgv.FindVisualChildOfType<ListViewItem>(i++)) != null)
@@ -321,6 +386,7 @@ namespace SystemTrayMenu.UserInterface
                     return;
                 }
             }
+#endif
         }
 
         internal void RiseItemOpened(RowData rowData) => CellOpenOnClick?.Invoke(rowData);
@@ -332,7 +398,11 @@ namespace SystemTrayMenu.UserInterface
             textBoxSearch.Text = string.Empty;
             if (dgv.Items.Count > 0)
             {
+#if WINDOWS
                 dgv.ScrollIntoView(dgv.Items[0]);
+#else
+                dgv.ScrollIntoView(0);
+#endif
             }
         }
 
@@ -341,7 +411,11 @@ namespace SystemTrayMenu.UserInterface
             TextBoxSearch_TextChanged(true);
             if (dgv.Items.Count > 0)
             {
+#if WINDOWS
                 dgv.ScrollIntoView(dgv.Items[0]);
+#else
+                dgv.ScrollIntoView(0);
+#endif
             }
         }
 
@@ -360,10 +434,14 @@ namespace SystemTrayMenu.UserInterface
         }
 
         // TODO: Check if we can just use original IsMouseOver instead?  (Check if it requires Mouse.Capture(this))
+#if WINDOWS
         internal new bool IsMouseOver()
+#else
+        internal bool IsMouseOver()
+#endif
         {
             Point mousePos = NativeMethods.Screen.CursorPosition;
-            bool isMouseOver = Visibility == Visibility.Visible &&
+            bool isMouseOver = this.GetVisibility() == Visibility.Visible &&
                 mousePos.X >= 0 && mousePos.X < Width &&
                 mousePos.Y >= 0 && mousePos.Y < Height;
             return isMouseOver;
@@ -375,7 +453,9 @@ namespace SystemTrayMenu.UserInterface
         // TODO: As long as WPF transition from Forms is incomplete, keep it for testing.
         internal void RefreshDataGridView()
         {
+#if TODO_LINUX // maybe not required any more?
             ((CollectionView)CollectionViewSource.GetDefaultView(dgv.ItemsSource)).Refresh();
+#endif
         }
 
         // TODO: Check if it is implicitly already running due to SelectionChanged event
@@ -392,6 +472,9 @@ namespace SystemTrayMenu.UserInterface
             else if (indexAlternative >= 0 && dgv.Items.Count > indexAlternative)
             {
                 itemData = (RowData)dgv.Items[indexAlternative];
+#if !WINDOWS
+                index = indexAlternative;
+#endif
             }
             else
             {
@@ -399,7 +482,11 @@ namespace SystemTrayMenu.UserInterface
             }
 
             dgv.SelectedItem = itemData;
+#if WINDOWS
             dgv.ScrollIntoView(itemData);
+#else
+            dgv.ScrollIntoView(index);
+#endif
 
             RowSelectionChanged?.Invoke(itemData);
 
@@ -418,8 +505,13 @@ namespace SystemTrayMenu.UserInterface
 
             dgv.ItemsSource = data;
 
+            // TODO: Replace filter logic?
+            // See: https://learn.microsoft.com/en-us/windows/apps/design/controls/items-repeater#sorting-filtering-and-resetting-the-data
+            // See: https://www.answeroverflow.com/m/1090360510458888252
+#if TODO_LINUX
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(dgv.ItemsSource);
             view.Filter = (object item) => Filter_Default((RowData)item);
+#endif
 
             if (state != null)
             {
@@ -526,7 +618,11 @@ namespace SystemTrayMenu.UserInterface
         /// <param name="startLocation">Defines where the first menu is drawn (when no predecessor is set).</param>
         /// <param name="useCustomLocation">Use CustomLocation as start position.</param>
         internal void AdjustSizeAndLocation(
+#if WINDOWS
             Rect bounds,
+#else
+            Rectangle bounds,
+#endif
             Menu? menuPredecessor,
             StartLocation startLocation,
             bool useCustomLocation)
@@ -586,9 +682,18 @@ namespace SystemTrayMenu.UserInterface
             {
                 double scaling = Math.Round(Scaling.Factor, 0, MidpointRounding.AwayFromZero);
                 double overlappingOffset = 0D;
+                double predecessorFrameWidth = 0D;
 
                 // Make sure we have latest values of own window size
                 UpdateLayout();
+
+#if WINDOWS
+                double menuFrameWidth = windowFrame.ActualWidth;
+                double menuFrameHeight = windowFrame.ActualHeight;
+#else
+                double menuFrameWidth = windowFrame.Width;
+                double menuFrameHeight = windowFrame.Height;
+#endif
 
                 // Prepare parameters
                 if (startLocation == StartLocation.Predecessor)
@@ -604,18 +709,24 @@ namespace SystemTrayMenu.UserInterface
                     // After updating the layout the location should be available again.
                     menuPredecessor.UpdateLayout();
 
+#if WINDOWS
+                    predecessorFrameWidth = menuPredecessor.windowFrame.ActualWidth;
+#else
+                    predecessorFrameWidth = menuPredecessor.windowFrame.Width;
+#endif
+
                     directionToRight = menuPredecessor.directionToRight; // try keeping same direction from predecessor
 
                     if (!Settings.Default.AppearNextToPreviousMenu &&
-                        menuPredecessor.windowFrame.ActualWidth > Settings.Default.OverlappingOffsetPixels)
+                        predecessorFrameWidth > Settings.Default.OverlappingOffsetPixels)
                     {
                         if (directionToRight)
                         {
-                            overlappingOffset = Settings.Default.OverlappingOffsetPixels - menuPredecessor.windowFrame.ActualWidth;
+                            overlappingOffset = Settings.Default.OverlappingOffsetPixels - predecessorFrameWidth;
                         }
                         else
                         {
-                            overlappingOffset = menuPredecessor.windowFrame.ActualWidth - Settings.Default.OverlappingOffsetPixels;
+                            overlappingOffset = predecessorFrameWidth - Settings.Default.OverlappingOffsetPixels;
                         }
                     }
                 }
@@ -640,18 +751,18 @@ namespace SystemTrayMenu.UserInterface
 
                         if (directionToRight)
                         {
-                            x = originLocation.X + menuPredecessor.windowFrame.ActualWidth - scaling;
+                            x = originLocation.X + predecessorFrameWidth - scaling;
 
                             // Change direction when out of bounds (predecessor only)
                             if (startLocation == StartLocation.Predecessor &&
-                                bounds.X + bounds.Width <= x + windowFrame.ActualWidth - scaling)
+                                bounds.X + bounds.Width <= x + menuFrameWidth - scaling)
                             {
-                                x = originLocation.X - windowFrame.ActualWidth + scaling;
+                                x = originLocation.X - menuFrameWidth + scaling;
                                 if (x < bounds.X &&
-                                    originLocation.X + menuPredecessor.windowFrame.ActualWidth < bounds.X + bounds.Width &&
-                                    bounds.X + (bounds.Width / 2) > originLocation.X + (windowFrame.ActualWidth / 2))
+                                    originLocation.X + predecessorFrameWidth < bounds.X + bounds.Width &&
+                                    bounds.X + (bounds.Width / 2) > originLocation.X + (menuFrameWidth / 2))
                                 {
-                                    x = bounds.X + bounds.Width - windowFrame.ActualWidth + scaling;
+                                    x = bounds.X + bounds.Width - menuFrameWidth + scaling;
                                 }
                                 else
                                 {
@@ -666,24 +777,24 @@ namespace SystemTrayMenu.UserInterface
                         }
                         else
                         {
-                            x = originLocation.X - windowFrame.ActualWidth + scaling;
+                            x = originLocation.X - menuFrameWidth + scaling;
 
                             // Change direction when out of bounds (predecessor only)
                             if (startLocation == StartLocation.Predecessor &&
                                 x < bounds.X)
                             {
-                                x = originLocation.X + menuPredecessor.windowFrame.ActualWidth - scaling;
-                                if (x + windowFrame.ActualWidth > bounds.X + bounds.Width &&
+                                x = originLocation.X + predecessorFrameWidth - scaling;
+                                if (x + menuFrameWidth > bounds.X + bounds.Width &&
                                     originLocation.X > bounds.X &&
-                                    bounds.X + (bounds.Width / 2) < originLocation.X + (windowFrame.ActualWidth / 2))
+                                    bounds.X + (bounds.Width / 2) < originLocation.X + (menuFrameWidth / 2))
                                 {
                                     x = bounds.X;
                                 }
                                 else
                                 {
-                                    if (x + windowFrame.ActualWidth > bounds.X + bounds.Width)
+                                    if (x + menuFrameWidth > bounds.X + bounds.Width)
                                     {
-                                        x = bounds.X + bounds.Width - windowFrame.ActualWidth + scaling;
+                                        x = bounds.X + bounds.Width - menuFrameWidth + scaling;
                                     }
 
                                     directionToRight = !directionToRight;
@@ -699,7 +810,7 @@ namespace SystemTrayMenu.UserInterface
                     case StartLocation.TopRight:
                     case StartLocation.BottomRight:
                     default:
-                        x = bounds.Width - windowFrame.ActualWidth;
+                        x = bounds.Width - menuFrameWidth;
                         directionToRight = false;
                         break;
                 }
@@ -715,7 +826,11 @@ namespace SystemTrayMenu.UserInterface
                         y = originLocation.Y;
                         if (Settings.Default.AppearAtMouseLocation)
                         {
+#if WINDOWS
                             y -= labelTitle.ActualHeight; // Mouse should point below title
+#else
+                            y -= labelTitle.Height; // Mouse should point below title
+#endif
                         }
 
                         break;
@@ -754,9 +869,13 @@ namespace SystemTrayMenu.UserInterface
                             y += offset;
                         }
 
-                        if (searchPanel.Visibility == Visibility.Collapsed)
+                        if (searchPanel.GetVisibility() == Visibility.Collapsed)
                         {
+#if WINDOWS
                             y += menuPredecessor.searchPanel.ActualHeight;
+#else
+                            y += menuPredecessor.searchPanel.Height;
+#endif
                         }
 
                         break;
@@ -766,15 +885,15 @@ namespace SystemTrayMenu.UserInterface
                     case StartLocation.BottomLeft:
                     case StartLocation.BottomRight:
                     default:
-                        y = bounds.Height - windowFrame.ActualHeight;
+                        y = bounds.Height - menuFrameHeight;
                         break;
                 }
 
                 // Move vertically when out of bounds
                 // Besides that we need to subtract the top margin from y as it was not part of y calculation
-                if (bounds.Y + bounds.Height < y + windowFrame.ActualHeight)
+                if (bounds.Y + bounds.Height < y + menuFrameHeight)
                 {
-                    y = bounds.Y + bounds.Height - windowFrame.ActualHeight - windowFrame.Margin.Top;
+                    y = bounds.Y + bounds.Height - menuFrameHeight - windowFrame.Margin.Top;
                 }
                 else if (y < bounds.Y)
                 {
@@ -787,7 +906,7 @@ namespace SystemTrayMenu.UserInterface
 
                 if (Settings.Default.RoundCorners)
                 {
-                    windowFrame.CornerRadius = new CornerRadius(CornerRadius);
+                    windowFrame.CornerRadius = new CornerRadius(CornerRadiusConstant);
                 }
 
                 UpdateLayout();
@@ -796,6 +915,7 @@ namespace SystemTrayMenu.UserInterface
 
         internal Rect GetDataGridViewChildRect(RowData rowData)
         {
+#if TODO_LINUX
             // When scrolled, we have to reduce the index number as we calculate based on visual tree
             int rowIndex = rowData.RowIndex;
             int startIndex = 0;
@@ -836,11 +956,24 @@ namespace SystemTrayMenu.UserInterface
                     }
                 }
             }
+#else
+            double offsetY = 0D;
+#endif
 
             // All childs are using same width and height, so we simply fill in values from parent instead of individual child
             return new(0D, offsetY, dgv.ActualWidth, (double)Resources["RowHeight"]);
         }
 
+#if !WINDOWS
+        protected override void IsVisibleChanged(AvaloniaPropertyChangedEventArgs e)
+        {
+            VisibilityChanged?.Invoke(this);
+
+            base.IsVisibleChanged(e);
+        }
+#endif
+
+#if TODO_LINUX
         private static bool Filter_Default(RowData itemData)
         {
             if (Settings.Default.ShowOnlyAsSearchResult && itemData.IsAdditionalItem)
@@ -865,15 +998,16 @@ namespace SystemTrayMenu.UserInterface
 
             return true;
         }
+#endif
 
         private void SetSubMenuState(MenuDataDirectoryState state)
         {
             if (Config.ShowFunctionKeyOpenFolder)
             {
-                buttonOpenFolder.Visibility = Visibility.Visible;
+                buttonOpenFolder.SetVisibility(Visibility.Visible);
             }
 
-            pictureBoxLoading.Visibility = Visibility.Collapsed;
+            pictureBoxLoading.SetVisibility(Visibility.Collapsed);
 
             switch (state)
             {
@@ -885,16 +1019,16 @@ namespace SystemTrayMenu.UserInterface
                     }
                     else
                     {
-                        labelStatus.Visibility = Visibility.Collapsed;
+                        labelStatus.SetVisibility(Visibility.Collapsed);
                     }
 
                     break;
                 case MenuDataDirectoryState.Empty:
-                    searchPanel.Visibility = Visibility.Collapsed;
+                    searchPanel.SetVisibility(Visibility.Collapsed);
                     labelStatus.Content = Translator.GetText("Directory empty");
                     break;
                 case MenuDataDirectoryState.NoAccess:
-                    searchPanel.Visibility = Visibility.Collapsed;
+                    searchPanel.SetVisibility(Visibility.Collapsed);
                     labelStatus.Content = Translator.GetText("Directory inaccessible");
                     break;
                 default:
@@ -906,9 +1040,13 @@ namespace SystemTrayMenu.UserInterface
 
         private void HandlePreviewKeyDown(object sender, KeyEventArgs e)
         {
-            searchPanel.Visibility = Visibility.Visible;
+            searchPanel.SetVisibility(Visibility.Visible);
 
+#if WINDOWS
             ModifierKeys modifiers = Keyboard.Modifiers;
+#else
+            ModifierKeys modifiers = e.KeyModifiers; // TODO: Check if ok?
+#endif
             switch (e.Key)
             {
                 case Key.F4:
@@ -1024,7 +1162,7 @@ namespace SystemTrayMenu.UserInterface
             SearchTextChanging?.Invoke();
 
             string? userPattern = textBoxSearch.Text?.Replace("%", " ").Replace("*", " ").ToLower();
-
+#if TODO_LINUX
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(dgv.ItemsSource);
             if (string.IsNullOrEmpty(userPattern))
             {
@@ -1036,6 +1174,7 @@ namespace SystemTrayMenu.UserInterface
                 SizeToContent = SizeToContent.Manual;
                 view.Filter = (object item) => Filter_ByUserPattern((RowData)item, userPattern);
             }
+#endif
 
             SearchTextChanged?.Invoke(this, string.IsNullOrEmpty(userPattern), causedByWatcherUpdate);
         }
@@ -1067,7 +1206,7 @@ namespace SystemTrayMenu.UserInterface
             AppRestart.ByMenuButton();
         }
 
-        private void MainMenu_MoveStart(object sender, MouseButtonEventArgs e)
+        private void MainMenu_MoveStart(object sender, EventArgs e)
         {
             // Hide all sub menus to clear the view for repositioning of the main menu
             if (SubMenu != null)
@@ -1080,7 +1219,9 @@ namespace SystemTrayMenu.UserInterface
             MouseMove += MainMenu_MoveRelocate;
             MouseUp += MainMenu_MoveEnd;
             Deactivated += MainMenu_MoveEnd;
+#if TODO_LINUX
             Mouse.Capture(this);
+#endif
         }
 
         private void MainMenu_MoveRelocate(object sender, MouseEventArgs e)
@@ -1096,7 +1237,9 @@ namespace SystemTrayMenu.UserInterface
 
         private void MainMenu_MoveEnd(object? sender, EventArgs? e)
         {
+#if TODO_LINUX
             Mouse.Capture(null);
+#endif
             MouseMove -= MainMenu_MoveRelocate;
             MouseUp -= MainMenu_MoveEnd;
             Deactivated -= MainMenu_MoveEnd;
@@ -1128,7 +1271,12 @@ namespace SystemTrayMenu.UserInterface
             {
                 // TODO: Refactor item selection to prevent running this loop
                 ListView lv = (ListView)sender;
+#if WINDOWS
                 foreach (RowData itemData in lv.Items.SourceCollection)
+#else
+                // TODO: SourceCollection
+                foreach (RowData itemData in lv.Items)
+#endif
                 {
                     itemData.IsSelected = lv.SelectedItem == itemData;
                 }
@@ -1163,11 +1311,13 @@ namespace SystemTrayMenu.UserInterface
                 if (!isShellContextMenuOpen)
                 {
                     CellMouseLeave?.Invoke();
+#if TODO_LINUX
                     if (e.LeftButton == MouseButtonState.Pressed)
                     {
                         string[] files = new string[] { rowData.Path };
                         DragDrop.DoDragDrop(this, new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
                     }
+#endif
                 }
             }
         }
@@ -1187,7 +1337,11 @@ namespace SystemTrayMenu.UserInterface
             if (((ListViewItem)sender).Content is RowData rowData)
             {
                 rowData.IsClicked = true;
+#if TODO_LINUX
                 countLeftMouseButtonClicked = e.ClickCount;
+#else
+                countLeftMouseButtonClicked = 1; // TODO: Fix double click
+#endif
             }
         }
 

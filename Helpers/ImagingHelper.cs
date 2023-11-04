@@ -7,8 +7,17 @@ namespace SystemTrayMenu.Helpers
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
+#if WINDOWS
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+#else
+    using Avalonia;
+    using Avalonia.Media;
+    using Avalonia.Media.Imaging;
+    using SystemTrayMenu.Utilities;
+    using Bitmap = System.Drawing.Bitmap;
+    using Size = System.Drawing.Size;
+#endif
 
     /// <summary>
     /// Provides helper methods for imaging.
@@ -123,14 +132,23 @@ namespace SystemTrayMenu.Helpers
         /// <returns>Rendered image.</returns>
         internal static RenderTargetBitmap CreateIconWithOverlay(BitmapSource originalBitmap, BitmapSource overlayBitmap)
         {
+#if WINDOWS
             DrawingVisual dVisual = new ();
             using (DrawingContext dc = dVisual.RenderOpen())
+#else
+            // TODO: ???? https://stackoverflow.com/questions/66124655/drawing-a-geometry-onto-a-bitmap-avalonia
+            Visual dVisual = new();
+            RenderTargetBitmap targetBitmap = new(originalBitmap.PixelSize, originalBitmap.Dpi);
+            using (DrawingContext dc = targetBitmap.CreateDrawingContext())
+#endif
             {
-                dc.DrawImage(originalBitmap, new (0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
-                dc.DrawImage(overlayBitmap, new (0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
+                dc.DrawImage(originalBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
+                dc.DrawImage(overlayBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
             }
 
+#if WINDOWS
             RenderTargetBitmap targetBitmap = new (originalBitmap.PixelWidth, originalBitmap.PixelHeight, originalBitmap.DpiX, originalBitmap.DpiY, PixelFormats.Default);
+#endif
             targetBitmap.Render(dVisual);
             return targetBitmap;
         }
@@ -143,14 +161,23 @@ namespace SystemTrayMenu.Helpers
         /// <returns>Rendered image.</returns>
         internal static RenderTargetBitmap ApplyOpactiy(BitmapSource originalBitmap, double opacity)
         {
+#if WINDOWS
             DrawingVisual dVisual = new ();
             using (DrawingContext dc = dVisual.RenderOpen())
+#else
+            // TODO: ???? https://stackoverflow.com/questions/66124655/drawing-a-geometry-onto-a-bitmap-avalonia
+            Visual dVisual = new();
+            RenderTargetBitmap targetBitmap = new(originalBitmap.PixelSize, originalBitmap.Dpi);
+            using (DrawingContext dc = targetBitmap.CreateDrawingContext())
+#endif
             {
                 dc.PushOpacity(opacity);
                 dc.DrawImage(originalBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
             }
 
+#if WINDOWS
             RenderTargetBitmap targetBitmap = new(originalBitmap.PixelWidth, originalBitmap.PixelHeight, originalBitmap.DpiX, originalBitmap.DpiY, PixelFormats.Default);
+#endif
             targetBitmap.Render(dVisual);
             return targetBitmap;
         }

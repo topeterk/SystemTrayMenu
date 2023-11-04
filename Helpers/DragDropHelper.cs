@@ -9,13 +9,17 @@ namespace SystemTrayMenu.Helpers
     using System.Net.Http;
     using System.Text;
     using System.Threading;
+#if WINDOWS
     using System.Windows;
+#else
+    using Avalonia.Input;
+#endif
     using SystemTrayMenu.UserInterface;
     using SystemTrayMenu.Utilities;
 
     public static class DragDropHelper
     {
-        public static void DragEnter(object sender, DragEventArgs e)
+        public static void DragEnter(object? sender, DragEventArgs e)
         {
             object data = e.Data.GetData("UniformResourceLocator");
 
@@ -26,7 +30,11 @@ namespace SystemTrayMenu.Helpers
                 string url = encod.GetString(bytes);
                 if (!string.IsNullOrEmpty(url))
                 {
+#if WINDOWS
                     e.Effects = DragDropEffects.Copy;
+#else
+                    e.DragEffects = DragDropEffects.Copy;
+#endif
                 }
             }
         }

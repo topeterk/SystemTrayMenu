@@ -6,18 +6,23 @@ namespace SystemTrayMenu.Utilities
 {
     using System;
     using System.IO;
+#if WINDOWS
     using System.Reflection;
     using System.Runtime.InteropServices;
     using Shell32;
+#endif
 
     internal static class FolderOptions
     {
         private static bool hideHiddenEntries;
         private static bool hideSystemEntries;
+#if WINDOWS
         private static IShellDispatch4? iShellDispatch4;
+#endif
 
         internal static void Initialize()
         {
+#if TODO_LINUX
             try
             {
                 iShellDispatch4 = (IShellDispatch4?)Activator.CreateInstance(
@@ -51,6 +56,10 @@ namespace SystemTrayMenu.Utilities
                     throw;
                 }
             }
+#else
+            hideHiddenEntries = false;
+            hideSystemEntries = false;
+#endif
         }
 
         internal static void ReadHiddenAttributes(string path, out bool hasHiddenFlag, out bool isDirectoryToHide)

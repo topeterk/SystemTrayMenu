@@ -2,6 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
+#if WINDOWS
 namespace SystemTrayMenu.UserInterface
 {
     using System;
@@ -708,8 +709,6 @@ namespace SystemTrayMenu.UserInterface
                 IntPtr plResult);
         }
 
-        #region System Tray Menu Helpers
-
         /// <summary>
         /// Creates and shows a shell context menu.
         /// </summary>
@@ -735,8 +734,6 @@ namespace SystemTrayMenu.UserInterface
             arrFI[0] = fileInfo;
             ctxMnu.ShowContextMenu(arrFI, position);
         }
-
-        #endregion
 
         /// <summary>
         /// Shows the context menu.
@@ -1266,3 +1263,4 @@ namespace SystemTrayMenu.UserInterface
         }
     }
 }
+#endif

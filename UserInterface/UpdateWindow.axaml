@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2022-2023 Peter Kirmeier -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:u="clr-namespace:SystemTrayMenu.Utilities"
+        xmlns:stm="clr-namespace:SystemTrayMenu"
+        x:Class="SystemTrayMenu.UserInterface.UpdateWindow"
+        mc:Ignorable="d" d:Background="{x:Static stm:MenuDefines.ColorBackground}"
+        Title="{u:Translate 'New version available!'}" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" MinWidth="600" MaxHeight="600" ShowInTaskbar="False">
+    <DockPanel>
+        <Label DockPanel.Dock="Top" x:Name="label" Content="{u:Translate 'Latest available version:'}" />
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="buttonGoToDownloadPage" Content="{u:Translate 'Go to download page'}" Click="ButtonGoToDownloadPage_Click"/>
+            <Button x:Name="buttonOk" Content="{u:Translate 'OK'}" Click="ButtonOk_Click" IsDefault="True"/>
+        </StackPanel>
+
+		<TextBox x:Name="textBox" Margin="5" VerticalContentAlignment="Top" IsReadOnly="True"/>
+		<!-- TODO: HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" -->
+    </DockPanel>
+</Window>

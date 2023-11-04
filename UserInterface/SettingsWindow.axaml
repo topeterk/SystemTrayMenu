@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2022-2023 Peter Kirmeier -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:u="clr-namespace:SystemTrayMenu.Utilities"
+        xmlns:stm="clr-namespace:SystemTrayMenu"
+        xmlns:local="clr-namespace:SystemTrayMenu.UserInterface"
+        x:Class="SystemTrayMenu.UserInterface.SettingsWindow"
+        mc:Ignorable="d" d:Background="{x:Static stm:MenuDefines.ColorBackground}"
+        Title="{u:Translate 'Settings'}" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" MinWidth="200" MinHeight="250">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row="0">
+            <TabItem Header="{u:Translate 'General'}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <u:GroupBox Header="{u:Translate 'Directory'}">
+                            <StackPanel>
+                                <TextBox x:Name="textBoxFolder" Margin="2" Background="{x:Null}" IsReadOnly="True" TextWrapping="NoWrap"/>
+                                <DockPanel LastChildFill="False">
+                                    <Button DockPanel.Dock="Left" Content="{u:Translate 'Changing directory'}" Click="ButtonChange_Click"/>
+                                    <Button DockPanel.Dock="Right" Content="{u:Translate 'Open directory'}" Click="ButtonOpenFolder_Click"/>
+                                </DockPanel>
+                                <CheckBox x:Name="checkBoxSetFolderByWindowsContextMenu" Content="{u:Translate 'Set by context menu '}"/>
+                                <DockPanel LastChildFill="False">
+                                    <Button DockPanel.Dock="Left" Content="{u:Translate 'Relative directory'}" Click="ButtonChangeRelativeFolder_Click"/>
+                                    <Button DockPanel.Dock="Right" Content="{u:Translate 'Open application directory'}" Click="ButtonOpenAssemblyLocation_Click"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Configuration and log files'}">
+                            <StackPanel>
+                                <CheckBox x:Name="checkBoxSaveConfigInApplicationDirectory" Content="{u:Translate 'Save configuration file in application directory'}"/>
+                                <CheckBox x:Name="checkBoxSaveLogFileInApplicationDirectory" Content="{u:Translate 'Saving log file in application directory'}"/>
+                            </StackPanel>
+                        </u:GroupBox>
+                        <u:GroupBox x:Name="groupBoxAutostart" Header="{u:Translate 'App start'}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="checkBoxAutostart" Content="{u:Translate 'Start with Windows'}" VerticalAlignment="Center"/>
+                                    <Button x:Name="buttonAddStartup" Content="{u:Translate 'Start with Windows'}" Click="ButtonAddStartup_Click" VerticalAlignment="Center"/>
+                                    <Label x:Name="labelStartupStatus" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <CheckBox x:Name="checkBoxCheckForUpdates" Content="{u:Translate 'Check for updates'}"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<!-- TODO: <u:GroupBox Header="{u:Translate 'Hotkey'}">                                                                                                                       -->
+						<!-- TODO: 	<DockPanel LastChildFill="False">                                                                                                                                 -->
+						<!-- TODO: 		<local:HotkeySelector x:Name="textBoxHotkey" AcceptsTab="False" MinWidth="200" VerticalAlignment="Center"/>                                                   -->
+						<!-- TODO: 		<Button x:Name="buttonHotkeyDefault" DockPanel.Dock="Right" Content="{u:Translate 'Default'}" Click="ButtonHotkeyDefault_Click" VerticalAlignment="Center"/>  -->
+						<!-- TODO: 	</DockPanel>                                                                                                                                                      -->
+						<!-- TODO: </u:GroupBox>                                                                                                                                                      -->
+						<u:GroupBox Header="{u:Translate 'Language'}">
+							<ComboBox x:Name="comboBoxLanguage" HorizontalAlignment="Left" MinWidth="120"/>
+							<!-- TODO: DisplayMemberPath="DisplayName" SelectedValuePath="Code" https://stackoverflow.com/questions/75117536/avalonia-ui-combobox-no-displaymemberpath-or-selectedvaluepath-templatedcontro -->
+						</u:GroupBox>
+                        <Button Content="{u:Translate 'Default'}" Click="ButtonGeneralDefault_Click" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="{u:Translate 'Size and location'}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+						<u:GroupBox Header="{u:Translate 'Sizes in percent'}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <local:NumericUpDown Grid.Row="0" Grid.Column="0" x:Name="numericUpDownSizeInPercent" Minimum="100" Maximum="200" Increment="5" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{u:Translate 'Application size'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                <local:NumericUpDown Grid.Row="1" Grid.Column="0" x:Name="numericUpDownIconSizeInPercent" Minimum="100" Maximum="200" Increment="5" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{u:Translate 'Icon size'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                <local:NumericUpDown Grid.Row="2" Grid.Column="0" x:Name="numericUpDownRowHeightInPercentage" Minimum="50" Maximum="200" Increment="5" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{u:Translate 'Row height'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                <local:NumericUpDown Grid.Row="3" Grid.Column="0" x:Name="numericUpDownMenuWidth" Minimum="0" Maximum="400" Increment="5" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{u:Translate 'Maximum menu width'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                <local:NumericUpDown Grid.Row="4" Grid.Column="0" x:Name="numericUpDownMenuHeight" Minimum="25" Maximum="400" Increment="5" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{u:Translate 'Maximum menu height'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            </Grid>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Main menu appears'}">
+                            <StackPanel>
+                                <RadioButton x:Name="radioButtonAppearAtTheBottomRight" GroupName="MainMenuAppearsAt" Content="{u:Translate 'Bottom right'}" />
+                                <RadioButton x:Name="radioButtonAppearAtTheBottomLeft" GroupName="MainMenuAppearsAt" Content="{u:Translate 'Bottom left'}" />
+                                <RadioButton x:Name="radioButtonUseCustomLocation" GroupName="MainMenuAppearsAt" Content="{u:Translate 'Custom (drag it to the appropriate position)'}" />
+                                <RadioButton x:Name="radioButtonAppearAtMouseLocation" GroupName="MainMenuAppearsAt" Content="{u:Translate 'At mouse location'}" />
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Sub menu appears'}">
+                            <StackPanel>
+                                <RadioButton x:Name="radioButtonNextToPreviousMenu" GroupName="SubMenuAppearsAt" Content="{u:Translate 'Next to the previous one'}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="radioButtonOverlapping" GroupName="SubMenuAppearsAt" Content="{u:Translate 'Overlapping'}" Checked="RadioButtonOverlapping_Checked" Unchecked="RadioButtonOverlapping_Unchecked" />
+                                    <local:NumericUpDown x:Name="numericUpDownOverlappingOffsetPixels" Margin="10,0,0,0" Minimum="0" Maximum="500" Increment="10" />
+                                    <TextBlock Text="{u:Translate 'Offset by pixels'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </u:GroupBox>
+                        <Button Content="{u:Translate 'Default'}" Click="ButtonSizeAndLocationDefault_Click" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="{u:Translate 'Expanded'}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+						<u:GroupBox Header="{u:Translate 'Optional Features'}">
+                            <StackPanel>
+                                <CheckBox x:Name="checkBoxResolveLinksToFolders" Content="{u:Translate 'Resolve links to folders and show content'}"/>
+                                <CheckBox x:Name="checkBoxShowInTaskbar" Content="{u:Translate 'Show in Taskbar'}" Unchecked="ShowHowToOpenSettings"/>
+                                <CheckBox x:Name="checkBoxSendHotkeyInsteadKillOtherInstances" Content="{u:Translate 'Send hotkey to other instance'}"/> <!-- TODO: It will use named pipes instead of hotkey! -->
+                                <CheckBox x:Name="checkBoxSupportGamepad" Content="{u:Translate 'Support Gamepad'}"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Click'}">
+                            <StackPanel>
+                                <CheckBox x:Name="checkBoxOpenItemWithOneClick" Content="{u:Translate 'Single click to open an element'}"/>
+                                <CheckBox x:Name="checkBoxOpenDirectoryWithOneClick" Content="{u:Translate 'Single click to open a directory'}"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Drag'}">
+                            <StackPanel>
+                                <CheckBox x:Name="checkBoxDragDropItems" Content="{u:Translate 'Copy row element via drag and drop'}"/>
+                                <CheckBox x:Name="checkBoxSwipeScrolling" Content="{u:Translate 'Scroll via swipe'}"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Directory of Internet Shortcut Icons'}">
+                            <StackPanel>
+                                <TextBox x:Name="textBoxIcoFolder" Margin="2" Background="{x:Null}" IsReadOnly="True" TextWrapping="NoWrap"/>
+                                <StackPanel HorizontalAlignment="Left">
+                                    <Button Content="{u:Translate 'Changing directory'}" Click="ButtonChangeIcoFolder_Click" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Sorting'}">
+                            <StackPanel>
+                                <RadioButton x:Name="radioButtonSortByTypeAndName" GroupName="SortBy" Content="{u:Translate 'Sorted by type (folder or file) and name'}" />
+                                <RadioButton x:Name="radioButtonSortByTypeAndDate" GroupName="SortBy" Content="{u:Translate 'Sorted by type (folder or file) and date'}" />
+                                <RadioButton x:Name="radioButtonSortByFileExtensionAndName" GroupName="SortBy" Content="{u:Translate 'Sorted by file extension and name'}" />
+                                <RadioButton x:Name="radioButtonSortByName" GroupName="SortBy" Content="{u:Translate 'Sorted by name'}" />
+                                <RadioButton x:Name="radioButtonSortByDate" GroupName="SortBy" Content="{u:Translate 'Sorted by date'}" />
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Hidden files and directories'}">
+                            <StackPanel>
+                                <RadioButton x:Name="radioButtonSystemSettingsShowHiddenFiles" GroupName="ShowHiddenFiles" Content="{u:Translate 'Use operating system settings'}" />
+                                <RadioButton x:Name="radioButtonNeverShowHiddenFiles" GroupName="ShowHiddenFiles" Content="{u:Translate 'Never show'}" />
+                                <RadioButton x:Name="radioButtonAlwaysShowHiddenFiles" GroupName="ShowHiddenFiles" Content="{u:Translate 'Always show'}" />
+                            </StackPanel>
+                        </u:GroupBox>
+                        <Button Content="{u:Translate 'Default'}" Click="ButtonAdvancedDefault_Click" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="{u:Translate 'Directories'}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+						<u:GroupBox Header="{u:Translate 'Add content of directory to root directory'}">
+                            <StackPanel>
+                                <CheckBox x:Name="checkBoxShowOnlyAsSearchResult" Content="{u:Translate 'Show only as search result'}"/>
+                                <DockPanel LastChildFill="False">
+                                    <Button DockPanel.Dock="Left" Content="{u:Translate 'Add directory'}" Click="ButtonAddFolderToRootFolder_Click"/>
+                                    <Button DockPanel.Dock="Right" x:Name="buttonRemoveFolder" Content="{u:Translate 'Remove directory'}" Click="ButtonRemoveFolder_Click" IsEnabled="False"/>
+                                </DockPanel>
+								<u:ListView x:Name="dataGridViewFolders" x:FieldModifier="private" MinHeight="90" Margin="5" ScrollViewer.VerticalScrollBarVisibility="Auto" Background="{x:Null}">
+									<!-- TODO: SelectionChanged="DataGridViewFolders_SelectionChanged" -->
+									<!-- TODO: <u:ListView.View> -->
+                                    <!-- TODO:     <Grid>        -->
+                                            <!-- TODO: <GridViewColumn DisplayMemberBinding="{Binding ColumnFolder}">             -->
+                                            <!-- TODO:     <GridViewColumn.Header>                                                -->
+                                            <!-- TODO:         <GridViewColumnHeader Content="{u:Translate 'Directory paths'}" /> -->
+                                            <!-- TODO:     </GridViewColumn.Header>                                               -->
+                                            <!-- TODO: </GridViewColumn>                                                          -->
+                                            <!-- TODO: <GridViewColumn>                                                           -->
+                                            <!-- TODO:     <GridViewColumn.Header>                                                -->
+                                            <!-- TODO:         <GridViewColumnHeader Content="{u:Translate 'Recursive'}" />       -->
+                                            <!-- TODO:     </GridViewColumn.Header>                                               -->
+                                            <!-- TODO:     <GridViewColumn.CellTemplate>                                          -->
+                                            <!-- TODO:         <DataTemplate>                                                     -->
+                                            <!-- TODO:             <CheckBox IsChecked="{Binding ColumnRecursiveLevel}"/>         -->
+                                            <!-- TODO:         </DataTemplate>                                                    -->
+                                            <!-- TODO:     </GridViewColumn.CellTemplate>                                         -->
+                                            <!-- TODO: </GridViewColumn>                                                          -->
+                                            <!-- TODO: <GridViewColumn>                                                           -->
+                                            <!-- TODO:     <GridViewColumn.Header>                                                -->
+                                            <!-- TODO:         <GridViewColumnHeader Content="{u:Translate 'Only Files'}" />      -->
+                                            <!-- TODO:     </GridViewColumn.Header>                                               -->
+                                            <!-- TODO:     <GridViewColumn.CellTemplate>                                          -->
+                                            <!-- TODO:         <DataTemplate>                                                     -->
+                                            <!-- TODO:             <CheckBox IsChecked="{Binding ColumnOnlyFiles}"/>              -->
+                                            <!-- TODO:         </DataTemplate>                                                    -->
+                                            <!-- TODO:     </GridViewColumn.CellTemplate>                                         -->
+                                            <!-- TODO: </GridViewColumn>                                                          -->
+									<!-- TODO:     </Grid>        -->
+                                    <!-- TODO: </u:ListView.View> -->
+                                </u:ListView>
+                                <Button x:Name="buttonAddSampleStartMenuFolder" Content="???" Click="ButtonAddSampleStartMenuFolder_Click" HorizontalAlignment="Left" IsEnabled="False"/>
+                                <CheckBox x:Name="checkBoxGenerateShortcutsToDrives" Content="{u:Translate 'Generate drive shortcuts on startup'}"/>
+                            </StackPanel>
+                        </u:GroupBox>
+                        <Button Content="{u:Translate 'Default'}" Click="ButtonClearFolders_Click" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="{u:Translate 'Expert'}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+						<u:GroupBox Header="{u:Translate 'Time until a menu opens'}">
+                            <StackPanel Orientation="Horizontal">
+                                <local:NumericUpDown x:Name="numericUpDownTimeUntilOpens" Minimum="20" Maximum="1000" Increment="10" />
+                                <TextBlock Text="{u:Translate 'Milliseconds until a menu opens when the mouse is on it'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Menu stays open'}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" x:Name="checkBoxStayOpenWhenItemClicked" Content="{u:Translate 'If an element was clicked'}"/>
+                                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="checkBoxStayOpenWhenFocusLost" Content="{u:Translate 'If the focus is lost and the mouse is still on the menu'}" Checked="CheckBoxStayOpenWhenFocusLost_CheckedChanged" Unchecked="CheckBoxStayOpenWhenFocusLost_CheckedChanged"/>
+                                <local:NumericUpDown Grid.Row="2" Grid.Column="0" x:Name="numericUpDownTimeUntilClose" Minimum="200" Maximum="5000" Increment="10" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{u:Translate 'Milliseconds until the menu closes if the mouse then leaves the menu'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="checkBoxStayOpenWhenFocusLostAfterEnterPressed" Content="{u:Translate 'If the focus is lost and the Enter key was pressed'}" Checked="CheckBoxStayOpenWhenFocusLostAfterEnterPressed_CheckedChanged" Unchecked="CheckBoxStayOpenWhenFocusLostAfterEnterPressed_CheckedChanged"/>
+                                <local:NumericUpDown Grid.Row="4" Grid.Column="0" x:Name="numericUpDownTimeUntilClosesAfterEnterPressed" Minimum="20" Maximum="1000" Increment="10" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{u:Translate 'Milliseconds until the menu closes if the menu is not reactivated'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            </Grid>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Cache'}">
+                            <StackPanel Orientation="Horizontal">
+                                <local:NumericUpDown x:Name="numericUpDownClearCacheIfMoreThanThisNumberOfItems" Minimum="200" Maximum="5000" Increment="1" />
+                                <TextBlock Text="{u:Translate 'Clear cache if more than this number of items'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Filter menu by file type e.g.: *.exe|*.dll'}">
+                            <TextBox x:Name="textBoxSearchPattern" Margin="2" TextWrapping="NoWrap" />
+                        </u:GroupBox>
+                        <Button Content="{u:Translate 'Default'}" Click="ButtonExpertDefault_Click" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="{u:Translate 'Customize'}">
+                <!-- TODO: Adjust MaxHeight? -->
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MaxHeight="600" VerticalAlignment="Top">
+                    <StackPanel>
+						<u:GroupBox Header="{u:Translate 'Appearance'}">
+                            <StackPanel>
+                                <CheckBox x:Name="checkBoxUseIconFromRootFolder" Content="{u:Translate 'Use icon from directory'}" />
+                                <CheckBox x:Name="checkBoxRoundCorners" Content="{u:Translate 'Round corners'}" />
+                                <CheckBox x:Name="checkBoxDarkModeAlwaysOn" Content="{u:Translate 'Color scheme dark always active'}"  Checked="CheckBoxDarkModeAlwaysOnCheckedChanged" Unchecked="CheckBoxDarkModeAlwaysOnCheckedChanged"/>
+                                <CheckBox x:Name="checkBoxUseFading" Content="{u:Translate 'Fading'}" />
+                                <CheckBox x:Name="checkBoxShowLinkOverlay" Content="{u:Translate 'Show link overlay'}" />
+                                <CheckBox x:Name="checkBoxShowDirectoryTitleAtTop" Content="{u:Translate 'Show directory title at top'}" />
+                                <CheckBox x:Name="checkBoxShowSearchBar" Content="{u:Translate 'Show search bar'}" />
+                                <CheckBox x:Name="checkBoxShowFunctionKeyOpenFolder" Content="{u:Translate '???'}" />
+                                <CheckBox x:Name="checkBoxShowFunctionKeyPinMenu" Content="{u:Translate '???'}" />
+                                <CheckBox x:Name="checkBoxShowFunctionKeySettings" Content="{u:Translate '???'}" Unchecked="ShowHowToOpenSettings" />
+                                <CheckBox x:Name="checkBoxShowFunctionKeyRestart" Content="{u:Translate '???'}" />
+                                <CheckBox x:Name="checkBoxShowCountOfElementsBelow" Content="{u:Translate 'Show count of elements'}" />
+                                <Button Content="{u:Translate 'Default'}" Margin="10,5,0,0" Click="ButtonAppearanceDefault_Click" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Color scheme bright'}">
+                            <StackPanel Margin="3,0,0,0">
+                                <Label Content="{u:Translate 'App menu'}" Padding="5" VerticalAlignment="Center"/>
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorIcons" Description="{u:Translate 'Icons'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorBackground" Description="{u:Translate 'Background'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorBackgroundBorder" Description="{u:Translate 'Border of menu'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSearchField" Description="{u:Translate 'Search field'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorOpenFolder" Description="{u:Translate 'Opened directory'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorOpenFolderBorder" Description="{u:Translate 'Border of opened directory'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSelectedItem" Description="{u:Translate 'Selected element'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSelectedItemBorder" Description="{u:Translate 'Border of selected element'}" />
+                                <Label Content="{u:Translate 'Scrollbar'}" Padding="5" VerticalAlignment="Center"/>
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorScrollbarBackground" Description="{u:Translate 'Background'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSlider" Description="{u:Translate 'Slider'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSliderDragging" Description="{u:Translate 'Slider while dragging'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSliderHover" Description="{u:Translate 'Slider while mouse hovers over it 1'}" />
+                                <!-- Deprecated since 2.0.0.0: textBoxColorSliderArrowsAndTrackHover, obsolete translation: 'Slider while mouse hovers over it 2' -->
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrow" Description="{u:Translate 'Arrow'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowClick" Description="{u:Translate 'Arrow when clicking'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowClickBackground" Description="{u:Translate 'Background of arrow when clicking'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowHover" Description="{u:Translate 'Arrow while mouse hovers over it'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowHoverBackground" Description="{u:Translate 'Background of arrow while mouse hovers over it'}" />
+                                <Button Content="{u:Translate 'Default'}" Margin="5,5,0,0" Click="ButtonDefaultColors_Click" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </u:GroupBox>
+						<u:GroupBox Header="{u:Translate 'Color scheme dark'}">
+                            <StackPanel Margin="3,0,0,0">
+                                <Label Content="{u:Translate 'App menu'}" Padding="5" VerticalAlignment="Center"/>
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorIconsDarkMode" Description="{u:Translate 'Icons'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorBackgroundDarkMode" Description="{u:Translate 'Background'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorBackgroundBorderDarkMode" Description="{u:Translate 'Border of menu'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSearchFieldDarkMode" Description="{u:Translate 'Search field'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorOpenFolderDarkMode" Description="{u:Translate 'Opened directory'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorOpenFolderBorderDarkMode" Description="{u:Translate 'Border of opened directory'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSelectedItemDarkMode" Description="{u:Translate 'Selected element'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSelectedItemBorderDarkMode" Description="{u:Translate 'Border of selected element'}" />
+                                <Label Content="{u:Translate 'Scrollbar'}" Padding="5" VerticalAlignment="Center"/>
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorScrollbarBackgroundDarkMode" Description="{u:Translate 'Background'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSliderDarkMode" Description="{u:Translate 'Slider'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSliderDraggingDarkMode" Description="{u:Translate 'Slider while dragging'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorSliderHoverDarkMode" Description="{u:Translate 'Slider while mouse hovers over it 1'}" />
+                                <!-- Deprecated since 2.0.0.0: textBoxColorSliderArrowsAndTrackHoverDarkMode, obsolete translation: 'Slider while mouse hovers over it 2' -->
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowDarkMode" Description="{u:Translate 'Arrow'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowClickDarkMode" Description="{u:Translate 'Arrow when clicking'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowClickBackgroundDarkMode" Description="{u:Translate 'Background of arrow when clicking'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowHoverDarkMode" Description="{u:Translate 'Arrow while mouse hovers over it'}" />
+                                <local:ColorSelector ColorChanged="TextBoxColorsChanged" x:Name="textBoxColorArrowHoverBackgroundDarkMode" Description="{u:Translate 'Background of arrow while mouse hovers over it'}" />
+                                <Button Content="{u:Translate 'Default'}" Margin="5,5,0,0" Click="ButtonDefaultColorsDark_Click" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </u:GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="buttonOk" Content="{u:Translate 'OK'}" Click="ButtonOk_Click"/>
+            <Button x:Name="buttonCancel" Content="{u:Translate 'Abort'}" Click="ButtonCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

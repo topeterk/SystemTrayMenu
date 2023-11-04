@@ -7,9 +7,22 @@ namespace SystemTrayMenu
     using System;
     using System.Drawing;
     using System.IO;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Threading;
+#else
+    using System.Reflection;
+    using Avalonia;
+    using Avalonia.Controls;
+    using Avalonia.Controls.ApplicationLifetimes;
+    using Avalonia.Markup.Xaml;
+    using Avalonia.Platform;
+    using Avalonia.Styling;
+    using Avalonia.Themes.Fluent;
+    using Avalonia.Threading;
+#endif
     using SystemTrayMenu.Business;
+    using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Properties;
@@ -22,38 +35,27 @@ namespace SystemTrayMenu
     {
         private Menus? menus;
         private JoystickHelper? joystickHelper;
+#if !WINDOWS
+        private IDisposable? updateCheckTimer;
+#endif
         private bool isDisposed;
 
         public App()
         {
             AppContext.SetSwitch("Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering", false);
 
+#if WINDOWS
             InitializeComponent();
+#endif
 
             AppRestart.BeforeRestarting += Dispose;
-
+#if TODO_LINUX
             Activated += (_, _) => IsActiveApp = true;
             Deactivated += (_, _) => IsActiveApp = false;
-            Startup += (_, _) =>
-            {
-                IconReader.Startup();
-
-                menus = new();
-                menus.Startup();
-
-                if (Settings.Default.SupportGamepad)
-                {
-                    joystickHelper = new();
-                    joystickHelper.KeyPressed += menus.KeyPressed;
-                }
-
-                if (Settings.Default.CheckForUpdates)
-                {
-                    _ = Dispatcher.InvokeAsync(
-                        () => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: false),
-                        DispatcherPriority.ApplicationIdle);
-                }
-            };
+#endif
+#if WINDOWS
+            Startup += AppStartupHandler;
+#endif
         }
 
         internal static bool IsActiveApp { get; private set; }
@@ -64,6 +66,38 @@ namespace SystemTrayMenu
             GC.SuppressFinalize(this);
         }
 
+#if !WINDOWS
+        public override void Initialize()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                foreach (IStyle style in Styles)
+                {
+                    if (style is FluentTheme theme)
+                    {
+                        // TODO: theme.Mode = Settings.DarkMode ? FluentThemeMode.Dark : FluentThemeMode.Light;
+                    }
+                }
+
+                UserInterface.TaskbarLogo main = new (); // TODO
+
+                desktop.MainWindow = main;
+                NativeMethods.Screen.DesktopScreens = desktop.MainWindow.Screens;
+                desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                desktop.Exit += AppExitHandler;
+
+                AppStartupHandler(this, desktop);
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
+#endif
+
         /// <summary>
         /// Loads an Icon from the application's Resources.
         /// Note: Only allowed to be called after App's Startup event.
@@ -72,7 +106,12 @@ namespace SystemTrayMenu
         /// <returns>New Icon object.</returns>
         internal static Icon LoadIconFromResource(string resourceName)
         {
+#if WINDOWS
             using (Stream stream = GetResourceStream(new("pack://application:,,,/" + resourceName, UriKind.Absolute)).Stream)
+#else
+            using (Stream stream = AvaloniaLocator.Current.GetService<IAssetLoader>()!.Open(
+                new Uri($"avares://{Assembly.GetEntryAssembly()!.GetName().Name!}{"/" + resourceName}")))
+#endif
             {
                 return new(stream);
             }
@@ -99,5 +138,44 @@ namespace SystemTrayMenu
                 isDisposed = true;
             }
         }
+
+        private void AppStartupHandler(object sender, object e)
+        {
+            IconReader.Startup();
+
+            menus = new();
+            menus.Startup();
+
+            if (Settings.Default.SupportGamepad)
+            {
+                joystickHelper = new();
+                joystickHelper.KeyPressed += menus.KeyPressed;
+            }
+
+            if (Settings.Default.CheckForUpdates)
+            {
+#if WINDOWS
+                _ = Dispatcher.InvokeAsync(
+                    () => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: false),
+                    DispatcherPriority.ApplicationIdle);
+#else
+                // Run check later in the background, so offline startup can proceed faster
+                updateCheckTimer = DispatcherTimer.RunOnce(
+                    () => Dispatcher.UIThread.Post(() => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: false)),
+                    new(0),
+                    DispatcherPriority.ApplicationIdle);
+#endif
+            }
+        }
+
+#if !WINDOWS
+        private void AppExitHandler(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                updateCheckTimer?.Dispose();
+            }
+        }
+#endif
     }
 }

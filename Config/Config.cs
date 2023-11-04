@@ -6,8 +6,12 @@ namespace SystemTrayMenu
 {
     using System;
     using System.IO;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Media;
+#else
+    using Avalonia.Media;
+#endif
     using Microsoft.Win32;
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Properties;

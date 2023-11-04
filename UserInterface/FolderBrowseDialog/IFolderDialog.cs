@@ -4,7 +4,11 @@
 
 namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
 {
+#if WINDOWS
     using System.Windows;
+#else
+    using SystemTrayMenu.Utilities;
+#endif
 
     public interface IFolderDialog
     {

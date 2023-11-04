@@ -5,24 +5,33 @@
 namespace SystemTrayMenu.Business
 {
     using System;
+#if WINDOWS
     using System.Windows.Input;
-    using SystemTrayMenu.DataClasses;
-    using SystemTrayMenu.UserInterface;
     using SystemTrayMenu.Utilities;
     using static SystemTrayMenu.Helpers.GlobalHotkeys;
+#else
+    using Avalonia.Input;
+    using ModifierKeys = Avalonia.Input.KeyModifiers;
+#endif
+    using SystemTrayMenu.DataClasses;
+    using SystemTrayMenu.UserInterface;
 
     internal class KeyboardInput : IDisposable
     {
+#if WINDOWS
         private readonly IHotkeyFunction hotkeyFunction = Create();
+#endif
 
         private Menu? focussedMenu;
 
+#if WINDOWS
         public KeyboardInput()
         {
             hotkeyFunction.KeyPressed += (_) => HotKeyPressed?.Invoke();
         }
 
         internal event Action? HotKeyPressed;
+#endif
 
         internal event Action<RowData?>? RowSelectionChanged;
 
@@ -32,11 +41,14 @@ namespace SystemTrayMenu.Business
 
         public void Dispose()
         {
+#if WINDOWS
             hotkeyFunction.Unregister();
+#endif
         }
 
         internal bool RegisterHotKey(string hotKeyString)
         {
+#if WINDOWS
             if (!string.IsNullOrEmpty(hotKeyString))
             {
                 try
@@ -51,6 +63,9 @@ namespace SystemTrayMenu.Business
             }
 
             return true;
+#else
+            return false;
+#endif
         }
 
         internal void ResetSelectedByKey() => focussedMenu = null;

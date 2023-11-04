@@ -40,8 +40,8 @@
                 <ListView x:Name="AppInfoListView" d:ItemsSource="{d:SampleData ItemCount=2}">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn x:Name="colKey" Header="Application Key" DisplayMemberBinding="{Binding Key}"/>
-                            <GridViewColumn x:Name="colValue" Header="Value" DisplayMemberBinding="{Binding Value}"/>
+                            <GridViewColumn Header="Application Key" DisplayMemberBinding="{Binding Key}"/>
+                            <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -50,10 +50,10 @@
                 <ListView x:Name="AssemblyInfoListView" d:ItemsSource="{d:SampleData ItemCount=2}" GridViewColumnHeader.Click="AssemblyInfoListView_ColumnClick" MouseDoubleClick="AssemblyInfoListView_DoubleClick">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn x:Name="colAssemblyName" Header="Assembly" DisplayMemberBinding="{Binding Name}"/>
-                            <GridViewColumn x:Name="colAssemblyVersion" Header="Version" DisplayMemberBinding="{Binding Version}"/>
-                            <GridViewColumn x:Name="colAssemblyBuilt" Header="Built" DisplayMemberBinding="{Binding Built}"/>
-                            <GridViewColumn x:Name="colAssemblyCodeBase" Header="CodeBase" DisplayMemberBinding="{Binding CodeBase}"/>
+                            <GridViewColumn Header="Assembly" DisplayMemberBinding="{Binding Name}"/>
+                            <GridViewColumn Header="Version" DisplayMemberBinding="{Binding Version}"/>
+                            <GridViewColumn Header="Built" DisplayMemberBinding="{Binding Built}"/>
+                            <GridViewColumn Header="CodeBase" DisplayMemberBinding="{Binding CodeBase}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -64,8 +64,8 @@
                     <ListView x:Name="AssemblyDetailsListView" d:ItemsSource="{d:SampleData ItemCount=2}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn x:Name="colDetailsKey" Header="Assembly Key" DisplayMemberBinding="{Binding Key}"/>
-                                <GridViewColumn x:Name="colDetailsValue" Header="Value" DisplayMemberBinding="{Binding Value}"/>
+                                <GridViewColumn Header="Assembly Key" DisplayMemberBinding="{Binding Key}"/>
+                                <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>

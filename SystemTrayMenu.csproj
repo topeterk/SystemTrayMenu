@@ -2,12 +2,15 @@
   <!-- Global project settings -->
   <PropertyGroup>
     <!-- https://learn.microsoft.com/en-us/dotnet/standard/frameworks -->
-    <!--<TargetFrameworks>net7.0-windows10.0.22000.0;net7.0</TargetFrameworks>-->
-    <TargetFrameworks>net7.0-windows10.0.22000.0</TargetFrameworks>
+    <!--<TargetFrameworks>net7.0-windows10.0.22000.0;net6.0</TargetFrameworks>-->
+    <TargetFrameworks>net7.0-windows10.0.22000.0;net6.0</TargetFrameworks>
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
     <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net7.0-windows10.0.22000.0' ">win-x64</RuntimeIdentifier>
-    <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net7.0' ">linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net6.0' ">linux-x64</RuntimeIdentifier>
     <UseWPF Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">True</UseWPF>
+    <DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);TODO_LINUX</DefineConstants>
+    <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
+    <TrimMode>copyused</TrimMode>
     <Nullable>enable</Nullable>
     <SelfContained>true</SelfContained>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
@@ -47,7 +50,12 @@ EXIT 0</PreBuildEvent>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <NoWarn>1701;1702;WFAC010;MSB3061</NoWarn>
   </PropertyGroup>
-  <!-- Release settings -->
+  <PropertyGroup Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">
+	<NoWarn>$(NoWarn);CA2213;CS0649;CS8600;CS8601;CS8602;CS8603;CS8604;CS8605;CS8618;CS8622</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
+    <!-- TODO: Get rid of private API (https://github.com/AvaloniaUI/Avalonia/wiki/Using-private-apis-in-nuget-packages) -->
+    <AvaloniaAccessUnstablePrivateApis>true</AvaloniaAccessUnstablePrivateApis>
+    <Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>true</Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ErrorReport>none</ErrorReport>
     <DebugSymbols>true</DebugSymbols>
@@ -56,7 +64,6 @@ EXIT 0</PreBuildEvent>
   <!-- Files -->
   <ItemGroup>
     <AdditionalFiles Include=".stylecop.json" />
-    <ApplicationDefinition Include="Business\App.xaml" />
     <EmbeddedResource Remove="UserInterface\Menu.resx" />
     <Resource Include="Resources\SystemTrayMenu.ico" />
     <Resource Include="Resources\SystemTrayMenu.png" />
@@ -86,16 +93,28 @@ EXIT 0</PreBuildEvent>
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-  <!-- References NuGet -->
+  <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">
+	<Compile Remove="Utilities/PrivilegeChecker.cs" />
+	<None Include="Utilities/PrivilegeChecker.cs" />
+    <Page Remove="**/*.xaml" />
+    <None Include="**/*.xaml" />
+    <Compile Remove="**/*.xaml.cs" />
+    <Compile Include="**/*.xaml.cs" Link="%(RecursiveDir)$([System.IO.Path]::ChangeExtension('%(Filename)', 'axaml.cs'))" />
+    <AvaloniaResource Include="Resources/**" />
+    <AvaloniaResource Remove="Resources/ScrollBarStyles.xaml" />
+    <!--AvaloniaXaml Include="**/*.axaml" /-->
+  </ItemGroup>
   <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">
-    <FrameworkReference Update="Microsoft.WindowsDesktop.App;Microsoft.WindowsDesktop.App.WPF" TargetingPackVersion="7.0.0" />
+    <None Include="**/*.axaml" />
+  </ItemGroup>
+  <!-- References NuGet -->
+  <ItemGroup>
     <PackageReference Include="H.NotifyIcon" Version="2.0.118" />
     <PackageReference Include="HidSharp" Version="2.1.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0-preview1.23165.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -104,6 +123,23 @@ EXIT 0</PreBuildEvent>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>ThirdParty\Clearcove.Logging.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">
+    <FrameworkReference Update="Microsoft.WindowsDesktop.App;Microsoft.WindowsDesktop.App.WPF" TargetingPackVersion="7.0.0" />
+    <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">
+    <PackageReference Include="Avalonia" Version="11.0.5" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.0.5" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.5" />
+    <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.5" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.5" />
+	<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.5" />
+	<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.5" />
+	<PackageReference Include="Avalonia.Themes.Simple" Version="11.0.5" />
+	<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
   <!-- References Native -->
   <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">

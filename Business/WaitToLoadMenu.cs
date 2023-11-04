@@ -5,7 +5,11 @@
 namespace SystemTrayMenu.Business
 {
     using System;
+#if WINDOWS
     using System.Windows.Threading;
+#else
+    using Avalonia.Threading;
+#endif
     using SystemTrayMenu.DataClasses;
 
     internal class WaitToLoadMenu : IDisposable

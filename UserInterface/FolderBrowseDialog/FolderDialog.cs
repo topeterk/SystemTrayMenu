@@ -5,12 +5,18 @@
 namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
 {
     using System;
+#if WINDOWS
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
     using System.Windows;
     using System.Windows.Interop;
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
+#else
+    using System.Threading.Tasks;
+    using Avalonia.Controls;
+    using Window = SystemTrayMenu.Utilities.Window;
+#endif
 
     public class FolderDialog : IFolderDialog, IDisposable
     {
@@ -42,9 +48,12 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
         /// </summary>
         /// <param name="owner">The window the dialog is assigned to.</param>
         /// <returns>True is returned on successful user interaction and when not cancelled by the user otherwise false is returned.</returns>
+#if TODO_LINUX
         [SupportedOSPlatform("windows")]
+#endif
         public bool ShowDialog(Window? owner)
         {
+#if WINDOWS
             NativeMethods.IFileDialog frm = (NativeMethods.IFileDialog)new NativeMethods.FileOpenDialogRCW();
             frm.GetOptions(out uint options);
             options |= NativeMethods.FOS_PICKFOLDERS |
@@ -109,7 +118,21 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
                     Log.Warn("Folder Dialog failed", ex);
                 }
             }
+#else
+            // TODO: Replace with proper dialog, settings and translation
+            OpenFolderDialog dialog = new();
+            dialog.Directory = InitialFolder;
+            dialog.Title = "Select Folder";
 
+            if (owner is null)
+            {
+                owner = new Window();
+            }
+
+            Task<string?> dialogtask = dialog.ShowAsync(owner);
+            dialogtask.Wait();
+            Folder = dialogtask.Result;
+#endif
             return false;
         }
 

@@ -6,12 +6,17 @@ namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Drawing;
+#if WINDOWS
     using System.Windows.Threading;
+#else
+    using Avalonia.Threading;
+#endif
     using H.NotifyIcon.Core;
+    using SystemTrayMenu.Utilities;
 
     internal class AppNotifyIcon : IDisposable
     {
-        private readonly Dispatcher dispatchter = Dispatcher.CurrentDispatcher;
+        private readonly Dispatcher dispatchter = WPFExtensions.CurrentDispatcher;
         private readonly TrayIconWithContextMenu notifyIcon = new ();
         private Icon? loadingIcon;
 

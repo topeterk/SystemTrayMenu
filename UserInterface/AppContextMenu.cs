@@ -7,8 +7,13 @@ namespace SystemTrayMenu.UserInterface
     using System;
     using System.Diagnostics;
     using System.Reflection;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Threading;
+#else
+    using Avalonia;
+    using Avalonia.Threading;
+#endif
     using H.NotifyIcon.Core;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Utilities;
@@ -44,7 +49,7 @@ namespace SystemTrayMenu.UserInterface
                 string text,
                 Action actionClick)
         {
-            Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
+            Dispatcher dispatcher = WPFExtensions.CurrentDispatcher;
             menu.Items.Add(new PopupMenuItem(
                 text, new ((_, _) => dispatcher.Invoke(actionClick))));
         }

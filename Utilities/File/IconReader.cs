@@ -12,9 +12,13 @@ namespace SystemTrayMenu.Utilities
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Threading;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Interop;
     using System.Windows.Media.Imaging;
+#else
+    using Avalonia;
+#endif
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Helpers;
 
@@ -193,9 +197,14 @@ namespace SystemTrayMenu.Utilities
             return true;
         }
 
+#if WINDOWS
         private static BitmapSource? TryCreateBitmapSourceFromIcon(string path, Icon icon) => Application.Current.Dispatcher.Invoke(() =>
+#else
+        private static BitmapSource? TryCreateBitmapSourceFromIcon(string path, Icon icon) => WPFExtensions.CurrentDispatcher.Invoke(() =>
+#endif
         {
             BitmapSource? bitmap = null;
+#if TODO_LINUX
             try
             {
                 bitmap = Imaging.CreateBitmapSourceFromHIcon(
@@ -208,7 +217,7 @@ namespace SystemTrayMenu.Utilities
             {
                 Log.Warn($"Failed to {nameof(TryCreateBitmapSourceFromIcon)}: {path} ", ex);
             }
-
+#endif
             return bitmap;
         });
 

@@ -9,19 +9,24 @@ namespace SystemTrayMenu.DllImports
     using System;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Interop;
+#else
+    using Avalonia.Controls;
+#endif
 
     /// <summary>
     /// wraps the methodcalls to native windows dll's.
     /// </summary>
-    public static partial class NativeMethods
+    internal static partial class NativeMethods
     {
         private const int WS_EX_TOOLWINDOW = 0x00000080;
         private const int GWL_EXSTYLE = -20;
 
         internal static void HideFromAltTab(Window window)
         {
+#if WINDOWS
             WindowInteropHelper wndHelper = new WindowInteropHelper(window);
 
             if (Environment.Is64BitProcess)
@@ -36,6 +41,7 @@ namespace SystemTrayMenu.DllImports
                 exStyle |= WS_EX_TOOLWINDOW; // do not show when user presses alt + tab
                 SetWindowLong(wndHelper.Handle, GWL_EXSTYLE, (IntPtr)exStyle);
             }
+#endif
         }
 
         /// <summary>

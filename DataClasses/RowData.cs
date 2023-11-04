@@ -9,9 +9,14 @@ namespace SystemTrayMenu.DataClasses
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Runtime.CompilerServices;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+#else
+    using Avalonia;
+    using Avalonia.Media;
+#endif
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface;
@@ -21,7 +26,7 @@ namespace SystemTrayMenu.DataClasses
     {
         private Brush? backgroundBrush;
         private Brush? borderBrush;
-        private ImageSource? columnIcon;
+        private BitmapSource? columnIcon;
         private string? columnText;
         private bool isClicked;
         private bool isSelected;
@@ -109,7 +114,7 @@ namespace SystemTrayMenu.DataClasses
             }
         }
 
-        public ImageSource? ColumnIcon
+        public BitmapSource? ColumnIcon
         {
             get => columnIcon;
             set
@@ -288,6 +293,7 @@ namespace SystemTrayMenu.DataClasses
 
         internal void OpenShellContextMenu(Point? mousePosition)
         {
+#if TODO_LINUX
             Point position = default;
 
             if (mousePosition != null)
@@ -313,6 +319,7 @@ namespace SystemTrayMenu.DataClasses
             {
                 ShellContextMenu.OpenShellContextMenu(FileInfo, position);
             }
+#endif
         }
 
         internal void OpenSubMenu()

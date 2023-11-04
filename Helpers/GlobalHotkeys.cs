@@ -4,6 +4,7 @@
 //
 // Copyright (c) 2023-2023 Peter Kirmeier
 
+#if WINDOWS
 namespace SystemTrayMenu.Helpers
 {
     using System;
@@ -433,3 +434,4 @@ namespace SystemTrayMenu.Helpers
         }
     }
 }
+#endif

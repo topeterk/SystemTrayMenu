@@ -10,11 +10,19 @@ namespace SystemTrayMenu.Business
     using System.Data;
     using System.IO;
     using System.Linq;
+#if WINDOWS
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Threading;
     using Microsoft.Win32;
+#else
+    using Avalonia;
+    using Avalonia.Input;
+    using Avalonia.Threading;
+    using ModifierKeys = Avalonia.Input.KeyModifiers;
+    using Rect = System.Drawing.Rectangle;
+#endif
     using SystemTrayMenu.DataClasses;
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Helpers;
@@ -55,7 +63,9 @@ namespace SystemTrayMenu.Business
                 Settings.Default.Save();
             }
 
+#if WINDOWS
             keyboardInput.HotKeyPressed += SwitchOpenCloseByHotKey;
+#endif
             keyboardInput.RowSelectionChanged += waitToOpenMenu.RowSelectionChanged;
             keyboardInput.EnterPressed += waitToOpenMenu.OpenSubMenuByKey;
 
@@ -126,7 +136,9 @@ namespace SystemTrayMenu.Business
                 }
             }
 
+#if TODO_LINUX
             SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
+#endif
 
             mainMenu = new(null, Config.Path);
         }
@@ -134,7 +146,9 @@ namespace SystemTrayMenu.Business
         public void Dispose()
         {
             SingleAppInstance.Wakeup -= SwitchOpenCloseByHotKey;
+#if TODO_LINUX
             SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
+#endif
             workerMainMenu.Dispose();
             foreach (BackgroundWorker worker in workersSubMenu)
             {
@@ -204,7 +218,7 @@ namespace SystemTrayMenu.Business
                 workerMainMenu.CancelAsync();
                 menuNotifyIcon.LoadingStop();
             }
-            else if (mainMenu.Visibility == Visibility.Visible)
+            else if (mainMenu.GetVisibility() == Visibility.Visible)
             {
                 // Main menu is visible, hide all menus
                 mainMenu.HideWithFade(true);
@@ -228,7 +242,7 @@ namespace SystemTrayMenu.Business
         internal void KeyPressed(Key key, ModifierKeys modifiers)
         {
             // Look for a valid menu that is visible, active and has focus
-            if (mainMenu.Visibility == Visibility.Visible)
+            if (mainMenu.GetVisibility() == Visibility.Visible)
             {
                 Menu? menu = mainMenu;
                 do
@@ -236,7 +250,7 @@ namespace SystemTrayMenu.Business
                     if (menu.IsActive || menu.IsKeyboardFocusWithin)
                     {
                         // Send the keys to the active menu
-                        menu.Dispatcher.Invoke(keyboardInput.CmdKeyProcessed, new object[] { menu, key, modifiers });
+                        menu.Dispatcher.Invoke(() => keyboardInput.CmdKeyProcessed(menu, key, modifiers));
                         return;
                     }
 
@@ -337,7 +351,7 @@ namespace SystemTrayMenu.Business
 
         private void LoadSubMenuCompleted(object? senderCompleted, RunWorkerCompletedEventArgs e)
         {
-            if (e.Result == null || mainMenu.Visibility != Visibility.Visible)
+            if (e.Result == null || mainMenu.GetVisibility() != Visibility.Visible)
             {
                 return;
             }
@@ -364,10 +378,10 @@ namespace SystemTrayMenu.Business
                 // Sub Menu (completed)
                 // There will be some layout, size and position changes.
                 // Just hide the inner controls for a moment until all changes have been applied.
-                menu.windowFrame.Visibility = Visibility.Hidden;
+                menu.windowFrame.SetVisibility(Visibility.Hidden);
                 menu.AddItemsToMenu(menuData.RowDatas, menuData.DirectoryState);
                 AdjustMenusSizeAndLocation(menu.Level);
-                menu.windowFrame.Visibility = Visibility.Visible;
+                menu.windowFrame.SetVisibility(Visibility.Visible);
             }
             else
             {
@@ -444,7 +458,7 @@ namespace SystemTrayMenu.Business
                 timerStillActiveCheck.Start();
             }
 
-            menu.IsVisibleChanged += (sender, _) => MenuVisibleChanged((Menu)sender);
+            menu.VisibilityChanged += MenuVisibleChanged;
             menu.RowSelectionChanged += waitToOpenMenu.RowSelectionChanged;
             menu.CellMouseEnter += waitToOpenMenu.MouseEnter;
             menu.CellMouseLeave += waitToOpenMenu.MouseLeave;
@@ -466,7 +480,7 @@ namespace SystemTrayMenu.Business
             menu.StartLoadSubMenu += StartLoadSubMenu;
             void StartLoadSubMenu(RowData rowData)
             {
-                if (mainMenu.Visibility != Visibility.Visible)
+                if (mainMenu.GetVisibility() != Visibility.Visible)
                 {
                     return;
                 }
@@ -508,7 +522,7 @@ namespace SystemTrayMenu.Business
 
         private void MenuVisibleChanged(Menu menu)
         {
-            if (menu.Visibility == Visibility.Visible)
+            if (menu.GetVisibility() == Visibility.Visible)
             {
                 AdjustMenusSizeAndLocation(menu.Level);
 
@@ -537,7 +551,7 @@ namespace SystemTrayMenu.Business
 
         private void FadeHalfOrOutIfNeeded()
         {
-            if (!App.IsActiveApp && mainMenu.Visibility == Visibility.Visible)
+            if (!App.IsActiveApp && mainMenu.GetVisibility() == Visibility.Visible)
             {
                 if (Settings.Default.StaysOpenWhenFocusLost && IsMouseOverAnyMenu(mainMenu) != null)
                 {
@@ -640,10 +654,10 @@ namespace SystemTrayMenu.Business
                     // Remember width of the initial menu as we don't want to overlap with it
                     if (taskbarPosition == TaskbarPosition.Left)
                     {
-                        screenBounds.X += (int)menu.Width - overlapTolerance;
+                        screenBounds.X += (int)(menu.Width - overlapTolerance);
                     }
 
-                    screenBounds.Width -= (int)menu.Width - overlapTolerance;
+                    screenBounds.Width -= (int)(menu.Width - overlapTolerance);
                 }
 
                 menuPredecessor = menu;
@@ -700,7 +714,12 @@ namespace SystemTrayMenu.Business
             try
             {
                 List<RowData> rowDatas = new();
+#if WINDOWS
                 foreach (RowData rowData in menu.GetDataGridView().Items.SourceCollection)
+#else
+                // TODO: SourceCollection
+                foreach (RowData rowData in menu.GetDataGridView().Items)
+#endif
                 {
                     // TODO: Check if this check is correct as it looks like wronge entries might be modified as well?
                     if (rowData.Path.StartsWith($"{e.OldFullPath}"))
@@ -808,7 +827,12 @@ namespace SystemTrayMenu.Business
                 rowData.HiddenEntry = hasHiddenFlag;
                 rowData.LoadIcon(true);
 
+#if WINDOWS
                 var items = (List<RowData>)menu.GetDataGridView().Items.SourceCollection;
+#else
+                // TODO: SourceCollection
+                var items = menu.GetDataGridView().Items;
+#endif
                 List<RowData> rowDatas = new(items.Count + 1) { rowData };
                 foreach (RowData item in items)
                 {

@@ -9,17 +9,17 @@ namespace SystemTrayMenu.DllImports
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
 
-    public static partial class NativeMethods
+    internal static partial class NativeMethods
     {
-        public const uint FOS_PICKFOLDERS = 0x00000020;
-        public const uint FOS_FORCEFILESYSTEM = 0x00000040;
-        public const uint FOS_NOVALIDATE = 0x00000100;
-        public const uint FOS_NOTESTFILECREATE = 0x00010000;
-        public const uint FOS_DONTADDTORECENT = 0x02000000;
+        internal const uint FOS_PICKFOLDERS = 0x00000020;
+        internal const uint FOS_FORCEFILESYSTEM = 0x00000040;
+        internal const uint FOS_NOVALIDATE = 0x00000100;
+        internal const uint FOS_NOTESTFILECREATE = 0x00010000;
+        internal const uint FOS_DONTADDTORECENT = 0x02000000;
 
-        public const uint S_OK = 0x0000;
+        internal const uint S_OK = 0x0000;
 
-        public const uint SIGDN_FILESYSPATH = 0x80058000;
+        internal const uint SIGDN_FILESYSPATH = 0x80058000;
 
         [ComImport]
         [SupportedOSPlatform("windows")]

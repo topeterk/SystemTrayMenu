@@ -4,7 +4,13 @@
 
 namespace SystemTrayMenu
 {
+#if WINDOWS
+    using System.Windows;
     using System.Windows.Media;
+#else
+    using System.Drawing;
+    using Avalonia.Media;
+#endif
 
     internal static class MenuDefines
     {
@@ -13,8 +19,15 @@ namespace SystemTrayMenu
 
         /* -- General -- */
 
+        public static SolidColorBrush ColorSystemControlDefault =>
+#if WINDOWS
+            SystemColors.ControlBrush;
+#else
+            new (Avalonia.Media.Color.FromArgb(SystemColors.Control.A, SystemColors.Control.R, SystemColors.Control.G, SystemColors.Control.B).ToUInt32());
+#endif
+
         public static SolidColorBrush ColorForeground =>
-            Config.IsDarkMode() ? Brushes.White : Brushes.Black;
+            Config.IsDarkMode() ? new(Colors.White) : new(Colors.Black);
 
         public static SolidColorBrush ColorSelectedItem =>
             Config.IsDarkMode() ? AppColors.DarkModeSelecetedItem : AppColors.SelectedItem;

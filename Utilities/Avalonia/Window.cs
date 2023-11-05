@@ -9,10 +9,7 @@ namespace SystemTrayMenu.Utilities
 {
     using System;
     using System.Threading.Tasks;
-    using Avalonia;
-    using Avalonia.Controls;
     using Avalonia.Input;
-    using Avalonia.Markup.Xaml;
     using Avalonia.Media;
     using Avalonia.Threading;
 
@@ -25,6 +22,13 @@ namespace SystemTrayMenu.Utilities
 
     public class Window : Avalonia.Controls.Window
     {
+        public Window()
+        {
+            RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias); // = ClearType
+
+            Opened += (sender, e) => ContentRendered?.Invoke(sender, e);
+        }
+
         internal event EventHandler? ContentRendered;
 
         internal event EventHandler<PointerEventArgs>? MouseEnter
@@ -74,18 +78,6 @@ namespace SystemTrayMenu.Utilities
             Task<bool?> dialog = ShowDialog<bool?>(this);
             dialog.Wait(); // TODO: Most likely we get stuck here as we have to await?
             return dialog.Result;
-        }
-
-        protected void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-#if DEBUG
-            this.AttachDevTools();
-#endif
-
-            RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias); // = ClearType
-
-            Opened += (sender, e) => ContentRendered?.Invoke(sender, e);
         }
     }
 }

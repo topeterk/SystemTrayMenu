@@ -36,7 +36,6 @@ namespace SystemTrayMenu.Utilities
     using Avalonia.Input;
     using Avalonia.Interactivity;
     using Avalonia.Markup.Xaml;
-    using Avalonia.Media.Imaging;
     using Avalonia.Platform;
 
     public delegate void RoutedEventHandler(object sender, RoutedEventArgs e);
@@ -45,7 +44,7 @@ namespace SystemTrayMenu.Utilities
     {
         internal static void Shutdown(this Application application)
         {
-            ((IClassicDesktopStyleApplicationLifetime?)application.ApplicationLifetime)?.Shutdown(); // TODO
+            ((IClassicDesktopStyleApplicationLifetime?)application.ApplicationLifetime)?.Shutdown();
         }
 
         internal static object GetData(this IDataObject obj, string dataFormat) => obj.Get(dataFormat) ?? new (); // TODO

@@ -85,9 +85,14 @@ namespace SystemTrayMenu
                     }
                 }
 
-                UserInterface.TaskbarLogo main = new (); // TODO
-
-                desktop.MainWindow = main;
+                // TODO: Get rid of this empty pseudo window?
+                desktop.MainWindow = new()
+                {
+                    ShowActivated = false,
+                    ShowInTaskbar = false,
+                    IsVisible = false,
+                    WindowState = WindowState.Minimized,
+                };
                 NativeMethods.Screen.DesktopScreens = desktop.MainWindow.Screens;
                 desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 desktop.Exit += AppExitHandler;

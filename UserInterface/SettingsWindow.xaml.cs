@@ -946,7 +946,7 @@ namespace SystemTrayMenu.UserInterface
                 Settings.Default.ColorArrowHoverDarkMode = textBoxColorArrowHoverDarkMode.Text;
                 Settings.Default.ColorArrowHoverBackgroundDarkMode = textBoxColorArrowHoverBackgroundDarkMode.Text;
 
-                Config.InitializeColors(false);
+                AppColors.Initialize(false);
             }
         }
 

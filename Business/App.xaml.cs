@@ -43,6 +43,7 @@ namespace SystemTrayMenu
         public App()
         {
             AppContext.SetSwitch("Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering", false);
+            AppColors.Initialize(true);
 
 #if !AVALONIA
             InitializeComponent();

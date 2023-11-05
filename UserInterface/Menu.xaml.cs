@@ -44,7 +44,7 @@ namespace SystemTrayMenu.UserInterface
     public partial class Menu : Window
     {
         private const int CornerRadiusConstant = 10;
-#if TODO_AVALONIA
+#if TODO_AVALONIA // Fade Events
         private static readonly RoutedEvent FadeToTransparentEvent = EventManager.RegisterRoutedEvent(
             nameof(FadeToTransparent), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Menu));
 
@@ -53,12 +53,6 @@ namespace SystemTrayMenu.UserInterface
 
         private static readonly RoutedEvent FadeOutEvent = EventManager.RegisterRoutedEvent(
             nameof(FadeOut), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Menu));
-#else
-        private static readonly RoutedEvent FadeToTransparentEvent;
-
-        private static readonly RoutedEvent FadeInEvent;
-
-        private static readonly RoutedEvent FadeOutEvent;
 #endif
 
         private readonly string folderPath;
@@ -243,8 +237,9 @@ namespace SystemTrayMenu.UserInterface
 
                 NativeMethods.HideFromAltTab(this);
 
+#if TODO_AVALONIA // Fade Events
                 RaiseEvent(new(routedEvent: FadeInEvent));
-
+#endif
                 FocusTextBox();
             };
 
@@ -308,7 +303,7 @@ namespace SystemTrayMenu.UserInterface
 
         internal event Action<Menu>? VisibilityChanged;
 
-#if TODO_AVALONIA
+#if TODO_AVALONIA // Fade Events
         internal event RoutedEventHandler FadeToTransparent
         {
             add { AddHandler(FadeToTransparentEvent, value); }
@@ -536,11 +531,13 @@ namespace SystemTrayMenu.UserInterface
 
             if (Opacity != 1D)
             {
+#if TODO_AVALONIA // Fade Events
                 if (Settings.Default.UseFading)
                 {
                     RaiseEvent(new(routedEvent: FadeInEvent));
                 }
                 else
+#endif
                 {
                     Opacity = 1D;
                 }
@@ -565,6 +562,7 @@ namespace SystemTrayMenu.UserInterface
             if (!Settings.Default.UseFading)
             {
                 Opacity = transparency ? 0.80D : 1D;
+#if TODO_AVALONIA // Fade Events
             }
             else if (transparency)
             {
@@ -573,6 +571,12 @@ namespace SystemTrayMenu.UserInterface
             else
             {
                 RaiseEvent(new(routedEvent: FadeInEvent));
+#else
+            }
+            else
+            {
+                Opacity = transparency ? 0.80D : 1D;
+#endif
             }
         }
 
@@ -600,16 +604,19 @@ namespace SystemTrayMenu.UserInterface
                 RowDataParent.SubMenu = null;
             }
 
+#if TODO_AVALONIA // Fade Events
             if (Settings.Default.UseFading)
             {
                 RaiseEvent(new(routedEvent: FadeOutEvent));
             }
             else
+#endif
             {
                 FadeOut_Completed(this, new());
             }
         }
 
+#if TODO_AVALONIA // Fade Events
         internal void StartFadeIn()
         {
             if (Settings.Default.UseFading)
@@ -617,6 +624,7 @@ namespace SystemTrayMenu.UserInterface
                 RaiseEvent(new(routedEvent: FadeInEvent));
             }
         }
+#endif
 
         /// <summary>
         /// Update the position and size of the menu.

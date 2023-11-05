@@ -161,6 +161,7 @@ namespace SystemTrayMenu.Helpers
         /// <returns>Rendered image.</returns>
         internal static RenderTargetBitmap ApplyOpactiy(BitmapSource originalBitmap, double opacity)
         {
+#if TODO_AVALONIA // The "Visual dVisual" must be created by UI thread?? (InvalidThreadException)
 #if !AVALONIA
             DrawingVisual dVisual = new ();
             using (DrawingContext dc = dVisual.RenderOpen())
@@ -180,6 +181,9 @@ namespace SystemTrayMenu.Helpers
 #endif
             targetBitmap.Render(dVisual);
             return targetBitmap;
+#else
+            return new(originalBitmap.PixelSize, originalBitmap.Dpi); // TODO: Rendering of image not working yet
+#endif
         }
     }
 }

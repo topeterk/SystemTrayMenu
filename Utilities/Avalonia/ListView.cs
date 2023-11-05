@@ -44,14 +44,19 @@ namespace SystemTrayMenu.Utilities
 
         internal ItemCollection Items
         {
-            get => (ItemCollection)ItemsSource!; // TODO: Evil cast
+            get
+            {
+                var lv = new ItemsControl();
+                lv.ItemsSource = ItemsSource;
+                return lv.Items;
+            }
             set => ItemsSource = value;
         }
 
         public void ScrollIntoView(int index)
         {
             var element = GetOrCreateElement(index);
-            ((TopLevel)VisualRoot!).UpdateLayout();
+            ((TopLevel?)VisualRoot)?.UpdateLayout();
             element.BringIntoView();
         }
     }

@@ -21,7 +21,15 @@ namespace SystemTrayMenu.UserInterface
     /// </summary>
     public partial class ColorPickerWindow : Window
     {
-        internal ColorPickerWindow(string description, Color initialColor)
+#if AVALONIA
+        public ColorPickerWindow()
+        {
+            // Dummy constructor to resolve this issue:
+            // Avalonia warning AVLN:0005: XAML resource "avares://SystemTrayMenu/UserInterface/ColorPickerWindow.axaml" won't be reachable via runtime loader, as no public constructor was found
+        }
+#endif
+
+        public ColorPickerWindow(string description, Color initialColor)
         {
             InitializeComponent();
 #if TODO_AVALONIA

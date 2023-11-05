@@ -68,6 +68,14 @@ namespace SystemTrayMenu.UserInterface
         private bool directionToRight;
         private Point lastLocation;
 
+#if AVALONIA
+        public Menu()
+        {
+            // Dummy constructor to resolve this issue:
+            // Avalonia warning AVLN:0005: XAML resource "avares://SystemTrayMenu/UserInterface/Menu.axaml" won't be reachable via runtime loader, as no public constructor was found
+        }
+#endif
+
         internal Menu(RowData? rowDataParent, string path)
         {
             InitializeComponent();

@@ -2,6 +2,10 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
+#if !AVALONIA || !DEBUG
+#define GLOBAL_TRY_CATCH
+#endif
+
 namespace SystemTrayMenu
 {
     using System;
@@ -17,7 +21,9 @@ namespace SystemTrayMenu
 
     internal static class Program
     {
+#if GLOBAL_TRY_CATCH
         private static bool isStartup = true;
+#endif
 
         [STAThread]
         private static void Main(string[] args)
@@ -36,7 +42,7 @@ namespace SystemTrayMenu
 #endif
 #endif
 
-#if !AVALONIA || !DEBUG
+#if GLOBAL_TRY_CATCH
             try
 #endif
             {
@@ -62,16 +68,17 @@ namespace SystemTrayMenu
                 if (SingleAppInstance.Initialize())
                 {
                     AppDomain currentDomain = AppDomain.CurrentDomain;
-#if !AVALONIA || !DEBUG
+#if GLOBAL_TRY_CATCH
                     currentDomain.UnhandledException += (sender, args)
                         => AskUserSendError((Exception)args.ExceptionObject);
 #endif
-
                     Scaling.Initialize();
                     FolderOptions.Initialize();
 #if !AVALONIA
                     using App app = new ();
+#if GLOBAL_TRY_CATCH
                     isStartup = false;
+#endif
                     Log.WriteApplicationRuns();
                     app.Run();
 #else
@@ -79,7 +86,9 @@ namespace SystemTrayMenu
                     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
                     // yet and stuff might break.
                     AppBuilder app = AppBuilder.Configure<App>();
+#if GLOBAL_TRY_CATCH
                     isStartup = false;
+#endif
                     app.UsePlatformDetect();
                     app.LogToTrace();
                     app.UseReactiveUI();
@@ -88,7 +97,7 @@ namespace SystemTrayMenu
 #endif
                 }
             }
-#if !AVALONIA || !DEBUG
+#if GLOBAL_TRY_CATCH
             catch (Exception ex)
             {
                 AskUserSendError(ex);
@@ -100,6 +109,7 @@ namespace SystemTrayMenu
                 Log.Close();
             }
 
+#if GLOBAL_TRY_CATCH
             static void AskUserSendError(Exception ex)
             {
                 Log.Error("Application Crashed", ex);
@@ -132,6 +142,7 @@ namespace SystemTrayMenu
                     AppRestart.ByThreadException();
                 }
             }
+#endif
         }
     }
 }

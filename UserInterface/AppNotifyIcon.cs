@@ -24,7 +24,7 @@ namespace SystemTrayMenu.UserInterface
         public AppNotifyIcon()
         {
             notifyIcon.ToolTip = "SystemTrayMenu";
-#if TODO_AVALONIA
+#if TODO_AVALONIA // System.Drawing.Icon replacement
             notifyIcon.Icon = Config.GetAppIcon().Handle;
 #else
             // Icon (more specific: System.Drawing) is no longer available, so it must be replaced
@@ -53,13 +53,17 @@ namespace SystemTrayMenu.UserInterface
 
         public void LoadingStart()
         {
+#if TODO_AVALONIA // System.Drawing.Icon replacement
             loadingIcon ??= App.LoadIconFromResource("Resources/Loading.ico");
             notifyIcon.UpdateIcon(loadingIcon.Handle);
+#endif
         }
 
         public void LoadingStop()
         {
+#if TODO_AVALONIA // System.Drawing.Icon replacement
             notifyIcon.UpdateIcon(Config.GetAppIcon().Handle);
+#endif
         }
     }
 }

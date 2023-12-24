@@ -295,7 +295,11 @@ namespace SystemTrayMenu.Utilities
 
         private static BitmapSource GetIconAsBitmapSourceSTA(string path, string resolvedPath, bool linkOverlay, bool isFolder)
         {
+#if TODO_LINUX
             BitmapSource? bitmapSource = TryGetIconAsBitmapSourceSTA(path, resolvedPath, linkOverlay, isFolder);
+#else
+            BitmapSource? bitmapSource = null;
+#endif
             bitmapSource ??= NotFoundImage;
             bitmapSource.Freeze(); // Make it accessible for any thread
             return bitmapSource;

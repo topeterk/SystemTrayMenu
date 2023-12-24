@@ -20,10 +20,13 @@ namespace SystemTrayMenu.Helpers
 
     public sealed class WindowsTaskbar
     {
+#if TODO_LINUX
         private const string ClassName = "Shell_TrayWnd";
+#endif
 
         public WindowsTaskbar()
         {
+#if TODO_LINUX
             IntPtr taskbarHandle = User32FindWindow(ClassName, null);
 
             APPBARDATA data = new()
@@ -47,6 +50,10 @@ namespace SystemTrayMenu.Helpers
                 AlwaysOnTop = (state & ABS.AlwaysOnTop) == ABS.AlwaysOnTop;
                 AutoHide = (state & ABS.Autohide) == ABS.Autohide;
             }
+#else
+            Position = TaskbarPosition.Unknown;
+            Bounds = default;
+#endif
         }
 
         public Rectangle Bounds

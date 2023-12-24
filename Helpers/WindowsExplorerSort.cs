@@ -2,6 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
+#if TODO_LINUX
 namespace SystemTrayMenu.Helpers
 {
     using System.Collections.Generic;
@@ -20,3 +21,4 @@ namespace SystemTrayMenu.Helpers
         }
     }
 }
+#endif

@@ -96,12 +96,15 @@ namespace SystemTrayMenu.Helpers
 
         internal static List<RowData> SortItems(List<RowData> rowDatas)
         {
+#if TODO_LINUX
             if (Properties.Settings.Default.SortByTypeAndNameWindowsExplorerSort)
             {
                 rowDatas = rowDatas.OrderByDescending(x => x.IsFolder)
                     .ThenBy(x => x.ColumnText, new WindowsExplorerSort()).ToList();
             }
-            else if (Properties.Settings.Default.SortByTypeAndDate)
+            else
+#endif
+            if (Properties.Settings.Default.SortByTypeAndDate)
             {
                 rowDatas = rowDatas.OrderByDescending(x => x.IsFolder)
                     .ThenByDescending(x => x.FileInfo.LastWriteTime).ToList();

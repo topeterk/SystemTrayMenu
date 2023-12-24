@@ -5,6 +5,7 @@
 namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
 {
     using System;
+    using System.Threading.Tasks;
 #if !AVALONIA
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
@@ -13,12 +14,12 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
 #else
-    using System.Threading.Tasks;
     using Avalonia.Controls;
+    using Avalonia.Platform.Storage;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
 
-    public class FolderDialog : IFolderDialog, IDisposable
+    public class FolderDialog : IDisposable
     {
         private bool isDisposed;
 
@@ -51,7 +52,7 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
 #if TODO_AVALONIA
         [SupportedOSPlatform("windows")]
 #endif
-        public bool ShowDialog(Window? owner)
+        public async Task<bool> ShowDialog(Window? owner)
         {
 #if TODO_AVALONIA
             NativeMethods.IFileDialog frm = (NativeMethods.IFileDialog)new NativeMethods.FileOpenDialogRCW();
@@ -103,7 +104,7 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
                                 try
                                 {
                                     Folder = Marshal.PtrToStringAuto(pszString);
-                                    return true;
+                                    return await Task.FromResult(true);
                                 }
                                 finally
                                 {
@@ -118,22 +119,36 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
                     Log.Warn("Folder Dialog failed", ex);
                 }
             }
-#else
-            // TODO: Replace with proper dialog, settings and translation
-            OpenFolderDialog dialog = new();
-            dialog.Directory = InitialFolder;
-            dialog.Title = "Select Folder";
 
+            return await Task.FromResult(false);
+#else
             if (owner is null)
             {
                 owner = new Window();
             }
 
-            Task<string?> dialogtask = dialog.ShowAsync(owner);
-            dialogtask.Wait();
-            Folder = dialogtask.Result;
+            // TODO: Replace with proper dialog, settings and translation
+            OpenFolderDialog dialog = new();
+            if (!string.IsNullOrEmpty(InitialFolder))
+            {
+                dialog.Directory = InitialFolder;
+            }
+            else
+            {
+                dialog.Directory = (await TopLevel.GetTopLevel(owner)?.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents))?.Path.LocalPath;
+            }
+
+            if (string.IsNullOrEmpty(dialog.Directory))
+            {
+                dialog.Directory = ".";
+            }
+
+            dialog.Title = "Select Folder";
+
+            Folder = await dialog.ShowAsync(owner);
+
+            return await Task.FromResult(!string.IsNullOrEmpty(Folder));
 #endif
-            return false;
         }
 
         public void Dispose()

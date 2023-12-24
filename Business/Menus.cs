@@ -106,6 +106,12 @@ namespace SystemTrayMenu.Business
                 FadeHalfOrOutIfNeeded();
             };
 
+#if TODO_AVALONIA
+            SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
+#endif
+
+            mainMenu = new(null, Config.Path);
+
             CreateWatcher(Config.Path, false);
             foreach (var pathAndFlags in DirectoryHelpers.GetAddionalPathsForMainMenu())
             {
@@ -138,12 +144,6 @@ namespace SystemTrayMenu.Business
                     Log.Warn($"Failed to {nameof(CreateWatcher)}: {path}", ex);
                 }
             }
-
-#if TODO_AVALONIA
-            SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
-#endif
-
-            mainMenu = new(null, Config.Path);
         }
 
         public void Dispose()
@@ -296,7 +296,7 @@ namespace SystemTrayMenu.Business
             eDoWork.Result = menuData;
         }
 
-        private void LoadMainMenuCompleted(object? sender, RunWorkerCompletedEventArgs e)
+        private async void LoadMainMenuCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
             keyboardInput.ResetSelectedByKey();
             menuNotifyIcon.LoadingStop();
@@ -334,13 +334,13 @@ namespace SystemTrayMenu.Business
                     case MenuDataDirectoryState.Empty:
                         MessageBox.Show(Translator.GetText("Your root directory for the app does not exist or is empty! Change the root directory or put some files, directories or shortcuts into the root directory."));
                         OpenFolder(Config.Path);
-                        Config.SetFolderByUser();
+                        await Config.SetFolderByUser(mainMenu);
                         AppRestart.ByConfigChange();
                         break;
                     case MenuDataDirectoryState.NoAccess:
                         MessageBox.Show(Translator.GetText("You have no access to the root directory of the app. Grant access to the directory or change the root directory."));
                         OpenFolder(Config.Path);
-                        Config.SetFolderByUser();
+                        await Config.SetFolderByUser(mainMenu);
                         AppRestart.ByConfigChange();
                         break;
                     case MenuDataDirectoryState.Undefined:

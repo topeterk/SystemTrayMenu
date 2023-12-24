@@ -6,6 +6,7 @@ namespace SystemTrayMenu
 {
     using System;
     using System.IO;
+    using System.Threading.Tasks;
 #if WINDOWS
     using System.Windows;
     using Microsoft.Win32;
@@ -118,19 +119,19 @@ namespace SystemTrayMenu
                     "SystemTrayMenu",
                     MessageBoxButton.OK);
                 ShowHelpFAQ();
-                SetFolderByUser();
+                SetFolderByUser().Wait();
             }
 #endif
 
             return !string.IsNullOrEmpty(Path);
         }
 
-        public static void SetFolderByUser(Window? owner = null, bool save = true)
+        public static async Task SetFolderByUser(Window? owner = null, bool save = true)
         {
             using FolderDialog dialog = new();
             dialog.InitialFolder = Path;
 
-            if (dialog.ShowDialog(owner))
+            if (await dialog.ShowDialog(owner))
             {
                 Settings.Default.PathDirectory = dialog.Folder;
                 if (save)
@@ -140,12 +141,12 @@ namespace SystemTrayMenu
             }
         }
 
-        public static void SetFolderIcoByUser(Window owner)
+        public static async Task SetFolderIcoByUser(Window owner)
         {
             using FolderDialog dialog = new();
             dialog.InitialFolder = Settings.Default.PathIcoDirectory;
 
-            if (dialog.ShowDialog(owner))
+            if (await dialog.ShowDialog(owner))
             {
                 Settings.Default.PathIcoDirectory = dialog.Folder;
             }

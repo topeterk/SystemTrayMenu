@@ -698,9 +698,9 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
-        private void ButtonChange_Click(object sender, RoutedEventArgs e)
+        private async void ButtonChange_Click(object sender, RoutedEventArgs e)
         {
-            Config.SetFolderByUser(this, false);
+            await Config.SetFolderByUser(this, false);
             textBoxFolder.Text = Config.Path;
         }
 
@@ -755,9 +755,9 @@ namespace SystemTrayMenu.UserInterface
             checkBoxCheckForUpdates.IsChecked = false;
         }
 
-        private void ButtonChangeIcoFolder_Click(object sender, RoutedEventArgs e)
+        private async void ButtonChangeIcoFolder_Click(object sender, RoutedEventArgs e)
         {
-            Config.SetFolderIcoByUser(this);
+            await Config.SetFolderIcoByUser(this);
             textBoxIcoFolder.Text = Settings.Default.PathIcoDirectory;
         }
 
@@ -776,12 +776,12 @@ namespace SystemTrayMenu.UserInterface
             checkBoxGenerateShortcutsToDrives.IsChecked = false;
         }
 
-        private void ButtonAddFolderToRootFolder_Click(object sender, RoutedEventArgs e)
+        private async void ButtonAddFolderToRootFolder_Click(object sender, RoutedEventArgs e)
         {
             using FolderDialog dialog = new();
             dialog.InitialFolder = Config.Path;
 
-            if (dialog.ShowDialog(this))
+            if (await dialog.ShowDialog(this))
             {
                 if (!string.IsNullOrEmpty(dialog.Folder))
                 {

@@ -18,6 +18,12 @@ namespace SystemTrayMenu.Helpers
     {
         internal static void DiscoverItems(BackgroundWorker? worker, string path, ref MenuData menuData)
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                menuData.DirectoryState = MenuDataDirectoryState.Empty;
+                return;
+            }
+
             bool isNetworkRoot = false;
             try
             {

@@ -10,6 +10,7 @@ namespace SystemTrayMenu
 #if WINDOWS
     using System.Windows;
     using Microsoft.Win32;
+    using SystemTrayMenu.DllImports;
 #endif
 #if !AVALONIA
     using System.Windows.Media;
@@ -17,7 +18,6 @@ namespace SystemTrayMenu
     using Avalonia.Media;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
-    using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
@@ -95,7 +95,7 @@ namespace SystemTrayMenu
             }
         }
 
-        public static bool SelectRootFolder(string[] args)
+        public static void ParseCommandline(string[] args)
         {
             // When given by command line take path from there
             if (args.Length > 0 && args[0] != "-r")
@@ -105,28 +105,9 @@ namespace SystemTrayMenu
                 Settings.Default.PathDirectory = path;
                 Settings.Default.Save();
             }
-
-            // Why not always just boot up to main menu and validate it there
-            // as later we can spawn windows but this is not possible here!
-#if TODO_AVALONIA
-            // If not set by config yet and also not set by command line, ask the user
-            if (string.IsNullOrEmpty(Path))
-            {
-                string textFirstStart = Translator.GetText(
-                    "Read the FAQ and then choose a root directory for SystemTrayMenu.");
-                MessageBox.Show(
-                    textFirstStart,
-                    "SystemTrayMenu",
-                    MessageBoxButton.OK);
-                ShowHelpFAQ();
-                SetFolderByUser().Wait();
-            }
-#endif
-
-            return !string.IsNullOrEmpty(Path);
         }
 
-        public static async Task SetFolderByUser(Window? owner = null, bool save = true)
+        public static async Task SetFolderByUser(Window owner, bool save = true)
         {
             using FolderDialog dialog = new();
             dialog.InitialFolder = Path;

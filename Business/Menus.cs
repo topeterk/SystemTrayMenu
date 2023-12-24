@@ -21,6 +21,7 @@ namespace SystemTrayMenu.Business
 #else
     using Avalonia.Input;
     using Avalonia.Threading;
+    using Application = Avalonia.Application;
     using ModifierKeys = Avalonia.Input.KeyModifiers;
     using Point = Avalonia.Point;
     using Rect = System.Drawing.Rectangle;
@@ -342,10 +343,27 @@ namespace SystemTrayMenu.Business
 
                         break;
                     case MenuDataDirectoryState.Empty:
-                        MessageBox.Show(Translator.GetText("Your root directory for the app does not exist or is empty! Change the root directory or put some files, directories or shortcuts into the root directory."));
-                        OpenFolder(Config.Path);
+                        if (string.IsNullOrEmpty(Config.Path))
+                        {
+                            MessageBox.Show(Translator.GetText("Read the FAQ and then choose a root directory for SystemTrayMenu."));
+                            Config.ShowHelpFAQ();
+                        }
+                        else
+                        {
+                            MessageBox.Show(Translator.GetText("Your root directory for the app does not exist or is empty! Change the root directory or put some files, directories or shortcuts into the root directory."));
+                            OpenFolder(Config.Path);
+                        }
+
                         await Config.SetFolderByUser(mainMenu);
-                        AppRestart.ByConfigChange();
+                        if (string.IsNullOrEmpty(Config.Path))
+                        {
+                            Application.Current.Shutdown();
+                        }
+                        else
+                        {
+                            AppRestart.ByConfigChange();
+                        }
+
                         break;
                     case MenuDataDirectoryState.NoAccess:
                         MessageBox.Show(Translator.GetText("You have no access to the root directory of the app. Grant access to the directory or change the root directory."));

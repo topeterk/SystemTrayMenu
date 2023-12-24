@@ -55,20 +55,6 @@ namespace SystemTrayMenu
                 Config.Initialize();
                 Translator.Initialize();
 
-                // Without a valid path we cannot do anything, just close application
-                if (!Config.SelectRootFolder(args))
-                {
-                    // Why not always just boot up to main menu and validate it there
-                    // as later we can spawn windows but this is not possible here!
-#if TODO_AVALONIA
-                    MessageBox.Show(
-                        Translator.GetText("Your root directory for the app does not exist or is empty! Change the root directory or put some files, directories or shortcuts into the root directory."),
-                        "SystemTrayMenu",
-                        MessageBoxButton.OK);
-                    return;
-#endif
-                }
-
                 if (SingleAppInstance.Initialize())
                 {
                     AppDomain currentDomain = AppDomain.CurrentDomain;
@@ -78,6 +64,8 @@ namespace SystemTrayMenu
 #endif
                     Scaling.Initialize();
                     FolderOptions.Initialize();
+
+                    Config.ParseCommandline(args);
 #if !AVALONIA
                     using App app = new ();
 #if GLOBAL_TRY_CATCH

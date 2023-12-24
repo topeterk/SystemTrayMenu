@@ -56,9 +56,6 @@ namespace SystemTrayMenu.Utilities
                     throw;
                 }
             }
-#else
-            hideHiddenEntries = false;
-            hideSystemEntries = false;
 #endif
         }
 

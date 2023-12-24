@@ -8,6 +8,7 @@ namespace SystemTrayMenu
     using System.IO;
 #if WINDOWS
     using System.Windows;
+    using Microsoft.Win32;
 #endif
 #if !AVALONIA
     using System.Windows.Media;
@@ -15,7 +16,6 @@ namespace SystemTrayMenu
     using Avalonia.Media;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
-    using Microsoft.Win32;
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
@@ -24,7 +24,7 @@ namespace SystemTrayMenu
 
     public static class Config
     {
-        private static readonly Icon? IconRootFolder = IconReader.GetRootFolderIcon(Path);
+        private static Icon? iconRootFolder;
         private static Icon? applicationIcon;
 
         private static bool readDarkModeDone;
@@ -71,9 +71,15 @@ namespace SystemTrayMenu
 
         public static Icon GetAppIcon()
         {
-            if (Settings.Default.UseIconFromRootFolder && (IconRootFolder != null))
+            if (Settings.Default.UseIconFromRootFolder && iconRootFolder is null)
             {
-                return IconRootFolder;
+                // Load icon only once
+                iconRootFolder = IconReader.GetRootFolderIcon(Path);
+            }
+
+            if (Settings.Default.UseIconFromRootFolder && iconRootFolder is not null)
+            {
+                return iconRootFolder;
             }
             else
             {
@@ -88,19 +94,21 @@ namespace SystemTrayMenu
             }
         }
 
-        public static void SetFolderByWindowsContextMenu(string[] args)
+        public static bool SelectRootFolder(string[] args)
         {
-            if (args != null && args.Length > 0 && args[0] != "-r")
+            // When given by command line take path from there
+            if (args.Length > 0 && args[0] != "-r")
             {
                 string path = args[0];
-                Log.Info($"SetFolderByWindowsContextMenu() path: {path}");
+                Log.Info($"SetFolderByCommandLine() path: {path}");
                 Settings.Default.PathDirectory = path;
                 Settings.Default.Save();
             }
-        }
 
-        public static void LoadOrSetByUser()
-        {
+            // Why not always just boot up to main menu and validate it there
+            // as later we can spawn windows but this is not possible here!
+#if TODO_AVALONIA
+            // If not set by config yet and also not set by command line, ask the user
             if (string.IsNullOrEmpty(Path))
             {
                 string textFirstStart = Translator.GetText(
@@ -112,6 +120,9 @@ namespace SystemTrayMenu
                 ShowHelpFAQ();
                 SetFolderByUser();
             }
+#endif
+
+            return !string.IsNullOrEmpty(Path);
         }
 
         public static void SetFolderByUser(Window? owner = null, bool save = true)
@@ -158,6 +169,7 @@ namespace SystemTrayMenu
         {
             if (!readDarkModeDone)
             {
+#if TODO_LINUX
                 // 0 = Dark mode, 1 = Light mode
                 if (Settings.Default.IsDarkModeAlwaysOn ||
                     IsRegistryValueThisValue(
@@ -171,6 +183,7 @@ namespace SystemTrayMenu
                 // Required for native UI rendering like the ShellContextMenu
                 NativeMethods.SetPreferredAppMode(isDarkMode ? NativeMethods.PreferredAppMode.ForceDark : NativeMethods.PreferredAppMode.ForceLight);
                 NativeMethods.FlushMenuThemes();
+#endif
 
                 readDarkModeDone = true;
             }
@@ -192,6 +205,7 @@ namespace SystemTrayMenu
         {
             if (!readHideFileExtdone)
             {
+#if TODO_LINUX
                 // 0 = To show extensions, 1 = To hide extensions
                 if (IsRegistryValueThisValue(
                     @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced",
@@ -200,13 +214,14 @@ namespace SystemTrayMenu
                 {
                     isHideFileExtension = true;
                 }
-
+#endif
                 readHideFileExtdone = true;
             }
 
             return isHideFileExtension;
         }
 
+#if TODO_LINUX
         private static bool IsRegistryValueThisValue(string keyName, string valueName, string value)
         {
             bool isRegistryValueThisValue = false;
@@ -239,6 +254,7 @@ namespace SystemTrayMenu
 
             return isRegistryValueThisValue;
         }
+#endif
 
         private static void UpgradeIfNotUpgraded()
         {

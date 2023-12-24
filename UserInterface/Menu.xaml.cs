@@ -55,7 +55,7 @@ namespace SystemTrayMenu.UserInterface
             nameof(FadeOut), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Menu));
 #endif
 
-        private readonly string folderPath;
+        private readonly string? folderPath;
 
         private int countLeftMouseButtonClicked;
         private bool isShellContextMenuOpen;
@@ -70,7 +70,7 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
-        internal Menu(RowData? rowDataParent, string path)
+        internal Menu(RowData? rowDataParent, string? path)
         {
             InitializeComponent();
 
@@ -133,10 +133,18 @@ namespace SystemTrayMenu.UserInterface
                 buttonRestart.SetVisibility(Visibility.Collapsed);
             }
 
-            string title = new DirectoryInfo(path).Name;
-            if (title.Length > MenuDefines.LengthMax)
+            string title;
+            if (string.IsNullOrEmpty(path))
             {
-                title = $"{title[..MenuDefines.LengthMax]}...";
+                title = Translator.GetText("Directory empty");
+            }
+            else
+            {
+                title = new DirectoryInfo(path).Name;
+                if (title.Length > MenuDefines.LengthMax)
+                {
+                    title = $"{title[..MenuDefines.LengthMax]}...";
+                }
             }
 
 #if DEBUG

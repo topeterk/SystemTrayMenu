@@ -110,38 +110,42 @@ namespace SystemTrayMenu.Business
             SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
 #endif
 
-            mainMenu = new(null, Config.Path);
+            mainMenu = new(null, string.IsNullOrEmpty(Config.Path) ? null : Config.Path);
 
-            CreateWatcher(Config.Path, false);
-            foreach (var pathAndFlags in DirectoryHelpers.GetAddionalPathsForMainMenu())
+            // Only install file system watchers when a path is properly set
+            if (!string.IsNullOrEmpty(Config.Path))
             {
-                CreateWatcher(pathAndFlags.Path, pathAndFlags.Recursive);
-            }
-
-            void CreateWatcher(string path, bool recursiv)
-            {
-                try
+                CreateWatcher(Config.Path, false);
+                foreach (var pathAndFlags in DirectoryHelpers.GetAddionalPathsForMainMenu())
                 {
-                    FileSystemWatcher watcher = new()
-                    {
-                        Path = path,
-                        NotifyFilter = NotifyFilters.Attributes |
-                        NotifyFilters.DirectoryName |
-                        NotifyFilters.FileName |
-                        NotifyFilters.LastWrite,
-                        Filter = "*.*",
-                    };
-                    watcher.Created += WatcherProcessItem;
-                    watcher.Deleted += WatcherProcessItem;
-                    watcher.Renamed += WatcherProcessItem;
-                    watcher.Changed += WatcherProcessItem;
-                    watcher.IncludeSubdirectories = recursiv;
-                    watcher.EnableRaisingEvents = true;
-                    watchers.Add(watcher);
+                    CreateWatcher(pathAndFlags.Path, pathAndFlags.Recursive);
                 }
-                catch (Exception ex)
+
+                void CreateWatcher(string path, bool recursiv)
                 {
-                    Log.Warn($"Failed to {nameof(CreateWatcher)}: {path}", ex);
+                    try
+                    {
+                        FileSystemWatcher watcher = new()
+                        {
+                            Path = path,
+                            NotifyFilter = NotifyFilters.Attributes |
+                            NotifyFilters.DirectoryName |
+                            NotifyFilters.FileName |
+                            NotifyFilters.LastWrite,
+                            Filter = "*.*",
+                        };
+                        watcher.Created += WatcherProcessItem;
+                        watcher.Deleted += WatcherProcessItem;
+                        watcher.Renamed += WatcherProcessItem;
+                        watcher.Changed += WatcherProcessItem;
+                        watcher.IncludeSubdirectories = recursiv;
+                        watcher.EnableRaisingEvents = true;
+                        watchers.Add(watcher);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warn($"Failed to {nameof(CreateWatcher)}: {path}", ex);
+                    }
                 }
             }
         }
@@ -177,7 +181,13 @@ namespace SystemTrayMenu.Business
             mainMenu.Close();
         }
 
-        internal static void OpenFolder(string path) => Log.ProcessStart(path);
+        internal static void OpenFolder(string? path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                Log.ProcessStart(path);
+            }
+        }
 
         internal void Startup()
         {

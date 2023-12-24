@@ -29,7 +29,9 @@ namespace SystemTrayMenu.Utilities
                     resolvedFilename = GetShortcutFileNamePath(shortcutFilename, out isFolderByShell);
                 }
 
+#if WINDOWS
                 staThread.SetApartmentState(ApartmentState.STA);
+#endif
                 staThread.Start(shortcutFilename);
                 staThread.Join();
             }

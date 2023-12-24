@@ -143,7 +143,6 @@ EXIT 0</PreBuildEvent>
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.5" />
 	<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.5" />
 	<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.5" />
-	<PackageReference Include="Avalonia.Themes.Simple" Version="11.0.5" />
 	<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>

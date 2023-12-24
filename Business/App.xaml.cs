@@ -75,16 +75,10 @@ namespace SystemTrayMenu
 
         public override void OnFrameworkInitializationCompleted()
         {
+            RequestedThemeVariant = Config.IsDarkMode() ? ThemeVariant.Dark : ThemeVariant.Light;
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                foreach (IStyle style in Styles)
-                {
-                    if (style is FluentTheme theme)
-                    {
-                        // TODO: theme.Mode = Settings.DarkMode ? FluentThemeMode.Dark : FluentThemeMode.Light;
-                    }
-                }
-
                 // TODO: Get rid of this empty pseudo window?
                 desktop.MainWindow = new()
                 {

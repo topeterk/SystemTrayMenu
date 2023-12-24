@@ -706,7 +706,9 @@ namespace SystemTrayMenu.UserInterface
 
         private void ButtonOpenFolder_Click(object sender, RoutedEventArgs e)
         {
+#if TODO_LINUX
             Log.ProcessStart("explorer.exe", Config.Path, true);
+#endif
         }
 
         private void ButtonChangeRelativeFolder_Click(object sender, RoutedEventArgs e)

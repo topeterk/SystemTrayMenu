@@ -10,6 +10,7 @@ namespace SystemTrayMenu
 {
     using System;
     using System.Reflection;
+    using System.Threading;
 #if WINDOWS
     using System.Windows;
 #endif
@@ -28,6 +29,7 @@ namespace SystemTrayMenu
         [STAThread]
         private static void Main(string[] args)
         {
+            Thread.CurrentThread.Name = "MainThread";
 #if !WINDOWS
 #if !REMOTE_DEBBUGING_STARTUP_BREAK
 #if WAIT_FOREVER

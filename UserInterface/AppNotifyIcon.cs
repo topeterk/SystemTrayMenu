@@ -8,10 +8,11 @@ namespace SystemTrayMenu.UserInterface
     using System.Drawing;
 #if !AVALONIA
     using System.Windows.Threading;
+    using H.NotifyIcon.Core;
 #else
+    using Avalonia.Controls;
     using Avalonia.Threading;
 #endif
-    using H.NotifyIcon.Core;
     using SystemTrayMenu.Utilities;
 
     internal class AppNotifyIcon : IDisposable
@@ -23,7 +24,13 @@ namespace SystemTrayMenu.UserInterface
         public AppNotifyIcon()
         {
             notifyIcon.ToolTip = "SystemTrayMenu";
+#if TODO_AVALONIA
             notifyIcon.Icon = Config.GetAppIcon().Handle;
+#else
+            // Icon (more specific: System.Drawing) is no longer available, so it must be replaced
+            // As quick fix just load the static Icon here only.
+            notifyIcon.Icon = new WindowIcon(new LocalResourceBitmap("/Resources/SystemTrayMenu.ico"));
+#endif
             notifyIcon.ContextMenu = new AppContextMenu().Create();
             notifyIcon.MessageWindow.MouseEventReceived += (sender, e) =>
             {

@@ -10,11 +10,11 @@ namespace SystemTrayMenu.UserInterface
 #if !AVALONIA
     using System.Windows;
     using System.Windows.Threading;
+    using H.NotifyIcon.Core;
 #else
     using Avalonia;
     using Avalonia.Threading;
 #endif
-    using H.NotifyIcon.Core;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Utilities;
 

@@ -91,6 +91,7 @@ namespace SystemTrayMenu.Utilities
         internal static void Unload()
         {
             ipcPipe?.Dispose();
+            ipcPipe = null;
         }
     }
 }

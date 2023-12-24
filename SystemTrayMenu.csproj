@@ -115,7 +115,6 @@ EXIT 0</PreBuildEvent>
   </ItemGroup>
   <!-- References NuGet -->
   <ItemGroup>
-    <PackageReference Include="H.NotifyIcon" Version="2.0.118" />
     <PackageReference Include="HidSharp" Version="2.1.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0-preview1.23165.1">
       <PrivateAssets>all</PrivateAssets>
@@ -132,6 +131,7 @@ EXIT 0</PreBuildEvent>
   </ItemGroup>
   <ItemGroup Condition=" '$(UseWPF)' ">
     <FrameworkReference Update="Microsoft.WindowsDesktop.App;Microsoft.WindowsDesktop.App.WPF" TargetingPackVersion="7.0.0" />
+    <PackageReference Include="H.NotifyIcon" Version="2.0.118" />
     <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
   </ItemGroup>
   <ItemGroup Condition=" !'$(UseWPF)' ">

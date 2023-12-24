@@ -18,7 +18,6 @@ namespace SystemTrayMenu
     using Avalonia.Markup.Xaml;
     using Avalonia.Platform;
     using Avalonia.Styling;
-    using Avalonia.Themes.Fluent;
     using Avalonia.Threading;
 #endif
     using SystemTrayMenu.Business;
@@ -175,6 +174,8 @@ namespace SystemTrayMenu
             {
                 updateCheckTimer?.Dispose();
             }
+
+            Dispose();
         }
 #endif
     }

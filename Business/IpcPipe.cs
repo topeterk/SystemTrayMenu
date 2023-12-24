@@ -48,6 +48,7 @@ namespace SystemTrayMenu.Business
             serverHandler = handler;
 
             serverThread = new(ServerThread);
+            serverThread.Name = "IpcPipe Server";
             serverThread?.Start(this);
         }
 

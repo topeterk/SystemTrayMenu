@@ -148,12 +148,12 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
                 if (folders.Count == 1)
                 {
                     Folder = folders[0].Path.LocalPath;
-                    return await Task.FromResult(true);
+                    return true;
                 }
             }
 #endif
 
-            return await Task.FromResult(false);
+            return false;
         }
 
         public void Dispose()

@@ -700,8 +700,10 @@ namespace SystemTrayMenu.UserInterface
 
         private async void ButtonChange_Click(object sender, RoutedEventArgs e)
         {
-            await Config.SetFolderByUser(this, false);
-            textBoxFolder.Text = Config.Path;
+            if (await Config.SetFolderByUser(this, false))
+            {
+                textBoxFolder.Text = Config.Path;
+            }
         }
 
         private void ButtonOpenFolder_Click(object sender, RoutedEventArgs e)
@@ -759,8 +761,10 @@ namespace SystemTrayMenu.UserInterface
 
         private async void ButtonChangeIcoFolder_Click(object sender, RoutedEventArgs e)
         {
-            await Config.SetFolderIcoByUser(this);
-            textBoxIcoFolder.Text = Settings.Default.PathIcoDirectory;
+            if (await Config.SetFolderIcoByUser(this))
+            {
+                textBoxIcoFolder.Text = Settings.Default.PathIcoDirectory;
+            }
         }
 
         private void ButtonAddSampleStartMenuFolder_Click(object sender, RoutedEventArgs e)

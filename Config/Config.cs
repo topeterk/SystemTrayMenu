@@ -107,7 +107,7 @@ namespace SystemTrayMenu
             }
         }
 
-        public static async Task SetFolderByUser(Window owner, bool save = true)
+        public static async Task<bool> SetFolderByUser(Window owner, bool save = true)
         {
             using FolderDialog dialog = new();
             dialog.InitialFolder = Path;
@@ -119,10 +119,14 @@ namespace SystemTrayMenu
                 {
                     Settings.Default.Save();
                 }
+
+                return true;
             }
+
+            return false;
         }
 
-        public static async Task SetFolderIcoByUser(Window owner)
+        public static async Task<bool> SetFolderIcoByUser(Window owner)
         {
             using FolderDialog dialog = new();
             dialog.InitialFolder = Settings.Default.PathIcoDirectory;
@@ -130,7 +134,10 @@ namespace SystemTrayMenu
             if (await dialog.ShowDialog(owner))
             {
                 Settings.Default.PathIcoDirectory = dialog.Folder;
+                return true;
             }
+
+            return false;
         }
 
         internal static void ShowHelpFAQ()

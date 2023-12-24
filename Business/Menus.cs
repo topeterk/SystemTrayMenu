@@ -354,13 +354,20 @@ namespace SystemTrayMenu.Business
                             OpenFolder(Config.Path);
                         }
 
-                        await Config.SetFolderByUser(mainMenu);
-                        if (string.IsNullOrEmpty(Config.Path))
+                        if (!await Config.SetFolderByUser(mainMenu))
                         {
+                            // Most likely the user canceled
+                            Application.Current.Shutdown();
+                        }
+                        else if (string.IsNullOrEmpty(Config.Path))
+                        {
+                            // Still not a valid path set.
+                            // Stop here otherwise this most likely loop again to this point.
                             Application.Current.Shutdown();
                         }
                         else
                         {
+                            // Everything looks fine so far, restart with new path.
                             AppRestart.ByConfigChange();
                         }
 
@@ -368,8 +375,23 @@ namespace SystemTrayMenu.Business
                     case MenuDataDirectoryState.NoAccess:
                         MessageBox.Show(Translator.GetText("You have no access to the root directory of the app. Grant access to the directory or change the root directory."));
                         OpenFolder(Config.Path);
-                        await Config.SetFolderByUser(mainMenu);
-                        AppRestart.ByConfigChange();
+                        if (!await Config.SetFolderByUser(mainMenu))
+                        {
+                            // Most likely the user canceled
+                            Application.Current.Shutdown();
+                        }
+                        else if (string.IsNullOrEmpty(Config.Path))
+                        {
+                            // Still not a valid path set.
+                            // Stop here otherwise this most likely loop again to this point.
+                            Application.Current.Shutdown();
+                        }
+                        else
+                        {
+                            // Everything looks fine so far, restart with new path.
+                            AppRestart.ByConfigChange();
+                        }
+
                         break;
                     case MenuDataDirectoryState.Undefined:
                         Log.Info($"{nameof(MenuDataDirectoryState)}.{nameof(MenuDataDirectoryState.Undefined)}");

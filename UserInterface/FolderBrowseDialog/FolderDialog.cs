@@ -14,6 +14,7 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
 #else
+    using System.Collections.Generic;
     using Avalonia.Controls;
     using Avalonia.Platform.Storage;
     using Window = SystemTrayMenu.Utilities.Window;
@@ -52,7 +53,7 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
 #if TODO_AVALONIA
         [SupportedOSPlatform("windows")]
 #endif
-        public async Task<bool> ShowDialog(Window? owner)
+        public async Task<bool> ShowDialog(Window owner)
         {
 #if TODO_AVALONIA
             NativeMethods.IFileDialog frm = (NativeMethods.IFileDialog)new NativeMethods.FileOpenDialogRCW();
@@ -89,7 +90,7 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
                 }
             }
 
-            if (frm.Show(owner == null ? IntPtr.Zero : new WindowInteropHelper(owner).Handle) == NativeMethods.S_OK)
+            if (frm.Show(new WindowInteropHelper(owner).Handle) == NativeMethods.S_OK)
             {
                 try
                 {
@@ -119,36 +120,40 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
                     Log.Warn("Folder Dialog failed", ex);
                 }
             }
+#else
+            IStorageProvider? storageProvider = TopLevel.GetTopLevel(owner)?.StorageProvider;
+            if (storageProvider is not null)
+            {
+                IStorageFolder? initialFolder = null;
+                if (!string.IsNullOrEmpty(InitialFolder))
+                {
+                    // Use given inital folder when valid.
+                    initialFolder = await storageProvider.TryGetFolderFromPathAsync(InitialFolder);
+                }
+
+                if (initialFolder is null)
+                {
+                    // Fallback to documents folder when no initial folder is given or valid.
+                    // When this fails initial folder will be null and the dialogs opens on the storage provider's default location.
+                    initialFolder = await storageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+                }
+
+                IReadOnlyList<IStorageFolder> folders = await storageProvider.OpenFolderPickerAsync(new()
+                {
+                    Title = "Select Folder",
+                    AllowMultiple = false,
+                    SuggestedStartLocation = initialFolder,
+                });
+
+                if (folders.Count == 1)
+                {
+                    Folder = folders[0].Path.LocalPath;
+                    return await Task.FromResult(true);
+                }
+            }
+#endif
 
             return await Task.FromResult(false);
-#else
-            if (owner is null)
-            {
-                owner = new Window();
-            }
-
-            // TODO: Replace with proper dialog, settings and translation
-            OpenFolderDialog dialog = new();
-            if (!string.IsNullOrEmpty(InitialFolder))
-            {
-                dialog.Directory = InitialFolder;
-            }
-            else
-            {
-                dialog.Directory = (await TopLevel.GetTopLevel(owner)?.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents))?.Path.LocalPath;
-            }
-
-            if (string.IsNullOrEmpty(dialog.Directory))
-            {
-                dialog.Directory = ".";
-            }
-
-            dialog.Title = "Select Folder";
-
-            Folder = await dialog.ShowAsync(owner);
-
-            return await Task.FromResult(!string.IsNullOrEmpty(Folder));
-#endif
         }
 
         public void Dispose()

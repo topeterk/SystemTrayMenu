@@ -6,20 +6,19 @@
 
 namespace SystemTrayMenu.DllImports
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
 #if !AVALONIA
+    using System;
+    using System.Linq;
     using System.Windows;
 #else
     using Avalonia;
     using Avalonia.Controls;
-    using Avalonia.Controls.ApplicationLifetimes;
-    using Avalonia.Input;
     using SystemTrayMenu.Utilities;
     using Rect = System.Drawing.Rectangle;
+    using Window = Avalonia.Controls.Window;
 #endif
 
     /// <summary>
@@ -131,7 +130,9 @@ namespace SystemTrayMenu.DllImports
 #endif
                     return LastCursorPosition;
 #else
-                    return Mouse.GetPosition(((IClassicDesktopStyleApplicationLifetime?)Application.Current!.ApplicationLifetime)!.MainWindow!); // TODO
+                    // TODO: Based on another window as mainWindow is no longer set?
+                    //  ((IClassicDesktopStyleApplicationLifetime?)Application.Current!.ApplicationLifetime)!.MainWindow!
+                    return Mouse.GetPosition(new Window());
 #endif
                 }
             }

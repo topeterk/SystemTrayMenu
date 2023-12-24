@@ -19,6 +19,7 @@ namespace SystemTrayMenu
     using Avalonia.Platform;
     using Avalonia.Styling;
     using Avalonia.Threading;
+    using Window = Avalonia.Controls.Window;
 #endif
     using SystemTrayMenu.Business;
     using SystemTrayMenu.DllImports;
@@ -78,15 +79,7 @@ namespace SystemTrayMenu
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // TODO: Get rid of this empty pseudo window?
-                desktop.MainWindow = new()
-                {
-                    ShowActivated = false,
-                    ShowInTaskbar = false,
-                    IsVisible = false,
-                    WindowState = WindowState.Minimized,
-                };
-                NativeMethods.Screen.DesktopScreens = desktop.MainWindow.Screens;
+                NativeMethods.Screen.DesktopScreens = new Window().Screens;
                 desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 desktop.Exit += AppExitHandler;
 

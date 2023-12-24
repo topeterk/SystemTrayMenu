@@ -89,7 +89,7 @@ namespace SystemTrayMenu.DllImports
                         screens = new(ScreenCount);
                         foreach (var screen in DesktopScreens!.All)
                         {
-                            Rect rect = new(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Position.X, screen.WorkingArea.Position.Y);
+                            Rect rect = new(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height);
                             screens.Add(rect);
 
                             if (screen.IsPrimary)
@@ -99,7 +99,6 @@ namespace SystemTrayMenu.DllImports
                         }
                     }
 #endif
-
                     return screens;
                 }
             }

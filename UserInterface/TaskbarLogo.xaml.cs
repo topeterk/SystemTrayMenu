@@ -43,7 +43,7 @@ namespace SystemTrayMenu.UserInterface
             ContentRendered -= LateInitialize;
 
             // Move the window out of screen, just for safety
-            Top += SystemParameters.VirtualScreenHeight;
+            Top += SystemParameters.VirtualScreenHeight * 2;
 #if !AVALONIA
             // There is nothing to see, so no need to show this window.
             // Therefore it shall always be in minimized state.

@@ -6,6 +6,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="SystemTrayMenu.UserInterface.TaskbarLogo"
         mc:Ignorable="d" Background="Transparent"
-        CanResize="False" Width="38" Height="38" Topmost="True">
+        CanResize="False" SystemDecorations="None" Width="38" Height="38" Topmost="True">
     <Image Width="32" Height="32" Margin="3" Source="{StaticResource ApplicationImage}"/>
 </Window>

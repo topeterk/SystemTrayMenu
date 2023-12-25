@@ -4,9 +4,9 @@
 
 namespace SystemTrayMenu.Utilities
 {
-    using System;
     using System.Threading;
 #if WINDOWS
+    using System;
     using System.IO;
     using Shell32;
 #endif
@@ -50,8 +50,14 @@ namespace SystemTrayMenu.Utilities
 
         public static bool IsNetworkRoot(string path)
         {
-            return path.StartsWith(@"\\", StringComparison.InvariantCulture) &&
-                !path[2..].Contains('\\', StringComparison.InvariantCulture);
+#if WINDOWS
+            // This is a windows specific path starting with "\\"
+            return path.StartsWith($"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}", StringComparison.InvariantCulture) &&
+                !path[2..].Contains(Path.DirectorySeparatorChar, StringComparison.InvariantCulture);
+#else
+            // Other systems do not have this as they are mounted into the one and only file system tree
+            return false;
+#endif
         }
 
         private static string GetShortcutFileNamePath(object shortcutFilename, out bool isFolder)

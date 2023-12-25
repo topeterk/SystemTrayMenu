@@ -62,7 +62,7 @@ namespace SystemTrayMenu.Helpers
         private static void CreateShortcut(string url, string pathToStoreFile)
         {
             string title = GetUrlShortcutTitle(url);
-            string fileNamePathShortcut = pathToStoreFile + "\\" + title.Trim() + ".url";
+            string fileNamePathShortcut = pathToStoreFile + Path.DirectorySeparatorChar + title.Trim() + ".url";
             WriteShortcut(url, null, fileNamePathShortcut);
             string pathIcon = DownloadUrlIcon(url);
             if (!string.IsNullOrEmpty(pathIcon))

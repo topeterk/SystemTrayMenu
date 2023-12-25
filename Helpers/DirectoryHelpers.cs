@@ -11,6 +11,7 @@ namespace SystemTrayMenu.Helpers
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Runtime.Versioning;
     using SystemTrayMenu.DataClasses;
     using SystemTrayMenu.Utilities;
 
@@ -153,6 +154,7 @@ namespace SystemTrayMenu.Helpers
             menuData.RowDatas = menuData.RowDatas.Except(rowDatasToRemove).ToList();
         }
 
+        [SupportedOSPlatform("windows")]
         private static void DiscoverNetworkRootDirectories(string path, ref MenuData menuData)
         {
             Process cmd = new();

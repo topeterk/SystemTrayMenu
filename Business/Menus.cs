@@ -837,7 +837,7 @@ namespace SystemTrayMenu.Business
                 foreach (RowData rowData in dgv.ItemsSource)
                 {
                     if (rowData.Path == e.FullPath ||
-                        rowData.Path.StartsWith($"{e.FullPath}\\"))
+                        rowData.Path.StartsWith($"{e.FullPath}{Path.DirectorySeparatorChar}"))
                     {
                         IconReader.RemoveIconFromCache(rowData.Path);
                         rowsToRemove.Add(rowData);

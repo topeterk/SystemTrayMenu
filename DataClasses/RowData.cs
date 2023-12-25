@@ -46,7 +46,7 @@ namespace SystemTrayMenu.DataClasses
             IsAdditionalItem = isAdditionalItem;
             Level = level;
             FileInfo = new FileInfo(path.Replace("\x00", string.Empty));
-            Path = isFolder ? $@"{FileInfo.FullName}\" : FileInfo.FullName;
+            Path = isFolder ? $"{FileInfo.FullName}{System.IO.Path.DirectorySeparatorChar}" : FileInfo.FullName;
             FileExtension = System.IO.Path.GetExtension(Path) ?? string.Empty;
 
             if (FileExtension.Equals(".lnk", StringComparison.InvariantCultureIgnoreCase))
@@ -64,7 +64,7 @@ namespace SystemTrayMenu.DataClasses
                 ResolvedPath = Path;
                 if (string.IsNullOrEmpty(FileInfo.Name))
                 {
-                    int nameBegin = FileInfo.FullName.LastIndexOf(@"\", StringComparison.InvariantCulture) + 1;
+                    int nameBegin = FileInfo.FullName.LastIndexOf(System.IO.Path.DirectorySeparatorChar.ToString(), StringComparison.InvariantCulture) + 1;
                     ColumnText = FileInfo.FullName[nameBegin..];
                 }
                 else if (FileExtension.Equals(".url", StringComparison.InvariantCultureIgnoreCase) ||

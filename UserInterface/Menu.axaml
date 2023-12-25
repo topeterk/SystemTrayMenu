@@ -10,7 +10,7 @@
         xmlns:local="clr-namespace:SystemTrayMenu.UserInterface"
         x:Class="SystemTrayMenu.UserInterface.Menu"
         mc:Ignorable="d" Background="Transparent" d:MaxHeight="200"
-        CanResize="False" Topmost="True" SizeToContent="WidthAndHeight" ShowInTaskbar="False"
+        CanResize="False" SystemDecorations="None" Topmost="True" SizeToContent="WidthAndHeight" ShowInTaskbar="False"
         KeyDown="HandlePreviewKeyDown">
 
 	<!-- TODO: Replace AllowsTransparency="True" and borderless window WindowStyle="None" with.. -->

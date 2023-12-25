@@ -116,11 +116,11 @@ EXIT 0</PreBuildEvent>
   <!-- References NuGet -->
   <ItemGroup>
     <PackageReference Include="HidSharp" Version="2.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0-preview1.23165.1">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507">
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -131,7 +131,7 @@ EXIT 0</PreBuildEvent>
   </ItemGroup>
   <ItemGroup Condition=" '$(UseWPF)' ">
     <FrameworkReference Update="Microsoft.WindowsDesktop.App;Microsoft.WindowsDesktop.App.WPF" TargetingPackVersion="7.0.0" />
-    <PackageReference Include="H.NotifyIcon" Version="2.0.118" />
+    <PackageReference Include="H.NotifyIcon" Version="2.0.123" />
     <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
   </ItemGroup>
   <ItemGroup Condition=" !'$(UseWPF)' ">
@@ -141,10 +141,10 @@ EXIT 0</PreBuildEvent>
     <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.5" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.5" />
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.5" />
-	<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.5" />
-	<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.5" />
-	<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.5" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.5" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
   </ItemGroup>
   <!-- References Native -->
   <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">

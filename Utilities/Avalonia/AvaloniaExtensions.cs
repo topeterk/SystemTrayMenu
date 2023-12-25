@@ -139,7 +139,7 @@ namespace SystemTrayMenu.Utilities
             // Find a workaround or fix! As a workaround add menu item to open the main menu instead:
             Dispatcher dispatcher = WPFExtensions.CurrentDispatcher;
             ContextMenu.Items.Insert(0, new PopupMenuItem(
-                Translator.GetText("Open Menu"), new((sender, e) => dispatcher.Invoke(() => MessageWindow.RaiseEvent(sender, e)))));
+                Translator.GetText("Open/Close Menu"), new((sender, e) => dispatcher.Invoke(() => MessageWindow.RaiseEvent(sender, e)))));
 #endif
         }
 

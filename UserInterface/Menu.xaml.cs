@@ -715,8 +715,8 @@ namespace SystemTrayMenu.UserInterface
                 double menuFrameWidth = windowFrame.ActualWidth;
                 double menuFrameHeight = windowFrame.ActualHeight;
 #else
-                double menuFrameWidth = windowFrame.Width;
-                double menuFrameHeight = windowFrame.Height;
+                double menuFrameWidth = windowFrame.DesiredSize.Width;
+                double menuFrameHeight = windowFrame.DesiredSize.Height;
 #endif
 
                 // Prepare parameters
@@ -736,7 +736,7 @@ namespace SystemTrayMenu.UserInterface
 #if !AVALONIA
                     predecessorFrameWidth = menuPredecessor.windowFrame.ActualWidth;
 #else
-                    predecessorFrameWidth = menuPredecessor.windowFrame.Width;
+                    predecessorFrameWidth = menuPredecessor.windowFrame.DesiredSize.Width;
 #endif
 
                     directionToRight = menuPredecessor.directionToRight; // try keeping same direction from predecessor

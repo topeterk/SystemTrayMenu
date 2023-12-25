@@ -69,9 +69,9 @@ namespace SystemTrayMenu.Utilities
 
         internal double Top { get => Position.Y; set => Position = new(Position.X, (int)value); }
 
-        internal double ActualHeight => Height;
+        internal double ActualHeight => DesiredSize.Height;
 
-        internal double ActualWidth => Width;
+        internal double ActualWidth => DesiredSize.Width;
 
         internal bool? ShowDialog()
         {

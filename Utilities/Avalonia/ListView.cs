@@ -24,9 +24,9 @@ namespace SystemTrayMenu.Utilities
             }
         }
 
-        internal double ActualHeight => Height;
+        internal double ActualHeight => DesiredSize.Height;
 
-        internal double ActualWidth => Width;
+        internal double ActualWidth => DesiredSize.Width;
 
         internal IList SelectedItems
         {

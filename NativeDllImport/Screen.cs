@@ -54,7 +54,16 @@ namespace SystemTrayMenu.DllImports
 #if !AVALONIA
             private static Point LastCursorPosition = default(Point);
 #else
-            internal static Screens? DesktopScreens { get; set; }
+            private static Window? screensWrapperWindow;
+
+            internal static Screens DesktopScreens
+            {
+                get
+                {
+                    screensWrapperWindow ??= new Window();
+                    return screensWrapperWindow.Screens;
+                }
+            }
 #endif
 
             internal static List<Rect> Screens
@@ -75,7 +84,7 @@ namespace SystemTrayMenu.DllImports
                         };
                     }
 #else
-                    int ScreenCount = DesktopScreens?.ScreenCount ?? 0;
+                    int ScreenCount = DesktopScreens.ScreenCount;
                     if (ScreenCount == 0)
                     {
                         return new()
@@ -86,15 +95,9 @@ namespace SystemTrayMenu.DllImports
                     else
                     {
                         screens = new(ScreenCount);
-                        foreach (var screen in DesktopScreens!.All)
+                        foreach (var screen in DesktopScreens.All)
                         {
-                            Rect rect = new(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height);
-                            screens.Add(rect);
-
-                            if (screen.IsPrimary)
-                            {
-                                PrimaryScreen = rect;
-                            }
+                            screens.Add(ScreenToRect(screen));
                         }
                     }
 #endif
@@ -106,7 +109,7 @@ namespace SystemTrayMenu.DllImports
             // The primary screen will have x = 0, y = 0 coordinates
             internal static Rect PrimaryScreen => Screens.FirstOrDefault((screen) => screen.Left == 0 && screen.Top == 0, Screens[0]);
 #else
-            internal static Rect PrimaryScreen { get; private set; }
+            internal static Rect PrimaryScreen => ScreenToRect(DesktopScreens.Primary);
 #endif
 
             internal static Point CursorPosition
@@ -151,7 +154,9 @@ namespace SystemTrayMenu.DllImports
                 return PrimaryScreen;
             }
 
-#if !AVALONIA
+#if AVALONIA
+            private static Rect ScreenToRect(Avalonia.Platform.Screen screen) => new(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height);
+#else
             internal static void FetchScreens()
             {
                 var backup = screens;

@@ -10,6 +10,7 @@ namespace SystemTrayMenu
 #if !AVALONIA
     using System.Windows;
     using System.Windows.Threading;
+    using SystemTrayMenu.DllImports;
 #else
     using System.Reflection;
     using Avalonia;
@@ -19,10 +20,8 @@ namespace SystemTrayMenu
     using Avalonia.Platform;
     using Avalonia.Styling;
     using Avalonia.Threading;
-    using Window = Avalonia.Controls.Window;
 #endif
     using SystemTrayMenu.Business;
-    using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Properties;
@@ -79,7 +78,6 @@ namespace SystemTrayMenu
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                NativeMethods.Screen.DesktopScreens = new Window().Screens;
                 desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 desktop.Exit += AppExitHandler;
 

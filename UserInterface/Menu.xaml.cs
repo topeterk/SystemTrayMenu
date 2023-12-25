@@ -438,7 +438,7 @@ namespace SystemTrayMenu.UserInterface
             }
             else
             {
-                textBoxSearch.CaretIndex = textBoxSearch.Text.Length;
+                textBoxSearch.CaretIndex = string.IsNullOrEmpty(textBoxSearch.Text) ? 0 : textBoxSearch.Text.Length; // On Linux: Text may be null?!
             }
 
             textBoxSearch.Focus();

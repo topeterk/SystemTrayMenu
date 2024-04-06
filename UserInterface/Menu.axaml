@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2022-2023 Peter Kirmeier -->
+<!-- Copyright (c) 2022-2024 Peter Kirmeier -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -13,16 +13,16 @@
         CanResize="False" SystemDecorations="None" Topmost="True" SizeToContent="WidthAndHeight" ShowInTaskbar="False"
         KeyDown="HandlePreviewKeyDown">
 
-	<!-- TODO: Replace AllowsTransparency="True" and borderless window WindowStyle="None" with.. -->
-	<!-- TODO: https://stackoverflow.com/questions/65748375/avaloniaui-how-to-change-the-style-of-the-window-borderless-toolbox-etc -->
-	<!-- TODO:  -->
-	<!-- TODO: ExtendClientAreaToDecorationsHint="True" -->
+    <!-- TODO: Replace AllowsTransparency="True" and borderless window WindowStyle="None" with.. -->
+    <!-- TODO: https://stackoverflow.com/questions/65748375/avaloniaui-how-to-change-the-style-of-the-window-borderless-toolbox-etc -->
+    <!-- TODO:  -->
+    <!-- TODO: ExtendClientAreaToDecorationsHint="True" -->
     <!-- TODO: ExtendClientAreaChromeHints="NoChrome"   -->
     <!-- TODO: ExtendClientAreaTitleBarHeightHint="-1"  -->
 
-	<!-- TODO: <Window.Triggers> -->
-		<!-- TODO: See? https://github.com/AvaloniaUI/Avalonia/issues/2605                -->
-		<!-- TODO: <EventTrigger RoutedEvent="local:Menu.FadeToTransparent">              -->
+    <!-- TODO: <Window.Triggers> -->
+        <!-- TODO: See? https://github.com/AvaloniaUI/Avalonia/issues/2605                -->
+        <!-- TODO: <EventTrigger RoutedEvent="local:Menu.FadeToTransparent">              -->
         <!-- TODO:     <BeginStoryboard Name="FadeToTransparentStoryboard">               -->
         <!-- TODO:         <Storyboard>                                                   -->
         <!-- TODO:             <DoubleAnimation                                           -->
@@ -50,7 +50,7 @@
         <!-- TODO:         </Storyboard>                                                  -->
         <!-- TODO:     </BeginStoryboard>                                                 -->
         <!-- TODO: </EventTrigger>                                                        -->
-	<!-- TODO: </Window.Triggers> -->
+    <!-- TODO: </Window.Triggers> -->
 
     <Window.Resources>
         <!-- Converted SVG images using https://github.com/BerndK/SvgToXaml/releases/tag/Ver_1.3.0 -->
@@ -107,10 +107,10 @@
     <Border x:Name="windowFrame" BorderThickness="1" CornerRadius="0" Margin="0,0,4,4"
             Background="{x:Static stm:MenuDefines.ColorBackground}"
             BorderBrush="{x:Static stm:MenuDefines.ColorBackgroundBorder}"
-			BoxShadow="2 2 4 2 Black">
-		<!-- TODO: Update: BoxShadow color with {Binding Source={x:Static stm:MenuDefines.ColorBackgroundBorder},Path=Color} and set fitting values -->
-		<!-- TODO: https://docs.avaloniaui.net/docs/next/reference/controls/detailed-reference/border -->
-		<DockPanel x:Name="tableLayoutPanelMenu">
+            BoxShadow="2 2 4 2 Black">
+        <!-- TODO: Update: BoxShadow color with {Binding Source={x:Static stm:MenuDefines.ColorBackgroundBorder},Path=Color} and set fitting values -->
+        <!-- TODO: https://docs.avaloniaui.net/docs/next/reference/controls/detailed-reference/border -->
+        <StackPanel x:Name="tableLayoutPanelMenu">
             <Label x:Name="labelTitle" DockPanel.Dock="Top" Padding="0" Margin="20,0" MinHeight="12"
                    HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold">
                 <TextBlock x:Name="txtTitle" TextTrimming="CharacterEllipsis"><Run Text="title"/></TextBlock>
@@ -122,41 +122,164 @@
                          Background="{x:Null}" Foreground="{x:Static stm:MenuDefines.ColorForeground}" CaretBrush="{x:Static stm:MenuDefines.ColorForeground}" />
             </DockPanel>
 
+            <ScrollViewer>
+                <!-- TODO: MaxHeight should be set for the whole window instead to calculate positions and sizes properly -->
+                <ScrollViewer.MaxHeight>
+                    <!-- TODO: Setting must be cut off on screen boundaries, maybe do this in Measure overload? MaxHeight = Math.Min(screenHeightMax, heightMaxByOptions) -->
+                    <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,*,*,*,/,+,+">
+                    <Binding Source="{x:Static u:Scaling.Factor}" />
+                    <Binding Source="{x:Static u:Scaling.FactorByDpi}" />
+                    <Binding>
+                        <Binding.Source>
+                            <sys:Double>450</sys:Double>
+                        </Binding.Source>
+                    </Binding>
+                    <DynamicResource ResourceKey="ColumnTextMaxWidth" />
+                    <!-- TODO: î Settings.Default.HeightMaxInPercent should replace resource binding above-->
+                    <Binding>
+                        <Binding.Source>
+                            <sys:Double>100</sys:Double>
+                        </Binding.Source>
+                    </Binding>
+                    <!-- TODO: î Mitigate percentage -->
+                    <!-- TODO: Remove the windowFrame after potential overhaul of height setting -->
+                    <!-- Margin of the windowFrame is allowed to exceed the boundaries, so we just add them afterwards -->
+                    <Binding Path="#windowFrame.Margin.Top" />
+                    <Binding Path="#windowFrame.Margin.Bottom" />
+                    </MultiBinding>
+                </ScrollViewer.MaxHeight>
+                <u:ListView x:Name="dgv" x:FieldModifier="internal" Margin="6,2,6,1" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <u:ListView.MaxWidth>
+                        <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,*,*,*,/,+,+">
+                            <Binding Source="{x:Static u:Scaling.Factor}" />
+                            <Binding Source="{x:Static u:Scaling.FactorByDpi}" />
+                            <Binding>
+                            <Binding.Source>
+                                <sys:Double>400</sys:Double>
+                            </Binding.Source>
+                            </Binding>
+                            <DynamicResource ResourceKey="ColumnTextMaxWidth" />
+                            <!-- TODO: î Settings.Default.WidthMaxInPercent should replace resource binding above-->
+                            <Binding>
+                                <Binding.Source>
+                                    <sys:Double>100</sys:Double>
+                                </Binding.Source>
+                            </Binding>
+                            <!-- TODO: î Mitigate percentage -->
+                            <!-- TODO: Remove the windowFrame after potential overhaul of width setting -->
+                            <!-- Margin of the windowFrame is allowed to exceed the boundaries, so we just add them afterwards -->
+                            <Binding Path="#windowFrame.Margin.Left" />
+                            <Binding Path="#windowFrame.Margin.Right" />
+                        </MultiBinding>
+                    </u:ListView.MaxWidth>
+                    <!--  Background="{x:Null}" -->
+                    <!-- TODO: SelectionChanged="ListView_SelectionChanged" ScrollViewer.ScrollChanged="HandleScrollChanged" -->
+                    <ItemsRepeater.Layout>
+                      <StackLayout Spacing="0" Orientation="Vertical"/>
+                    </ItemsRepeater.Layout>
+                    <!--u:ListView."Childs".Border.Padding="0" // In ctor, see: dgv_border -->
+                    <u:ListView.Resources>
+                        <!-- Set min-size according to: learn.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-customize-the-thumb-size-on-a-scrollbar#create-a-scrollbar-with-a-minimum-thumb-size -->
+                        <!-- Thumb's minimum height is half of VerticalScrollBarButtonHeightKey -->
+                        <!-- TODO: <sys:Double x:Key="{x:Static u:SystemParameters.VerticalScrollBarButtonHeightKey}">116</sys:Double>           -->
+                        <!-- TODO: <Storyboard x:Key="OpenAnimationStoryboard">                                                                  -->
+                        <!-- TODO:     <DoubleAnimation                                                                                          -->
+                        <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
+                        <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[0].(GradientStop.Offset)" -->
+                        <!-- TODO:         From="-0.4" To="1.0" Duration="0:0:0.6" />                                                            -->
+                        <!-- TODO:     <DoubleAnimation                                                                                          -->
+                        <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
+                        <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Offset)" -->
+                        <!-- TODO:         From="-0.2" To="1.3" Duration="0:0:0.6" />                                                            -->
+                        <!-- TODO:     <DoubleAnimation                                                                                          -->
+                        <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
+                        <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Offset)" -->
+                        <!-- TODO:         From="-0.0" To="1.5" Duration="0:0:0.6" />                                                            -->
+                        <!-- TODO: </Storyboard>                                                                                                 -->
+                    </u:ListView.Resources>
+                    <u:ListView.Styles>
+                        <Style Selector="Image">
+                            <Setter Property="MinHeight" Value="40" />
+                            <!-- TODO: Layout of items seem wrong, maybe fix with styles like above? -->
+                        </Style>
+                    </u:ListView.Styles>
+                    <u:ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="0" Height="{DynamicResource RowHeight}" Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1" HorizontalAlignment="Left">
+                                <Border x:Name="OpenAnimationBorder" BorderThickness="0">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <LinearGradientBrush.GradientStops>
+                                                <GradientStop Color="#00000000" Offset="-0.4"/>
+                                                <GradientStop Color="#8800ff00" Offset="-0.2"/>
+                                                <GradientStop Color="#00000000" Offset="-0.0" />
+                                            </LinearGradientBrush.GradientStops>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <StackPanel Orientation="Horizontal" Background="Red" HorizontalAlignment="Left">
+                                        <Image Width="{DynamicResource ColumnIconWidth}" Margin="2,-1,2,0" Source="{Binding ColumnIcon}" />
+                                        <TextBlock Margin="3,0,2,0" Padding="0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                Text="{Binding ColumnText}" Foreground="{x:Static stm:MenuDefines.ColorForeground}" Background="Green">
+                                            <!-- TODO: Optional or only for trimmed entries: ToolTip="{Binding ColumnText}" -->
+                                            <TextBlock.MaxWidth>
+                                                <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,-,-">
+                                                    <Binding Path="#dgv.MaxWidth" />
+                                                    <DynamicResource ResourceKey="ColumnIconWidth" />
+                                                    <Binding>
+                                                        <Binding.Source>
+                                                            <sys:Double>20</sys:Double>
+                                                            <!-- TODO: Calculation is not that ideal, we assume a fixed margin/padding to get "almost" fitting values -->
+                                                        </Binding.Source>
+                                                    </Binding>
+                                                </MultiBinding>
+                                            </TextBlock.MaxWidth>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </Border>
+                        </DataTemplate>
+                    </u:ListView.ItemTemplate>
+                    <!-- TODO: <u:ListView.ItemContainerStyle>                                                                              -->
+                    <!-- TODO:     <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">                -->
+                    <!-- TODO:         <Setter Property="BorderThickness" Value="0"/>                                                       -->
+                    <!-- TODO:         <Setter Property="Margin" Value="0"/>                                                                -->
+                    <!-- TODO:         <Setter Property="Padding" Value="0"/>                                                               -->
+                    <!-- TODO:         <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter" />                                 -->
+                    <!-- TODO:         <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave" />                                 -->
+                    <!-- TODO:         <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_PreviewMouseDown" />                     -->
+                    <!-- TODO:         <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" /> -->
+                    <!-- TODO:         <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ListViewItem_PreviewMouseLeftButtonUp" />     -->
+                    <!-- TODO:         <EventSetter Event="MouseRightButtonUp" Handler="ListViewItem_MouseRightButtonUp" />                 -->
+                    <!-- TODO:     </Style>                                                                                                 -->
+                    <!-- TODO: </u:ListView.ItemContainerStyle>                                                                             -->
+                </u:ListView>
+            </ScrollViewer>
+
             <DockPanel x:Name="tableLayoutPanelBottom" DockPanel.Dock="Bottom" Margin="12,6,14,5">
                 <DockPanel.Resources>
                     <SolidColorBrush x:Key="ButtonHoverColor" Color="LightGray" Opacity="0.15"/>
-				</DockPanel.Resources>
-				<DockPanel.Styles>
+                </DockPanel.Resources>
+                <DockPanel.Styles>
                     <Style Selector="Button">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="MinWidth" Value="18" />
+                        <Setter Property="MinHeight" Value="18" />
+                        <Setter Property="MaxWidth" Value="18" />
+                        <Setter Property="MaxHeight" Value="18" />
                         <Setter Property="BorderBrush" Value="Transparent" />
                         <Setter Property="Background" Value="Transparent" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type Button}">
-                                    <Border x:Name="Border" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}">
-                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    </Border>
-                                    <!-- TODO: <ControlTemplate.Triggers>                                                                                               -->
-                                    <!-- TODO:     <Trigger Property="IsMouseOver" Value="True">                                                                        -->
-                                    <!-- TODO:         <Setter Property="BorderBrush" Value="{x:Static stm:MenuDefines.ColorSelectedItemBorder}" TargetName="Border" /> -->
-                                    <!-- TODO:         <Setter Property="Background" Value="{StaticResource ButtonHoverColor}" TargetName="Border" />                   -->
-                                    <!-- TODO:         <Setter Property="Opacity" Value="0.9" TargetName="Border" />                                                    -->
-                                    <!-- TODO:     </Trigger>                                                                                                           -->
-                                    <!-- TODO: </ControlTemplate.Triggers>                                                                                              -->
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
                     </Style>
                 </DockPanel.Styles>
                 <Label x:Name="labelStatus" Content="{u:Translate 'loading'}" Padding="0" DockPanel.Dock="Left" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{x:Static stm:MenuDefines.ColorIcons}"/>
 
-                <Image x:Name="pictureBoxLoading" Width="18" Height="18" DockPanel.Dock="Right" Source="{StaticResource LoadingIconImage}"
+                <Image x:Name="pictureBoxLoading" MinWidth="18" MaxWidth="18" MaxHeight="18" DockPanel.Dock="Right" Source="{StaticResource LoadingIconImage}"
                        HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5">
                     <Image.RenderTransform>
-                        <RotateTransform Angle="0" /> <!-- TODO: x:Name="LoadingRotation" -->
+                        <RotateTransform Angle="0" />
+                        <!-- TODO: x:Name="LoadingRotation" -->
                     </Image.RenderTransform>
-					<!-- TODO: <Image.Triggers> -->
-						<!-- TODO: <EventTrigger RoutedEvent="Loaded">                                                -->
+                    <!-- TODO: <Image.Triggers> -->
+                        <!-- TODO: <EventTrigger RoutedEvent="Loaded">                                                -->
                         <!-- TODO:     <BeginStoryboard>                                                              -->
                         <!-- TODO:         <Storyboard>                                                               -->
                         <!-- TODO:             <DoubleAnimation                                                       -->
@@ -166,86 +289,21 @@
                         <!-- TODO:         </Storyboard>                                                              -->
                         <!-- TODO:     </BeginStoryboard>                                                             -->
                         <!-- TODO: </EventTrigger>                                                                    -->
-					<!-- TODO: </Image.Triggers> -->
+                    <!-- TODO: </Image.Triggers> -->
                 </Image>
-                <Button x:Name="buttonRestart" Width="18" Height="18" Padding="0" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxRestart_MouseClick" >
+                <Button x:Name="buttonRestart" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxRestart_MouseClick" >
                     <Image x:Name="pictureBoxRestart" Source="{StaticResource ic_fluent_arrow_sync_24_regularDrawingImage}"/>
                 </Button>
-                <Button x:Name="buttonSettings" Width="18" Height="18" Padding="0" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxSettings_MouseClick" >
+                <Button x:Name="buttonSettings" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxSettings_MouseClick" >
                     <Image x:Name="pictureBoxSettings" Source="{StaticResource ic_fluent_settings_28_regularDrawingImage}"/>
                 </Button>
-                <Button x:Name="buttonMenuAlwaysOpen" Width="18" Height="18" Padding="0" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxMenuAlwaysOpen_Click" >
+                <Button x:Name="buttonMenuAlwaysOpen" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxMenuAlwaysOpen_Click" >
                     <Image x:Name="pictureBoxMenuAlwaysOpen" Source="{StaticResource ic_fluent_pin_48_regularDrawingImage}"/>
                 </Button>
-                <Button x:Name="buttonOpenFolder" Width="18" Height="18" Padding="0" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxOpenFolder_Click" >
+                <Button x:Name="buttonOpenFolder" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxOpenFolder_Click" >
                     <Image x:Name="pictureBoxOpenFolder" Source="{StaticResource ic_fluent_folder_arrow_right_48_regularDrawingImage}"/>
                 </Button>
             </DockPanel>
-
-			<u:ListView x:Name="dgv" x:FieldModifier="internal" Margin="6,2,6,1" HorizontalAlignment="Stretch"
-                      Background="{x:Null}"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto">
-				<!-- TODO: SelectionChanged="ListView_SelectionChanged" ScrollViewer.ScrollChanged="HandleScrollChanged" -->
-				<ItemsRepeater.Layout>
-					<StackLayout Spacing="0" Orientation="Vertical"/>
-				</ItemsRepeater.Layout>
-                <!--u:ListView."Childs".Border.Padding="0" // In ctor, see: dgv_border -->
-				<u:ListView.Resources>
-                    <!-- Set min-size according to: learn.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-customize-the-thumb-size-on-a-scrollbar#create-a-scrollbar-with-a-minimum-thumb-size -->
-                    <!-- Thumb's minimum height is half of VerticalScrollBarButtonHeightKey -->
-                    <!-- TODO: <sys:Double x:Key="{x:Static u:SystemParameters.VerticalScrollBarButtonHeightKey}">116</sys:Double>           -->
-                    <!-- TODO: <Storyboard x:Key="OpenAnimationStoryboard">                                                                  -->
-                    <!-- TODO:     <DoubleAnimation                                                                                          -->
-                    <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
-                    <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[0].(GradientStop.Offset)" -->
-                    <!-- TODO:         From="-0.4" To="1.0" Duration="0:0:0.6" />                                                            -->
-                    <!-- TODO:     <DoubleAnimation                                                                                          -->
-                    <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
-                    <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Offset)" -->
-                    <!-- TODO:         From="-0.2" To="1.3" Duration="0:0:0.6" />                                                            -->
-                    <!-- TODO:     <DoubleAnimation                                                                                          -->
-                    <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
-                    <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Offset)" -->
-                    <!-- TODO:         From="-0.0" To="1.5" Duration="0:0:0.6" />                                                            -->
-                    <!-- TODO: </Storyboard>                                                                                                 -->
-                </u:ListView.Resources>
-				<u:ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Height="{DynamicResource RowHeight}" Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1">
-                            <Border x:Name="OpenAnimationBorder" BorderThickness="0">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <LinearGradientBrush.GradientStops>
-                                            <GradientStop Color="#00000000" Offset="-0.4"/>
-                                            <GradientStop Color="#8800ff00" Offset="-0.2"/>
-                                            <GradientStop Color="#00000000" Offset="-0.0" />
-                                        </LinearGradientBrush.GradientStops>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Width="{DynamicResource ColumnIconWidth}" Margin="2,-1,2,0" Source="{Binding ColumnIcon}" />
-                                    <TextBlock MaxWidth="{DynamicResource ColumnTextMaxWidth}" Margin="3,0,2,0" Padding="0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                                           Text="{Binding ColumnText}" Foreground="{x:Static stm:MenuDefines.ColorForeground}" />
-                                    <!-- TODO: Optional or only for trimmed entries: ToolTip="{Binding ColumnText}" -->
-                                </StackPanel>
-                            </Border>
-                        </Border>
-                    </DataTemplate>
-                </u:ListView.ItemTemplate>
-				<!-- TODO: <u:ListView.ItemContainerStyle>                                                                              -->
-                <!-- TODO:     <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">                -->
-                <!-- TODO:         <Setter Property="BorderThickness" Value="0"/>                                                       -->
-                <!-- TODO:         <Setter Property="Margin" Value="0"/>                                                                -->
-                <!-- TODO:         <Setter Property="Padding" Value="0"/>                                                               -->
-                <!-- TODO:         <EventSetter Event="MouseEnter" Handler="ListViewItem_MouseEnter" />                                 -->
-                <!-- TODO:         <EventSetter Event="MouseLeave" Handler="ListViewItem_MouseLeave" />                                 -->
-                <!-- TODO:         <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_PreviewMouseDown" />                     -->
-                <!-- TODO:         <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" /> -->
-                <!-- TODO:         <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ListViewItem_PreviewMouseLeftButtonUp" />     -->
-                <!-- TODO:         <EventSetter Event="MouseRightButtonUp" Handler="ListViewItem_MouseRightButtonUp" />                 -->
-                <!-- TODO:     </Style>                                                                                                 -->
-                <!-- TODO: </u:ListView.ItemContainerStyle>                                                                             -->
-		    </u:ListView>
-        </DockPanel>
+        </StackPanel>
     </Border>
 </Window>

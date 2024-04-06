@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2022-2023 Peter Kirmeier -->
+<!-- Copyright (c) 2022-2024 Peter Kirmeier -->
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:u="clr-namespace:SystemTrayMenu.Utilities"
              xmlns:stm="clr-namespace:SystemTrayMenu"
              x:Class="SystemTrayMenu.App">
 
-    <Application.Resources>
-        <ResourceDictionary>
+	<Application.Resources>
+		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<!-- TODO: ResourceInclude Source="/Resources/ScrollBarStyles.axaml" /-->
 			</ResourceDictionary.MergedDictionaries>
+
+			<u:ArithmeticConverter x:Key="ArithmeticConverter" />
 
 			<u:LocalResourceBitmap x:Key="ApplicationImage">
 				<x:Arguments>/Resources/SystemTrayMenu.png</x:Arguments>
@@ -29,7 +31,7 @@
 				<x:Arguments>/Resources/NotFound.ico</x:Arguments>
 			</u:LocalResourceBitmap>
 
-            <SolidColorBrush x:Key="ButtonHoverColor" Color="Gray" Opacity="0.5"/>
+			<SolidColorBrush x:Key="ButtonHoverColor" Color="Gray" Opacity="0.5"/>
 		</ResourceDictionary>
 	</Application.Resources>
 
@@ -101,26 +103,12 @@
 		<Style Selector="Button">
 			<Setter Property="MinWidth" Value="76" />
 			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
-			<!-- TODO: Find better solution instead of re-implementing the control template of a button,
-                                   only to manage changing the mouse hover border color. -->
 			<Setter Property="BorderBrush" Value="{StaticResource ButtonHoverColor}" />
 			<Setter Property="Background" Value="Transparent" />
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type Button}">
-						<Border x:Name="Border" Margin="2" Padding="7,5" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}">
-							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-						</Border>
-						<!-- TODO: <ControlTemplate.Triggers>                                                                                               -->
-						<!-- TODO:     <Trigger Property="IsMouseOver" Value="True">                                                                        -->
-						<!-- TODO:         <Setter Property="BorderBrush" Value="{x:Static stm:MenuDefines.ColorSelectedItemBorder}" TargetName="Border" /> -->
-						<!-- TODO:         <Setter Property="Background" Value="{StaticResource ButtonHoverColor}" TargetName="Border" />                   -->
-						<!-- TODO:         <Setter Property="Opacity" Value="0.9" TargetName="Border" />                                                    -->
-						<!-- TODO:     </Trigger>                                                                                                           -->
-						<!-- TODO: </ControlTemplate.Triggers>                                                                                              -->
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
+			<Style Selector="^:pointerover /template/ ContentPresenter">
+				<Setter Property="BorderBrush" Value="{x:Static stm:MenuDefines.ColorSelectedItemBorder}" />
+				<Setter Property="Background" Value="{StaticResource ButtonHoverColor}" />
+			</Style>
 		</Style>
 	</Application.Styles>
 </Application>

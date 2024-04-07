@@ -252,28 +252,23 @@
                         <Setter Property="BorderBrush" Value="Transparent" />
                         <Setter Property="Background" Value="Transparent" />
                     </Style>
+                    <Style Selector="Image.LoadingRotation">
+                        <Style.Animations>
+                            <Animation Duration="0:0:1" IterationCount="Infinite">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="RotateTransform.Angle" Value="0"/>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="RotateTransform.Angle" Value="360"/>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
                 </DockPanel.Styles>
                 <Label x:Name="labelStatus" Content="{u:Translate 'loading'}" Padding="0" DockPanel.Dock="Left" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{x:Static stm:MenuDefines.ColorIcons}"/>
 
-                <Image x:Name="pictureBoxLoading" MinWidth="18" MaxWidth="18" MaxHeight="18" DockPanel.Dock="Right" Source="{StaticResource LoadingIconImage}"
-                       HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5">
-                    <Image.RenderTransform>
-                        <RotateTransform Angle="0" />
-                        <!-- TODO: x:Name="LoadingRotation" -->
-                    </Image.RenderTransform>
-                    <!-- TODO: <Image.Triggers> -->
-                        <!-- TODO: <EventTrigger RoutedEvent="Loaded">                                                -->
-                        <!-- TODO:     <BeginStoryboard>                                                              -->
-                        <!-- TODO:         <Storyboard>                                                               -->
-                        <!-- TODO:             <DoubleAnimation                                                       -->
-                        <!-- TODO:                 Storyboard.TargetName="LoadingRotation"                            -->
-                        <!-- TODO:                 Storyboard.TargetProperty="(RotateTransform.Angle)"                -->
-                        <!-- TODO:                 From="0.0" To="360.0" Duration="0:0:1" RepeatBehavior="Forever" /> -->
-                        <!-- TODO:         </Storyboard>                                                              -->
-                        <!-- TODO:     </BeginStoryboard>                                                             -->
-                        <!-- TODO: </EventTrigger>                                                                    -->
-                    <!-- TODO: </Image.Triggers> -->
-                </Image>
+                <Image x:Name="pictureBoxLoading" DockPanel.Dock="Right" HorizontalAlignment="Right" MinWidth="18" MaxWidth="18" MaxHeight="18"
+                   Source="{StaticResource LoadingIconImage}" Classes="LoadingRotation" RenderTransformOrigin="9,9"/>
                 <Button x:Name="buttonRestart" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxRestart_MouseClick" >
                     <Image x:Name="pictureBoxRestart" Source="{StaticResource ic_fluent_arrow_sync_24_regularDrawingImage}"/>
                 </Button>

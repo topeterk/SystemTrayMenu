@@ -57,7 +57,9 @@ namespace SystemTrayMenu.UserInterface
 
         private readonly string? folderPath;
 
+#if !AVALONIA
         private int countLeftMouseButtonClicked;
+#endif
         private bool isShellContextMenuOpen;
         private bool directionToRight;
         private Point lastLocation;
@@ -1347,7 +1349,9 @@ namespace SystemTrayMenu.UserInterface
 #endif
             {
                 rowData.IsClicked = false;
+#if !AVALONIA
                 countLeftMouseButtonClicked = 0;
+#endif
                 if (!isShellContextMenuOpen)
                 {
                     CellMouseLeave?.Invoke();
@@ -1406,11 +1410,7 @@ namespace SystemTrayMenu.UserInterface
             if (((ListViewItem)sender).Content is RowData rowData)
             {
                 rowData.IsClicked = true;
-#if TODO_AVALONIA
                 countLeftMouseButtonClicked = e.ClickCount;
-#else
-                countLeftMouseButtonClicked = 1; // TODO: Fix double click
-#endif
             }
         }
 

@@ -224,7 +224,7 @@
                                         <!-- Avalonia Workaround: Make sure Background is of type LinearGradientBrush -->
                                         <!--  This works using XAML entirely but by assigning a pseudo class (which starts the animation) -->
                                         <!--  it fails with an invalid cast exception, so we have to make sure we provide correct type beforehand -->
-                                        <!--  See: ... -->
+                                        <!--  See: https://github.com/AvaloniaUI/Avalonia/discussions/15269 -->
                                         <GradientStop Color="{Binding BackgroundBrush}"/>
                                     </LinearGradientBrush>
                                 </u:SolidBorder.Background>

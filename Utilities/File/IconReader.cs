@@ -158,6 +158,7 @@ namespace SystemTrayMenu.Utilities
             }
         }
 
+#if TODO_LINUX
         internal static Icon? GetRootFolderIcon(string path)
         {
             NativeMethods.SHFILEINFO shFileInfo = default;
@@ -168,6 +169,7 @@ namespace SystemTrayMenu.Utilities
             IntPtr imageList = NativeMethods.Shell32SHGetFileInfo(path, attribute, ref shFileInfo, (uint)Marshal.SizeOf(shFileInfo), flags);
             return TryGetIcon(path, linkOverlay, shFileInfo, imageList);
         }
+#endif
 
         private static bool CacheGetOrAddIcon(
             string key,
@@ -199,6 +201,7 @@ namespace SystemTrayMenu.Utilities
             return true;
         }
 
+#if TODO_LINUX
 #if !AVALONIA
         private static BitmapSource? TryCreateBitmapSourceFromIcon(string path, Icon icon) => Application.Current.Dispatcher.Invoke(() =>
 #else
@@ -222,7 +225,9 @@ namespace SystemTrayMenu.Utilities
 #endif
             return bitmap;
         });
+#endif
 
+#if TODO_LINUX
         private static BitmapSource? TryGetIconAsBitmapSourceSTA(string path, string resolvedPath, bool linkOverlay, bool isFolder)
         {
             BitmapSource? result = null;
@@ -292,6 +297,7 @@ namespace SystemTrayMenu.Utilities
             icon = new Icon(string.Empty);
             return false;
         }
+#endif
 
         private static BitmapSource GetIconAsBitmapSourceSTA(string path, string resolvedPath, bool linkOverlay, bool isFolder)
         {
@@ -340,6 +346,7 @@ namespace SystemTrayMenu.Utilities
             return flags;
         }
 
+#if TODO_LINUX
         private static Icon? TryGetIcon(
             string path, bool linkOverlay, NativeMethods.SHFILEINFO shFileInfo, IntPtr imageList)
         {
@@ -381,5 +388,6 @@ namespace SystemTrayMenu.Utilities
 
             return icon;
         }
+#endif
     }
 }

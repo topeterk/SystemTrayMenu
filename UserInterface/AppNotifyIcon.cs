@@ -19,7 +19,9 @@ namespace SystemTrayMenu.UserInterface
     {
         private readonly Dispatcher dispatchter = WPFExtensions.CurrentDispatcher;
         private readonly TrayIconWithContextMenu notifyIcon = new ();
+#if TODO_LINUX
         private Icon? loadingIcon;
+#endif
 
         public AppNotifyIcon()
         {
@@ -48,7 +50,9 @@ namespace SystemTrayMenu.UserInterface
         public void Dispose()
         {
             notifyIcon.Dispose();
+#if TODO_LINUX
             loadingIcon?.Dispose();
+#endif
         }
 
         public void LoadingStart()

@@ -88,6 +88,7 @@ namespace SystemTrayMenu
         }
 #endif
 
+#if TODO_LINUX
         /// <summary>
         /// Loads an Icon from the application's Resources.
         /// Note: Only allowed to be called after App's Startup event.
@@ -106,6 +107,7 @@ namespace SystemTrayMenu
                 return new(stream);
             }
         }
+#endif
 
         protected virtual void Dispose(bool disposing)
         {

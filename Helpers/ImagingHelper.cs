@@ -15,7 +15,9 @@ namespace SystemTrayMenu.Helpers
     using Avalonia.Media;
     using Avalonia.Media.Imaging;
     using SystemTrayMenu.Utilities;
+#if TODO_LINUX
     using Bitmap = System.Drawing.Bitmap;
+#endif
     using Size = System.Drawing.Size;
 #endif
 
@@ -34,6 +36,7 @@ namespace SystemTrayMenu.Helpers
         /// <returns>Wether or not the icon was succesfully generated.</returns>
         internal static bool ConvertToIcon(Stream input, Stream output, int size = 16, bool preserveAspectRatio = false)
         {
+#if TODO_LINUX
             Bitmap inputBitmap = (Bitmap)Image.FromStream(input);
             if (inputBitmap != null)
             {
@@ -105,7 +108,7 @@ namespace SystemTrayMenu.Helpers
 
                 return false;
             }
-
+#endif
             return false;
         }
 

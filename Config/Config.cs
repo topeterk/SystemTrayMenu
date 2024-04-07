@@ -21,12 +21,16 @@ namespace SystemTrayMenu
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
+#if TODO_LINUX
     using Icon = System.Drawing.Icon;
+#endif
 
     public static class Config
     {
+#if TODO_LINUX
         private static Icon? iconRootFolder;
         private static Icon? applicationIcon;
+#endif
 
         private static bool readDarkModeDone;
         private static bool isDarkMode;
@@ -70,6 +74,7 @@ namespace SystemTrayMenu
             }
         }
 
+#if TODO_LINUX
         public static Icon GetAppIcon()
         {
             if (Settings.Default.UseIconFromRootFolder && iconRootFolder is null)
@@ -94,6 +99,7 @@ namespace SystemTrayMenu
                 return applicationIcon;
             }
         }
+#endif
 
         public static void ParseCommandline(string[] args)
         {

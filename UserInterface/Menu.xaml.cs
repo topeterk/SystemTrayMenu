@@ -1313,22 +1313,36 @@ namespace SystemTrayMenu.UserInterface
             labelStatus.Content = count.ToString() + " " + Translator.GetText(count == 1 ? "element" : "elements");
         }
 
+#if AVALONIA
+        internal void ListViewItem_MouseEnter(RowData rowData)
+#else
         private void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
+#endif
         {
             if (!isShellContextMenuOpen)
             {
+#if !AVALONIA
                 // "DisconnectedItem" protection
                 if (((ListViewItem)sender).Content is RowData rowData)
                 {
                     CellMouseEnter?.Invoke(rowData);
                 }
+#else
+                CellMouseEnter?.Invoke(rowData);
+#endif
             }
         }
 
+#if AVALONIA
+        internal void ListViewItem_MouseLeave(RowData rowData)
+#else
         private void ListViewItem_MouseLeave(object sender, MouseEventArgs e)
+#endif
         {
+#if !AVALONIA
             // "DisconnectedItem" protection
             if (((ListViewItem)sender).Content is RowData rowData)
+#endif
             {
                 rowData.IsClicked = false;
                 countLeftMouseButtonClicked = 0;

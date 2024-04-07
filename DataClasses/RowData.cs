@@ -15,6 +15,7 @@ namespace SystemTrayMenu.DataClasses
     using System.Windows.Media.Imaging;
 #else
     using Avalonia;
+    using Avalonia.Input;
     using Avalonia.Media;
 #endif
     using SystemTrayMenu.Helpers;
@@ -233,6 +234,18 @@ namespace SystemTrayMenu.DataClasses
         /// </summary>
         /// <param name="propertyName">Name of the changing property.</param>
         public void CallPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+#if AVALONIA
+        public void MouseEnterHandler(object sender, PointerEventArgs e)
+        {
+            Owner?.ListViewItem_MouseEnter(this);
+        }
+
+        public void MouseExitHandler(object sender, PointerEventArgs e)
+        {
+            Owner?.ListViewItem_MouseLeave(this);
+        }
+#endif
 
         internal void LoadIcon(bool isMainMenu)
         {

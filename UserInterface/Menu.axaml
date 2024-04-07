@@ -202,7 +202,8 @@
                             <u:SolidBorder x:Name="OpenAnimationBorder" Margin="0" Padding="0" Height="{DynamicResource RowHeight}" HorizontalAlignment="Stretch"
                                     Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1"
                                     PointerEntered="ListViewItem_MouseEnter"
-                                    PointerExited="ListViewItem_MouseLeave">
+                                    PointerExited="ListViewItem_MouseLeave" 
+                                    PointerPressed="ListViewItem_PointerPressed">
                                 <u:SolidBorder.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                         <LinearGradientBrush.GradientStops>
@@ -236,9 +237,6 @@
                     </u:ListView.ItemTemplate>
                     <!-- TODO: <u:ListView.ItemContainerTheme>                                                                              -->
                     <!-- TODO:     <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">                -->
-                    <!-- TODO:         <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_PreviewMouseDown" />                     -->
-                    <!-- TODO:         <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" /> -->
-                    <!-- TODO:         <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ListViewItem_PreviewMouseLeftButtonUp" />     -->
                     <!-- TODO:         <EventSetter Event="MouseRightButtonUp" Handler="ListViewItem_MouseRightButtonUp" />                 -->
                     <!-- TODO:     </Style>                                                                                                 -->
                     <!-- TODO: </u:ListView.ItemContainerTheme>                                                                             -->

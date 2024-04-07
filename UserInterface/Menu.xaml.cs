@@ -1346,7 +1346,9 @@ namespace SystemTrayMenu.UserInterface
             if (((StyledElement)sender).DataContext is RowData rowData)
 #endif
             {
+#if !AVALONIA
                 rowData.IsClicked = false;
+#endif
                 countLeftMouseButtonClicked = 0;
                 if (!isShellContextMenuOpen)
                 {
@@ -1362,6 +1364,16 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
+#if AVALONIA
+        private void ListViewItem_PointerPressed(object sender, PointerPressedEventArgs e)
+        {
+            if (((StyledElement)sender).DataContext is RowData rowData)
+            {
+                CellMouseDown?.Invoke(rowData);
+                rowData.OpenItem(e.ClickCount);
+            }
+        }
+#else  // rowData.IsClicked only visible in the moment of clicking, so should be replaced with OpenAnimationBorder/OpenAnimationStoryboard
         private void ListViewItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             // "DisconnectedItem" protection
@@ -1402,6 +1414,7 @@ namespace SystemTrayMenu.UserInterface
 
             countLeftMouseButtonClicked = 0;
         }
+#endif
 
         private void ListViewItem_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {

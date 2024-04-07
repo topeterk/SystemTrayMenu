@@ -235,11 +235,6 @@
                             </u:SolidBorder>
                         </DataTemplate>
                     </u:ListView.ItemTemplate>
-                    <!-- TODO: <u:ListView.ItemContainerTheme>                                                                              -->
-                    <!-- TODO:     <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">                -->
-                    <!-- TODO:         <EventSetter Event="MouseRightButtonUp" Handler="ListViewItem_MouseRightButtonUp" />                 -->
-                    <!-- TODO:     </Style>                                                                                                 -->
-                    <!-- TODO: </u:ListView.ItemContainerTheme>                                                                             -->
                 </u:ListView>
             </ScrollViewer>
 

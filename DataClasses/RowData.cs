@@ -360,15 +360,12 @@ namespace SystemTrayMenu.DataClasses
 
         internal void UpdateColors()
         {
-#if !AVALONIA
             if (IsClicked)
             {
                 BorderBrush = MenuDefines.ColorIcons;
                 BackgroundBrush = MenuDefines.ColorSelectedItem;
             }
-            else
-#endif
-            if (SubMenu != null)
+            else if (SubMenu != null)
             {
                 BorderBrush = MenuDefines.ColorOpenFolderBorder;
                 BackgroundBrush = MenuDefines.ColorOpenFolder;

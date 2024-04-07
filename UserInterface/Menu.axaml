@@ -4,8 +4,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:stm="clr-namespace:SystemTrayMenu"
         xmlns:u="clr-namespace:SystemTrayMenu.Utilities"
@@ -202,23 +200,15 @@
                     <u:ListView.ItemTemplate>
                         <DataTemplate>
                             <u:SolidBorder x:Name="OpenAnimationBorder" Margin="0" Padding="0" Height="{DynamicResource RowHeight}" HorizontalAlignment="Stretch"
-                                    Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1">
-<!-- TODO: This slows down the list too much, so still disabled yet:
-                                <i:Interaction.Behaviors>
-                                    <ia:EventTriggerBehavior EventName="PointerEntered" SourceObject="OpenAnimationBorder">
-                                        <ia:CallMethodAction TargetObject="{Binding}" MethodName="MouseEnterHandler" />
-                                    </ia:EventTriggerBehavior>
-                                    <ia:EventTriggerBehavior EventName="PointerExited" SourceObject="OpenAnimationBorder">
-                                        <ia:CallMethodAction TargetObject="{Binding}" MethodName="MouseExitHandler" />
-                                    </ia:EventTriggerBehavior>
-                                </i:Interaction.Behaviors>
--->
+                                    Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1"
+                                    PointerEntered="ListViewItem_MouseEnter"
+                                    PointerExited="ListViewItem_MouseLeave">
                                 <u:SolidBorder.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                         <LinearGradientBrush.GradientStops>
                                             <GradientStop Color="#00000000" Offset="-0.4"/>
                                             <GradientStop Color="#8800ff00" Offset="-0.2"/>
-                                            <GradientStop Color="#00000000" Offset="-0.0" />
+                                            <GradientStop Color="#00000000" Offset="-0.0"/>
                                         </LinearGradientBrush.GradientStops>
                                     </LinearGradientBrush>
                                 </u:SolidBorder.Background>

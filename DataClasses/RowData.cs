@@ -235,18 +235,6 @@ namespace SystemTrayMenu.DataClasses
         /// <param name="propertyName">Name of the changing property.</param>
         public void CallPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-#if AVALONIA
-        public void MouseEnterHandler(object sender, PointerEventArgs e)
-        {
-            Owner?.ListViewItem_MouseEnter(this);
-        }
-
-        public void MouseExitHandler(object sender, PointerEventArgs e)
-        {
-            Owner?.ListViewItem_MouseLeave(this);
-        }
-#endif
-
         internal void LoadIcon(bool isMainMenu)
         {
             if (!IconReader.GetIconAsync(IsPointingToFolder, Path, ResolvedPath, ShowOverlay, isMainMenu, UpdateFinalIcon, isMainMenu))

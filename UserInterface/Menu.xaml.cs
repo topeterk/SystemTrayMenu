@@ -1314,27 +1314,27 @@ namespace SystemTrayMenu.UserInterface
         }
 
 #if AVALONIA
-        internal void ListViewItem_MouseEnter(RowData rowData)
+        internal void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
 #else
         private void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
 #endif
         {
             if (!isShellContextMenuOpen)
             {
-#if !AVALONIA
                 // "DisconnectedItem" protection
+#if !AVALONIA
                 if (((ListViewItem)sender).Content is RowData rowData)
+#else
+                if (((StyledElement)sender).DataContext is RowData rowData)
+#endif
                 {
                     CellMouseEnter?.Invoke(rowData);
                 }
-#else
-                CellMouseEnter?.Invoke(rowData);
-#endif
             }
         }
 
 #if AVALONIA
-        internal void ListViewItem_MouseLeave(RowData rowData)
+        internal void ListViewItem_MouseLeave(object sender, MouseEventArgs e)
 #else
         private void ListViewItem_MouseLeave(object sender, MouseEventArgs e)
 #endif
@@ -1342,6 +1342,8 @@ namespace SystemTrayMenu.UserInterface
 #if !AVALONIA
             // "DisconnectedItem" protection
             if (((ListViewItem)sender).Content is RowData rowData)
+#else
+            if (((StyledElement)sender).DataContext is RowData rowData)
 #endif
             {
                 rowData.IsClicked = false;

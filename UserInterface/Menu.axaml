@@ -201,9 +201,9 @@
                         <DataTemplate>
                             <u:SolidBorder x:Name="OpenAnimationBorder" Margin="0" Padding="0" Height="{DynamicResource RowHeight}" HorizontalAlignment="Stretch"
                                     Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1"
-                                    PointerEntered="ListViewItem_MouseEnter"
-                                    PointerExited="ListViewItem_MouseLeave" 
-                                    PointerPressed="ListViewItem_PointerPressed">
+                                    Tapped="ListViewItem_SingleTapped" DoubleTapped="ListViewItem_DoubleTapped"
+                                    PointerPressed="ListViewItem_PointerPressed" PointerReleased="ListViewItem_PointerReleased"
+                                    PointerEntered="ListViewItem_MouseEnter" PointerExited="ListViewItem_MouseLeave">
                                 <u:SolidBorder.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                         <LinearGradientBrush.GradientStops>

@@ -1370,7 +1370,22 @@ namespace SystemTrayMenu.UserInterface
             if (((StyledElement)sender).DataContext is RowData rowData)
             {
                 CellMouseDown?.Invoke(rowData);
-                rowData.OpenItem(e.ClickCount);
+            }
+        }
+
+        private void ListViewItem_SingleTapped(object sender, TappedEventArgs e)
+        {
+            if (((StyledElement)sender).DataContext is RowData rowData)
+            {
+                rowData.OpenItem(1);
+            }
+        }
+
+        private void ListViewItem_DoubleTapped(object sender, TappedEventArgs e)
+        {
+            if (((StyledElement)sender).DataContext is RowData rowData)
+            {
+                rowData.OpenItem(2);
             }
         }
 #else  // rowData.IsClicked only visible in the moment of clicking, so should be replaced with OpenAnimationBorder/OpenAnimationStoryboard
@@ -1416,10 +1431,17 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
-        private void ListViewItem_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+#if AVALONIA
+        private void ListViewItem_PointerReleased(object sender, PointerReleasedEventArgs e)
+        {
+            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased &&
+                ((StyledElement)sender).DataContext is RowData rowData)
+#else
+                private void ListViewItem_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             // "DisconnectedItem" protection
             if (((ListViewItem)sender).Content is RowData rowData)
+#endif
             {
                 // At mouse location
                 Point position = Mouse.GetPosition(this);

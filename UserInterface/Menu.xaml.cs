@@ -385,6 +385,21 @@ namespace SystemTrayMenu.UserInterface
 
         internal void RiseItemExecuted(RowData rowData)
         {
+#if AVALONIA
+            // TODO: Optimize out search of parent visual control
+            foreach (Control item in dgv.Children)
+            {
+                if (item.DataContext == rowData)
+                {
+                    if (item is SolidBorder openAnimationBorder)
+                    {
+                        openAnimationBorder.StartOpenAnimation();
+                    }
+
+                    return;
+                }
+            }
+#endif
 #if TODO_AVALONIA
             ListViewItem? lvi;
             int i = 0;

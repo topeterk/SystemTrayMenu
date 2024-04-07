@@ -177,40 +177,55 @@
                     <ItemsRepeater.Layout>
                       <StackLayout Spacing="0" Orientation="Vertical"/>
                     </ItemsRepeater.Layout>
-                    <!--u:ListView."Childs".Border.Padding="0" // In ctor, see: dgv_border -->
                     <u:ListView.Resources>
                         <!-- Set min-size according to: learn.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-customize-the-thumb-size-on-a-scrollbar#create-a-scrollbar-with-a-minimum-thumb-size -->
                         <!-- Thumb's minimum height is half of VerticalScrollBarButtonHeightKey -->
-                        <!-- TODO: <sys:Double x:Key="{x:Static u:SystemParameters.VerticalScrollBarButtonHeightKey}">116</sys:Double>           -->
-                        <!-- TODO: <Storyboard x:Key="OpenAnimationStoryboard">                                                                  -->
-                        <!-- TODO:     <DoubleAnimation                                                                                          -->
-                        <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
-                        <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[0].(GradientStop.Offset)" -->
-                        <!-- TODO:         From="-0.4" To="1.0" Duration="0:0:0.6" />                                                            -->
-                        <!-- TODO:     <DoubleAnimation                                                                                          -->
-                        <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
-                        <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Offset)" -->
-                        <!-- TODO:         From="-0.2" To="1.3" Duration="0:0:0.6" />                                                            -->
-                        <!-- TODO:     <DoubleAnimation                                                                                          -->
-                        <!-- TODO:         Storyboard.TargetName="OpenAnimationBorder"                                                           -->
-                        <!-- TODO:         Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[2].(GradientStop.Offset)" -->
-                        <!-- TODO:         From="-0.0" To="1.5" Duration="0:0:0.6" />                                                            -->
-                        <!-- TODO: </Storyboard>                                                                                                 -->
+                        <!-- TODO: <sys:Double x:Key="{x:Static u:SystemParameters.VerticalScrollBarButtonHeightKey}">116</sys:Double> -->
                     </u:ListView.Resources>
+                    <u:ListView.Styles>
+                        <Style Selector=":is(Border):OpenAnimationStoryboard">
+                            <Style.Animations>
+                                <Animation Duration="0:0:0.6" IterationCount="1">
+                                    <KeyFrame Cue="0%">
+                                        <Setter Property="Background">
+                                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStop Color="#00000000" Offset="-0.4"/>
+                                                    <GradientStop Color="#8800ff00" Offset="-0.2"/>
+                                                    <GradientStop Color="#00000000" Offset="-0.0"/>
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </Setter>
+                                    </KeyFrame>
+                                    <KeyFrame Cue="100%">
+                                        <Setter Property="Background">
+                                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStop Color="#00000000" Offset="1.0"/>
+                                                    <GradientStop Color="#8800ff00" Offset="1.3"/>
+                                                    <GradientStop Color="#00000000" Offset="1.5"/>
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </Setter>
+                                    </KeyFrame>
+                                </Animation>
+                            </Style.Animations>
+                        </Style>
+                    </u:ListView.Styles>
                     <u:ListView.ItemTemplate>
                         <DataTemplate>
-                            <u:SolidBorder x:Name="OpenAnimationBorder" Margin="0" Padding="0" Height="{DynamicResource RowHeight}" HorizontalAlignment="Stretch"
-                                    Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1"
+                            <u:SolidBorder Margin="0" Padding="0" Height="{DynamicResource RowHeight}" HorizontalAlignment="Stretch"
+                                    BorderBrush="{Binding BorderBrush}" BorderThickness="1"
                                     Tapped="ListViewItem_SingleTapped" DoubleTapped="ListViewItem_DoubleTapped"
                                     PointerPressed="ListViewItem_PointerPressed" PointerReleased="ListViewItem_PointerReleased"
                                     PointerEntered="ListViewItem_MouseEnter" PointerExited="ListViewItem_MouseLeave">
                                 <u:SolidBorder.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <LinearGradientBrush.GradientStops>
-                                            <GradientStop Color="#00000000" Offset="-0.4"/>
-                                            <GradientStop Color="#8800ff00" Offset="-0.2"/>
-                                            <GradientStop Color="#00000000" Offset="-0.0"/>
-                                        </LinearGradientBrush.GradientStops>
+                                    <LinearGradientBrush>
+                                        <!-- Avalonia Workaround: Make sure Background is of type LinearGradientBrush -->
+                                        <!--  This works using XAML entirely but by assigning a pseudo class (which starts the animation) -->
+                                        <!--  it fails with an invalid cast exception, so we have to make sure we provide correct type beforehand -->
+                                        <!--  See: ... -->
+                                        <GradientStop Color="{Binding BackgroundBrush}"/>
                                     </LinearGradientBrush>
                                 </u:SolidBorder.Background>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">

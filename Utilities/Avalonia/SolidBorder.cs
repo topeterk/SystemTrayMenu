@@ -7,16 +7,38 @@
 #if AVALONIA
 namespace SystemTrayMenu.Utilities
 {
+    using System;
     using Avalonia;
+    using Avalonia.Controls;
+    using Avalonia.Controls.Metadata;
     using Avalonia.Rendering;
+    using Avalonia.Threading;
 
-    public class SolidBorder : Avalonia.Controls.Border, ICustomHitTest
+    [PseudoClasses(":OpenAnimationStoryboard")]
+    internal class SolidBorder : Avalonia.Controls.Border, ICustomHitTest
     {
+        private IDisposable? animationTimer;
+        private bool isAnimationRunning;
+
         // Border will only return true on hit where child elements exists,
         // this makes sure to return true even when background is not actually "filled"
         // HitTest gets Pointer location relative to current instance's top left corner,
         // so we have to check agains our current bounds but without any offsets to parent control.
         public bool HitTest(Point point) => new Rect(new Size(Bounds.Width, Bounds.Height)).Contains(point);
+
+        internal void StartOpenAnimation()
+        {
+            if (!isAnimationRunning)
+            {
+                // By assigning the pseudo class, the animation starts playing
+                // After the animation completed, the class gets reset that allows firing it again
+                PseudoClasses.Set(":OpenAnimationStoryboard", isAnimationRunning = true);
+                animationTimer = DispatcherTimer.RunOnce(
+                    () => Dispatcher.UIThread.Post(() => PseudoClasses.Set(":OpenAnimationStoryboard", isAnimationRunning = false)),
+                    TimeSpan.FromSeconds(1),
+                    DispatcherPriority.Default);
+            }
+        }
     }
 }
 #endif

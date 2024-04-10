@@ -59,6 +59,8 @@ namespace SystemTrayMenu.UserInterface
 
 #if !AVALONIA
         private int countLeftMouseButtonClicked;
+#else
+        private TaskbarPosition taskbarPosition = TaskbarPosition.Unknown; // TODO: Optimize away?
 #endif
         private bool isShellContextMenuOpen;
         private bool directionToRight;
@@ -343,6 +345,10 @@ namespace SystemTrayMenu.UserInterface
         }
 
         internal Point Location => new (Left, Top); // TODO WPF Replace Forms wrapper
+
+#if AVALONIA
+        internal Rect MenuBounds { get; private set; } = default;
+#endif
 
         internal int Level { get; set; }
 
@@ -651,6 +657,46 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
+#if AVALONIA
+        /// <summary>
+        /// Performs AdjustSizeAndLocation on this menu and all of its submenus
+        /// </summary>
+        internal void AdjustMenusSizeAndLocation()
+        {
+            if (Level == 0)
+            {
+                GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation);
+
+                MenuBounds = screenBounds;
+
+                if (!Settings.Default.AppearAtTheBottomLeft &&
+                    !Settings.Default.AppearAtMouseLocation &&
+                    !Settings.Default.UseCustomLocation)
+                {
+                    const double overlapTolerance = 4D;
+
+                    // Remember width of the initial menu as we don't want to overlap with it
+                    if (taskbarPosition == TaskbarPosition.Left)
+                    {
+                        screenBounds.Translate(new(screenBounds.X + (Width - overlapTolerance), 0));
+                    }
+
+                    screenBounds.Translate(new Vector(screenBounds.Width - (Width - overlapTolerance), 0));
+                }
+
+                AdjustSizeAndLocation(MenuBounds, ParentMenu, startLocation, useCustomLocation);
+            }
+            else
+            {
+                if (ParentMenu is not null)
+                {
+                    MenuBounds = ParentMenu.MenuBounds;
+                    AdjustSizeAndLocation(MenuBounds, ParentMenu, StartLocation.Predecessor, false /* TODO unused */);
+                }
+            }
+        }
+#endif
+
         /// <summary>
         /// Update the position and size of the menu.
         /// </summary>
@@ -659,21 +705,18 @@ namespace SystemTrayMenu.UserInterface
         /// <param name="startLocation">Defines where the first menu is drawn (when no predecessor is set).</param>
         /// <param name="useCustomLocation">Use CustomLocation as start position.</param>
         internal void AdjustSizeAndLocation(
-#if !AVALONIA
             Rect bounds,
-#else
-            Rectangle bounds,
-#endif
             Menu? menuPredecessor,
             StartLocation startLocation,
             bool useCustomLocation)
         {
             Point originLocation = new(0D, 0D);
 
+#if TODO_AVALONIA
             // Update the height and width
             AdjustDataGridViewHeight(menuPredecessor, bounds.Height);
             AdjustDataGridViewWidth();
-
+#endif
             if (Level > 0)
             {
                 if (menuPredecessor == null)
@@ -1011,6 +1054,82 @@ namespace SystemTrayMenu.UserInterface
             VisibilityChanged?.Invoke(this);
 
             base.IsVisibleChanged(e);
+        }
+#endif
+
+#if TODO // Seems to be called multiple times (while changing visbility), so disabled for now
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+
+            AdjustMenusSizeAndLocation();
+        }
+#endif
+
+#if AVALONIA
+        private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation)
+        {
+#if TODO // Avalonia Native Screens
+            if (Settings.Default.AppearAtMouseLocation)
+            {
+                screenBounds = NativeMethods.Screen.FromPoint(NativeMethods.Screen.CursorPosition);
+                useCustomLocation = false;
+            }
+            else if (Settings.Default.UseCustomLocation)
+            {
+                screenBounds = NativeMethods.Screen.FromPoint(new(
+                    Settings.Default.CustomLocationX,
+                    Settings.Default.CustomLocationY));
+
+                useCustomLocation = screenBounds.Contains(
+                    new Point(Settings.Default.CustomLocationX, Settings.Default.CustomLocationY));
+            }
+            else
+            {
+                screenBounds = NativeMethods.Screen.PrimaryScreen;
+                useCustomLocation = false;
+            }
+#else
+            screenBounds = new Rect(0, 0, 1920, 1080);
+            useCustomLocation = false;
+#endif
+
+            // Shrink the usable space depending on taskbar location
+            taskbarPosition = new WindowsTaskbar().Position;
+            switch (taskbarPosition)
+            {
+#if TODO // Avalonia Taskbar Offset
+                case TaskbarPosition.Left:
+                    screenBounds.X += taskbar.Size.Width;
+                    screenBounds.Width -= taskbar.Size.Width;
+                    startLocation = StartLocation.BottomLeft;
+                    break;
+                case TaskbarPosition.Right:
+                    screenBounds.Width -= taskbar.Size.Width;
+                    startLocation = StartLocation.BottomRight;
+                    break;
+                case TaskbarPosition.Top:
+                    screenBounds.Y += taskbar.Size.Height;
+                    screenBounds.Height -= taskbar.Size.Height;
+                    startLocation = StartLocation.TopRight;
+                    break;
+                case TaskbarPosition.Bottom:
+                default:
+                    screenBounds.Height -= taskbar.Size.Height;
+                    startLocation = StartLocation.BottomRight;
+                    break;
+#else
+                default:
+                    screenBounds.Translate(new(0, -50));
+                    startLocation = StartLocation.BottomRight;
+                    break;
+#endif
+            }
+
+            if (Settings.Default.AppearAtTheBottomLeft)
+            {
+                startLocation = StartLocation.BottomLeft;
+            }
         }
 #endif
 
@@ -1454,7 +1573,7 @@ namespace SystemTrayMenu.UserInterface
             if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased &&
                 ((StyledElement)sender).DataContext is RowData rowData)
 #else
-                private void ListViewItem_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void ListViewItem_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             // "DisconnectedItem" protection
             if (((ListViewItem)sender).Content is RowData rowData)

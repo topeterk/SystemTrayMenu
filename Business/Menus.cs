@@ -50,7 +50,9 @@ namespace SystemTrayMenu.Business
         private readonly DispatcherTimer waitLeave = new();
         private readonly Menu mainMenu;
 
+#if !AVALONIA
         private TaskbarPosition taskbarPosition = TaskbarPosition.Unknown;
+#endif
         private bool mainMenuPreloading = true;
         private bool showMenuAfterMainPreload;
         private TaskbarLogo? taskbarLogo;
@@ -433,7 +435,11 @@ namespace SystemTrayMenu.Business
                 // Just hide the inner controls for a moment until all changes have been applied.
                 menu.windowFrame.SetVisibility(Visibility.Hidden);
                 menu.AddItemsToMenu(menuData.RowDatas, menuData.DirectoryState);
+#if AVALONIA
+                menu.AdjustMenusSizeAndLocation();
+#else
                 AdjustMenusSizeAndLocation(menu.Level);
+#endif
                 menu.windowFrame.SetVisibility(Visibility.Visible);
             }
             else
@@ -452,7 +458,11 @@ namespace SystemTrayMenu.Business
             // However, when the main menu loads, we know it is valid and we can enter desired state directly.
             menu.AddItemsToMenu(rowDatas, menu.Level == 0 ? MenuDataDirectoryState.Valid : null);
 
+#if AVALONIA
+            menu.MenuScrolled += () => menu.SubMenu?.AdjustMenusSizeAndLocation();
+#else
             menu.MenuScrolled += () => AdjustMenusSizeAndLocation(menu.Level + 1); // TODO: Only update vertical location while scrolling?
+#endif
             menu.MouseLeave += (_, _) =>
             {
                 // Restart timer
@@ -481,8 +491,11 @@ namespace SystemTrayMenu.Business
                     }
                 }
 
+#if AVALONIA
+                menu.SubMenu?.AdjustMenusSizeAndLocation();
+#else
                 AdjustMenusSizeAndLocation(menu.Level + 1);
-
+#endif
                 if (!causedByWatcherUpdate)
                 {
                     // if there is any open sub menu, close it
@@ -577,8 +590,11 @@ namespace SystemTrayMenu.Business
         {
             if (menu.GetVisibility() == Visibility.Visible)
             {
+#if AVALONIA
+                menu.AdjustMenusSizeAndLocation();
+#else
                 AdjustMenusSizeAndLocation(menu.Level);
-
+#endif
                 if (menu.Level == 0)
                 {
                     menu.ResetSearchText();
@@ -624,6 +640,7 @@ namespace SystemTrayMenu.Business
             }
         }
 
+#if !AVALONIA
         private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation)
         {
             if (Settings.Default.AppearAtMouseLocation)
@@ -717,13 +734,18 @@ namespace SystemTrayMenu.Business
                 menu = menu.SubMenu;
             }
         }
+#endif
 
         private void AdjustLocationOnWatcherUpdate(Menu menu)
         {
             // Force refresh of view, let layout settle and then update position based on new size
             menu.RefreshDataGridView();
             menu.UpdateLayout();
+#if AVALONIA
+            menu.AdjustMenusSizeAndLocation();
+#else
             AdjustMenusSizeAndLocation(menu.Level);
+#endif
         }
 
         private void ExecuteWatcherHistory()

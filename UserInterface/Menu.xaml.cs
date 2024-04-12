@@ -768,10 +768,10 @@ namespace SystemTrayMenu.UserInterface
                 double overlappingOffset = 0D;
                 double predecessorFrameWidth = 0D;
 
+#if !AVALONIA
                 // Make sure we have latest values of own window size
                 UpdateLayout();
 
-#if !AVALONIA
                 double menuFrameWidth = windowFrame.ActualWidth;
                 double menuFrameHeight = windowFrame.ActualHeight;
 #else
@@ -788,12 +788,12 @@ namespace SystemTrayMenu.UserInterface
                         return;
                     }
 
+#if !AVALONIA
                     // When (later in calculation) a list item is not found,
                     // its values might be invalidated due to resizing or moving.
                     // After updating the layout the location should be available again.
                     menuPredecessor.UpdateLayout();
 
-#if !AVALONIA
                     predecessorFrameWidth = menuPredecessor.windowFrame.ActualWidth;
 #else
                     predecessorFrameWidth = menuPredecessor.windowFrame.DesiredSize.Width;
@@ -993,7 +993,9 @@ namespace SystemTrayMenu.UserInterface
                     windowFrame.CornerRadius = new CornerRadius(CornerRadiusConstant);
                 }
 
+#if !AVALONIA
                 UpdateLayout();
+#endif
             }
         }
 
@@ -1057,10 +1059,17 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
-#if TODO // Seems to be called multiple times (while changing visbility), so disabled for now
+#if AVALONIA
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
+
+            AdjustMenusSizeAndLocation();
+        }
+
+        protected override void OnResized(WindowResizedEventArgs e)
+        {
+            base.OnResized(e);
 
             AdjustMenusSizeAndLocation();
         }

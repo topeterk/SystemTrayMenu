@@ -431,16 +431,16 @@ namespace SystemTrayMenu.Business
             if (menuData.DirectoryState != MenuDataDirectoryState.Undefined)
             {
                 // Sub Menu (completed)
+#if !AVALONIA
                 // There will be some layout, size and position changes.
                 // Just hide the inner controls for a moment until all changes have been applied.
                 menu.windowFrame.SetVisibility(Visibility.Hidden);
-                menu.AddItemsToMenu(menuData.RowDatas, menuData.DirectoryState);
-#if AVALONIA
-                menu.AdjustMenusSizeAndLocation();
-#else
-                AdjustMenusSizeAndLocation(menu.Level);
 #endif
+                menu.AddItemsToMenu(menuData.RowDatas, menuData.DirectoryState);
+#if !AVALONIA
+                AdjustMenusSizeAndLocation(menu.Level);
                 menu.windowFrame.SetVisibility(Visibility.Visible);
+#endif
             }
             else
             {
@@ -491,9 +491,7 @@ namespace SystemTrayMenu.Business
                     }
                 }
 
-#if AVALONIA
-                menu.SubMenu?.AdjustMenusSizeAndLocation();
-#else
+#if !AVALONIA
                 AdjustMenusSizeAndLocation(menu.Level + 1);
 #endif
                 if (!causedByWatcherUpdate)
@@ -590,9 +588,7 @@ namespace SystemTrayMenu.Business
         {
             if (menu.GetVisibility() == Visibility.Visible)
             {
-#if AVALONIA
-                menu.AdjustMenusSizeAndLocation();
-#else
+#if !AVALONIA
                 AdjustMenusSizeAndLocation(menu.Level);
 #endif
                 if (menu.Level == 0)

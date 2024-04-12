@@ -397,7 +397,8 @@ namespace SystemTrayMenu.UserInterface
             {
                 if (item.DataContext == rowData)
                 {
-                    if (item is SolidBorder openAnimationBorder)
+                    SolidBorder openAnimationBorder = item.FindVisualChildOfType<SolidBorder>();
+                    if (openAnimationBorder is not null)
                     {
                         openAnimationBorder.StartOpenAnimation();
                     }

@@ -4,10 +4,11 @@
 
 namespace SystemTrayMenu.Utilities
 {
-    using System.Threading;
-#if WINDOWS
     using System;
     using System.IO;
+    using System.Runtime.Versioning;
+    using System.Threading;
+#if WINDOWS
     using Shell32;
 #endif
 
@@ -48,16 +49,20 @@ namespace SystemTrayMenu.Utilities
             return resolvedFilename;
         }
 
+        [SupportedOSPlatformGuard("Windows")]
         public static bool IsNetworkRoot(string path)
         {
-#if WINDOWS
-            // This is a windows specific path starting with "\\"
-            return path.StartsWith($"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}", StringComparison.InvariantCulture) &&
+            if (OperatingSystem.IsWindows())
+            {
+                // This is a windows specific path starting with "\\"
+                return path.StartsWith($"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}", StringComparison.InvariantCulture) &&
                 !path[2..].Contains(Path.DirectorySeparatorChar, StringComparison.InvariantCulture);
-#else
-            // Other systems do not have this as they are mounted into the one and only file system tree
-            return false;
-#endif
+            }
+            else
+            {
+                // Other systems do not have this as they are mounted into the one and only file system tree
+                return false;
+            }
         }
 
         private static string GetShortcutFileNamePath(object shortcutFilename, out bool isFolder)

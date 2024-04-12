@@ -5,8 +5,8 @@
 namespace SystemTrayMenu.UserInterface
 {
     using System;
-    using System.Drawing;
 #if !AVALONIA
+    using System.Drawing;
     using System.Windows.Threading;
     using H.NotifyIcon.Core;
 #else
@@ -19,19 +19,20 @@ namespace SystemTrayMenu.UserInterface
     {
         private readonly Dispatcher dispatchter = WPFExtensions.CurrentDispatcher;
         private readonly TrayIconWithContextMenu notifyIcon = new ();
-#if TODO_LINUX
+#if AVALONIA
+        private WindowIcon? loadingIcon;
+#else
         private Icon? loadingIcon;
 #endif
 
         public AppNotifyIcon()
         {
             notifyIcon.ToolTip = "SystemTrayMenu";
-#if TODO_AVALONIA // System.Drawing.Icon replacement
-            notifyIcon.Icon = Config.GetAppIcon().Handle;
+
+#if AVALONIA
+            notifyIcon.Icon = Config.GetAppIcon();
 #else
-            // Icon (more specific: System.Drawing) is no longer available, so it must be replaced
-            // As quick fix just load the static Icon here only.
-            notifyIcon.Icon = new WindowIcon(new LocalResourceBitmap("/Resources/SystemTrayMenu.ico"));
+            notifyIcon.Icon = Config.GetAppIcon().Handle;
 #endif
             notifyIcon.ContextMenu = new AppContextMenu().Create();
             notifyIcon.MessageWindow.MouseEventReceived += (sender, e) =>
@@ -50,22 +51,28 @@ namespace SystemTrayMenu.UserInterface
         public void Dispose()
         {
             notifyIcon.Dispose();
-#if TODO_LINUX
+#if !AVALONIA
             loadingIcon?.Dispose();
 #endif
         }
 
         public void LoadingStart()
         {
-#if TODO_AVALONIA // System.Drawing.Icon replacement
             loadingIcon ??= App.LoadIconFromResource("Resources/Loading.ico");
+#if AVALONIA
+            notifyIcon.Icon = loadingIcon; // TODO: Loading/Unloading icons will not update the icon, maybe try using bindings?
+
+            // TODO: Think about XAML tray icon: https://docs.avaloniaui.net/docs/reference/controls/detailed-reference/tray-icon
+#else
             notifyIcon.UpdateIcon(loadingIcon.Handle);
 #endif
         }
 
         public void LoadingStop()
         {
-#if TODO_AVALONIA // System.Drawing.Icon replacement
+#if AVALONIA
+            notifyIcon.Icon = Config.GetAppIcon();
+#else
             notifyIcon.UpdateIcon(Config.GetAppIcon().Handle);
 #endif
         }

@@ -88,14 +88,17 @@ namespace SystemTrayMenu
         }
 #endif
 
-#if TODO_LINUX
         /// <summary>
         /// Loads an Icon from the application's Resources.
         /// Note: Only allowed to be called after App's Startup event.
         /// </summary>
         /// <param name="resourceName">Absolute file path from root directory.</param>
         /// <returns>New Icon object.</returns>
+#if AVALONIA
+        internal static WindowIcon LoadIconFromResource(string resourceName)
+#else
         internal static Icon LoadIconFromResource(string resourceName)
+#endif
         {
 #if !AVALONIA
             using (Stream stream = GetResourceStream(new("pack://application:,,,/" + resourceName, UriKind.Absolute)).Stream)
@@ -107,7 +110,6 @@ namespace SystemTrayMenu
                 return new(stream);
             }
         }
-#endif
 
         protected virtual void Dispose(bool disposing)
         {

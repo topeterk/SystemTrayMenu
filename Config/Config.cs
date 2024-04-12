@@ -15,6 +15,7 @@ namespace SystemTrayMenu
 #if !AVALONIA
     using System.Windows.Media;
 #else
+    using Avalonia.Controls;
     using Avalonia.Media;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
@@ -27,7 +28,10 @@ namespace SystemTrayMenu
 
     public static class Config
     {
-#if TODO_LINUX
+#if AVALONIA
+        private static WindowIcon? iconRootFolder;
+        private static WindowIcon? applicationIcon;
+#else
         private static Icon? iconRootFolder;
         private static Icon? applicationIcon;
 #endif
@@ -74,13 +78,18 @@ namespace SystemTrayMenu
             }
         }
 
-#if TODO_LINUX
+#if AVALONIA
+        public static WindowIcon GetAppIcon()
+#else
         public static Icon GetAppIcon()
+#endif
         {
             if (Settings.Default.UseIconFromRootFolder && iconRootFolder is null)
             {
+#if !AVALONIA // TODO
                 // Load icon only once
                 iconRootFolder = IconReader.GetRootFolderIcon(Path);
+#endif
             }
 
             if (Settings.Default.UseIconFromRootFolder && iconRootFolder is not null)
@@ -91,15 +100,18 @@ namespace SystemTrayMenu
             {
                 if (applicationIcon == null)
                 {
+#if AVALONIA
+                    applicationIcon = App.LoadIconFromResource("Resources/SystemTrayMenu.ico");
+#else
                     Icon icon = App.LoadIconFromResource("Resources/SystemTrayMenu.ico");
                     applicationIcon = new(icon, (int)SystemParameters.SmallIconWidth, (int)SystemParameters.SmallIconHeight);
                     icon.Dispose();
+#endif
                 }
 
                 return applicationIcon;
             }
         }
-#endif
 
         public static void ParseCommandline(string[] args)
         {

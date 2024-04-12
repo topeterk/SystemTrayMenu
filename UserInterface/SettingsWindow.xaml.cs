@@ -49,7 +49,7 @@ namespace SystemTrayMenu.UserInterface
             Translate();
             void Translate()
             {
-                if (IsStartupTask())
+                if (!HasAutostartSupport())
                 {
                     groupBoxAutostart.Content = $"{(string)groupBoxAutostart.Content} ({Translator.GetText("Task Manager")})";
                 }
@@ -67,7 +67,7 @@ namespace SystemTrayMenu.UserInterface
             checkBoxSaveConfigInApplicationDirectory.IsChecked = CustomSettingsProvider.IsActivatedConfigPathAssembly();
             checkBoxSaveLogFileInApplicationDirectory.IsChecked = Settings.Default.SaveLogFileInApplicationDirectory;
 
-            if (IsStartupTask())
+            if (!HasAutostartSupport())
             {
                 checkBoxAutostart.SetVisibility(Visibility.Collapsed);
                 labelStartupStatus.Content = string.Empty;
@@ -426,13 +426,18 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
-        private static bool IsStartupTask()
+        [SupportedOSPlatformGuard("Windows")]
+        private static bool HasAutostartSupport()
         {
-            bool useStartupTask = false;
-#if RELEASEPACKAGE
-            useStartupTask = true;
+            if (!OperatingSystem.IsWindows())
+            {
+                return false;
+            }
+#if RELEASEPACKAGE // Windows Store version
+            return false;
+#else
+            return true;
 #endif
-            return useStartupTask;
         }
 
 #if TODO_AVALONIA
@@ -473,7 +478,7 @@ namespace SystemTrayMenu.UserInterface
                 }
             }
 
-            if (!IsStartupTask())
+            if (HasAutostartSupport())
             {
                 if (checkBoxAutostart.IsChecked ?? false)
                 {

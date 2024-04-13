@@ -118,10 +118,32 @@ namespace SystemTrayMenu.Utilities
     {
         private static MessageWindow msgWindow = new();
         private static TrayIcon? trayIcon;
+        private WindowIcon? icon;
+        private string tooltip = string.Empty;
 
-        internal string ToolTip { get; set; } = string.Empty;
+        internal string ToolTip
+        {
+            set
+            {
+                tooltip = value;
+                if (trayIcon is not null)
+                {
+                    trayIcon.ToolTipText = value;
+                }
+            }
+        }
 
-        internal WindowIcon Icon { get; set; }
+        internal WindowIcon Icon
+        {
+            set
+            {
+                icon = value;
+                if (trayIcon is not null)
+                {
+                    trayIcon.Icon = value;
+                }
+            }
+        }
 
         internal PopupMenu? ContextMenu { get; set; }
 
@@ -130,8 +152,8 @@ namespace SystemTrayMenu.Utilities
         internal void Create()
         {
             trayIcon = new();
-            trayIcon.Icon = Icon;
-            trayIcon.ToolTipText = ToolTip;
+            trayIcon.Icon = icon;
+            trayIcon.ToolTipText = tooltip;
             trayIcon.Menu = ContextMenu;
             trayIcon.Clicked += MessageWindow.RaiseEvent;
 #if !TODO_LINUX

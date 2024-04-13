@@ -27,6 +27,7 @@ namespace SystemTrayMenu.UserInterface
 
         public AppNotifyIcon()
         {
+            // TODO: Rework and replace with XAML tray icon: https://docs.avaloniaui.net/docs/reference/controls/detailed-reference/tray-icon
             notifyIcon.ToolTip = "SystemTrayMenu";
 
 #if AVALONIA
@@ -60,9 +61,7 @@ namespace SystemTrayMenu.UserInterface
         {
             loadingIcon ??= App.LoadIconFromResource("Resources/Loading.ico");
 #if AVALONIA
-            notifyIcon.Icon = loadingIcon; // TODO: Loading/Unloading icons will not update the icon, maybe try using bindings?
-
-            // TODO: Think about XAML tray icon: https://docs.avaloniaui.net/docs/reference/controls/detailed-reference/tray-icon
+            notifyIcon.Icon = loadingIcon;
 #else
             notifyIcon.UpdateIcon(loadingIcon.Handle);
 #endif

@@ -38,7 +38,9 @@ namespace SystemTrayMenu.Business
 
     internal class Menus : IDisposable
     {
+#if !AVALONIA
         private readonly AppNotifyIcon menuNotifyIcon = new();
+#endif
         private readonly BackgroundWorker workerMainMenu = new();
         private readonly List<BackgroundWorker> workersSubMenu = new();
         private readonly WaitToLoadMenu waitToOpenMenu = new();
@@ -61,7 +63,9 @@ namespace SystemTrayMenu.Business
         public Menus()
         {
             SingleAppInstance.Wakeup += SwitchOpenCloseByHotKey;
+#if !AVALONIA
             menuNotifyIcon.Click += () => UserSwitchOpenClose(true);
+#endif
 
             if (!keyboardInput.RegisterHotKey(Settings.Default.HotKey))
             {
@@ -88,7 +92,11 @@ namespace SystemTrayMenu.Business
                     workerSubMenu.CancelAsync();
                 }
 
+#if AVALONIA
+                App.IsAppLoading = false;
+#else
                 menuNotifyIcon.LoadingStop();
+#endif
             }
 
             waitToOpenMenu.MouseSelect += keyboardInput.SelectByMouse;
@@ -180,7 +188,9 @@ namespace SystemTrayMenu.Business
             timerStillActiveCheck.Stop();
             waitLeave.Stop();
             taskbarLogo?.Close();
+#if !AVALONIA
             menuNotifyIcon.Dispose();
+#endif
             mainMenu.Close();
         }
 
@@ -232,7 +242,11 @@ namespace SystemTrayMenu.Business
             {
                 // Stop current loading process of main menu
                 workerMainMenu.CancelAsync();
+#if AVALONIA
+                App.IsAppLoading = false;
+#else
                 menuNotifyIcon.LoadingStop();
+#endif
             }
             else if (mainMenu.GetVisibility() == Visibility.Visible)
             {
@@ -250,7 +264,11 @@ namespace SystemTrayMenu.Business
                     GenerateDriveShortcuts.Start();
                 }
 
+#if AVALONIA
+                App.IsAppLoading = true;
+#else
                 menuNotifyIcon.LoadingStart();
+#endif
                 workerMainMenu.RunWorkerAsync(null);
             }
         }
@@ -312,7 +330,11 @@ namespace SystemTrayMenu.Business
         private async void LoadMainMenuCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
             keyboardInput.ResetSelectedByKey();
+#if AVALONIA
+            App.IsAppLoading = false;
+#else
             menuNotifyIcon.LoadingStop();
+#endif
 
             if (e.Result == null)
             {

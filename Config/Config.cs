@@ -31,7 +31,6 @@ namespace SystemTrayMenu
     {
 #if AVALONIA
         private static WindowIcon? iconRootFolder;
-        private static WindowIcon? applicationIcon;
 #else
         private static Icon? iconRootFolder;
         private static Icon? applicationIcon;
@@ -80,17 +79,26 @@ namespace SystemTrayMenu
         }
 
 #if AVALONIA
-        public static WindowIcon GetAppIcon()
+        public static WindowIcon? GetCustomAppIcon()
 #else
-        public static Icon GetAppIcon()
+        public static Icon GetCustomAppIcon()
 #endif
         {
+#if AVALONIA
+            if (Settings.Default.UseIconFromRootFolder)
+            {
+#if AVALONIA_TODO
+                iconRootFolder ??= IconReader.GetRootFolderIcon(Path);
+#endif
+                return iconRootFolder;
+            }
+
+            return null;
+#else
             if (Settings.Default.UseIconFromRootFolder && iconRootFolder is null)
             {
-#if !AVALONIA // TODO
                 // Load icon only once
                 iconRootFolder = IconReader.GetRootFolderIcon(Path);
-#endif
             }
 
             if (Settings.Default.UseIconFromRootFolder && iconRootFolder is not null)
@@ -101,17 +109,14 @@ namespace SystemTrayMenu
             {
                 if (applicationIcon == null)
                 {
-#if AVALONIA
-                    applicationIcon = App.LoadIconFromResource("Resources/SystemTrayMenu.ico");
-#else
                     Icon icon = App.LoadIconFromResource("Resources/SystemTrayMenu.ico");
                     applicationIcon = new(icon, (int)SystemParameters.SmallIconWidth, (int)SystemParameters.SmallIconHeight);
                     icon.Dispose();
-#endif
                 }
 
                 return applicationIcon;
             }
+#endif
         }
 
         public static void ParseCommandline(string[] args)

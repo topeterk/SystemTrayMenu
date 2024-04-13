@@ -5,9 +5,9 @@
 namespace SystemTrayMenu
 {
     using System;
-    using System.Drawing;
     using System.IO;
 #if !AVALONIA
+    using System.Drawing;
     using System.Windows;
     using System.Windows.Threading;
     using SystemTrayMenu.DllImports;
@@ -25,6 +25,7 @@ namespace SystemTrayMenu
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Properties;
+    using SystemTrayMenu.UserInterface;
     using SystemTrayMenu.Utilities;
 
     /// <summary>
@@ -35,6 +36,7 @@ namespace SystemTrayMenu
         private Menus? menus;
         private JoystickHelper? joystickHelper;
 #if AVALONIA
+        private TrayIcon? trayIcon;
         private IDisposable? updateCheckTimer;
 #endif
         private bool isDisposed;
@@ -58,6 +60,24 @@ namespace SystemTrayMenu
 #endif
         }
 
+#if AVALONIA
+        internal static bool IsAppLoading
+        {
+            set
+            {
+                App app = (App)Current;
+                if (value)
+                {
+                    app.trayIcon.Icon = (WindowIcon)app.Resources["ApplicationTrayIconLoading"];
+                }
+                else
+                {
+                    app.trayIcon.Icon = Config.GetCustomAppIcon() ?? (WindowIcon)app.Resources["ApplicationTrayIcon"];
+                }
+            }
+        }
+#endif
+
         internal static bool IsActiveApp { get; private set; }
 
         public void Dispose()
@@ -70,6 +90,12 @@ namespace SystemTrayMenu
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+
+            TrayIcons? trayIcons = TrayIcon.GetIcons(this);
+            if (trayIcons is not null && trayIcons.Count > 0)
+            {
+                trayIcon = trayIcons[0]; // Remember first (and only) one
+            }
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -110,6 +136,30 @@ namespace SystemTrayMenu
                 return new(stream);
             }
         }
+
+#if AVALONIA
+#if !TODO_LINUX // Check if workaround still required: implement or remove it
+        // It seems that on Ubuntu 22.04 the Clicked event on the icon does not fire?
+        // Find a workaround or fix! As a workaround add menu item to open the main menu instead
+#endif
+        internal void TrayMenu_Clicked(object sender, EventArgs args) => menus?.UserSwitchOpenClose(true);
+
+        internal void TrayMenu_OpenSettings(object sender, EventArgs args) => SettingsWindow.ShowSingleInstance();
+
+        internal void TrayMenu_OpenLog(object sender, EventArgs args) => Log.OpenLogFile();
+
+        internal void TrayMenu_OpenFAQ(object sender, EventArgs args) => Config.ShowHelpFAQ();
+
+        internal void TrayMenu_OpenSupport(object sender, EventArgs args) => Config.ShowSupportSystemTrayMenu();
+
+        internal void TrayMenu_OpenAbout(object sender, EventArgs args) => AboutBox.CreateAndOpenAbout();
+
+        internal void TrayMenu_CheckUpdates(object sender, EventArgs args) => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: true);
+
+        internal void TrayMenu_Restart(object sender, EventArgs args) => AppRestart.ByAppContextMenu();
+
+        internal void TrayMenu_Exit(object sender, EventArgs args) => this.Shutdown();
+#endif
 
         protected virtual void Dispose(bool disposing)
         {

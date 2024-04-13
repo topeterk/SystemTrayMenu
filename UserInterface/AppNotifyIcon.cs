@@ -2,39 +2,27 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
+#if !AVALONIA
 namespace SystemTrayMenu.UserInterface
 {
     using System;
-#if !AVALONIA
     using System.Drawing;
+    using System.Runtime.Versioning;
     using System.Windows.Threading;
     using H.NotifyIcon.Core;
-#else
-    using Avalonia.Controls;
-    using Avalonia.Threading;
-#endif
     using SystemTrayMenu.Utilities;
 
+    [SupportedOSPlatform("windows5.1.2600")]
     internal class AppNotifyIcon : IDisposable
     {
         private readonly Dispatcher dispatchter = WPFExtensions.CurrentDispatcher;
         private readonly TrayIconWithContextMenu notifyIcon = new ();
-#if AVALONIA
-        private WindowIcon? loadingIcon;
-#else
         private Icon? loadingIcon;
-#endif
 
         public AppNotifyIcon()
         {
-            // TODO: Rework and replace with XAML tray icon: https://docs.avaloniaui.net/docs/reference/controls/detailed-reference/tray-icon
             notifyIcon.ToolTip = "SystemTrayMenu";
-
-#if AVALONIA
-            notifyIcon.Icon = Config.GetAppIcon();
-#else
-            notifyIcon.Icon = Config.GetAppIcon().Handle;
-#endif
+            notifyIcon.Icon = Config.GetCustomAppIcon().Handle;
             notifyIcon.ContextMenu = new AppContextMenu().Create();
             notifyIcon.MessageWindow.MouseEventReceived += (sender, e) =>
             {
@@ -52,28 +40,19 @@ namespace SystemTrayMenu.UserInterface
         public void Dispose()
         {
             notifyIcon.Dispose();
-#if !AVALONIA
             loadingIcon?.Dispose();
-#endif
         }
 
         public void LoadingStart()
         {
             loadingIcon ??= App.LoadIconFromResource("Resources/Loading.ico");
-#if AVALONIA
-            notifyIcon.Icon = loadingIcon;
-#else
             notifyIcon.UpdateIcon(loadingIcon.Handle);
-#endif
         }
 
         public void LoadingStop()
         {
-#if AVALONIA
-            notifyIcon.Icon = Config.GetAppIcon();
-#else
-            notifyIcon.UpdateIcon(Config.GetAppIcon().Handle);
-#endif
+            notifyIcon.UpdateIcon(Config.GetCustomAppIcon().Handle);
         }
     }
 }
+#endif

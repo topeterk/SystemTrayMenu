@@ -26,7 +26,7 @@ namespace SystemTrayMenu.UserInterface
             AddSeperator(menu);
             AddItem(menu, "Frequently Asked Questions", Config.ShowHelpFAQ);
             AddItem(menu, "Support SystemTrayMenu", Config.ShowSupportSystemTrayMenu);
-            AddItem(menu, "About SystemTrayMenu", AboutBox.CreateAndOpenAbout);
+            AddItem(menu, "About SystemTrayMenu", AboutBox.ShowSingleInstance);
             AddItem(menu, "Check for updates", () => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: true));
             AddSeperator(menu);
             AddItem(menu, "Restart", AppRestart.ByAppContextMenu);

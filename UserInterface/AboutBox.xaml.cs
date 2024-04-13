@@ -2,14 +2,14 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2022-2023 Peter Kirmeier
+// Copyright (c) 2022-2024 Peter Kirmeier
 
 namespace SystemTrayMenu.UserInterface
 {
     using System;
-    using System.Diagnostics;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Reflection;
@@ -43,6 +43,8 @@ namespace SystemTrayMenu.UserInterface
     {
         private static readonly Regex RegexUrl = new(@"(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?");
 
+        private static AboutBox? singletonWindow;
+
         private string? entryAssemblyName;
         private string? callingAssemblyName;
         private string? executingAssemblyName;
@@ -52,13 +54,32 @@ namespace SystemTrayMenu.UserInterface
         {
             InitializeComponent();
 
+#if AVALONIA // seems to be called during InitializeComponent when set in XAML directly, so we add it here instead
+            TabPanelDetails.SelectionChanged += TabPanelDetails_SelectedIndexChanged;
+#endif
             Loaded += AboutBox_Load;
+            Closed += (_, _) => singletonWindow = null;
 
             TabPanelDetails.SetVisibility(Visibility.Collapsed);
             buttonSystemInfo.SetVisibility(Visibility.Collapsed);
         }
 
-        internal static void CreateAndOpenAbout()
+        public static bool IsOpen() => singletonWindow != null;
+
+        public static void ShowSingleInstance()
+        {
+            if (IsOpen())
+            {
+                singletonWindow!.HandleInvoke(() => singletonWindow?.Activate());
+            }
+            else
+            {
+                singletonWindow = CreateAbout();
+                singletonWindow.Show();
+            }
+        }
+
+        private static AboutBox CreateAbout()
         {
             string copyright = string.Empty;
             string productName = string.Empty;
@@ -180,7 +201,7 @@ namespace SystemTrayMenu.UserInterface
                 "Jens B., " +
                 "spitzlbergerj, " +
                 Environment.NewLine;
-            AboutBox aboutBox = new()
+            return new()
             {
                 AppTitle = productName,
                 AppDescription = fileDescription,
@@ -188,7 +209,6 @@ namespace SystemTrayMenu.UserInterface
                 AppCopyright = copyright,
                 AppMoreInfo = moreInfo,
             };
-            aboutBox.ShowDialog();
         }
 
         // <summary>

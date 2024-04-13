@@ -152,7 +152,7 @@ namespace SystemTrayMenu
 
         internal void TrayMenu_OpenSupport(object sender, EventArgs args) => Config.ShowSupportSystemTrayMenu();
 
-        internal void TrayMenu_OpenAbout(object sender, EventArgs args) => AboutBox.CreateAndOpenAbout();
+        internal void TrayMenu_OpenAbout(object sender, EventArgs args) => AboutBox.ShowSingleInstance();
 
         internal void TrayMenu_CheckUpdates(object sender, EventArgs args) => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: true);
 

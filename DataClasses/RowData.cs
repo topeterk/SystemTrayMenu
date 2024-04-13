@@ -294,31 +294,34 @@ namespace SystemTrayMenu.DataClasses
 
         internal void OpenShellContextMenu(Point? mousePosition)
         {
-#if TODO_LINUX
-            Point position = default;
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
+            {
+                Point position = default;
 
-            if (mousePosition != null)
-            {
-                position = mousePosition.Value;
-            }
-            else
-            {
-                if (Owner != null)
+                if (mousePosition != null)
                 {
-                    // Snap context menu left aligned to the ListViewItem with a small padding, but keep it vertically centered
-                    Rect rectChild = Owner.GetDataGridViewChildRect(this);
-                    position = Owner.GetRelativeChildPositionTo(Owner.GetDataGridView());
-                    position.Offset(Owner.Left + rectChild.Left + 10D, Owner.Top + rectChild.Top + (rectChild.Height / 2D));
+                    position = mousePosition.Value;
                 }
-            }
+                else
+                {
+                    if (Owner != null)
+                    {
+                        // Snap context menu left aligned to the ListViewItem with a small padding, but keep it vertically centered
+                        Rect rectChild = Owner.GetDataGridViewChildRect(this);
+                        position = Owner.GetRelativeChildPositionTo(Owner.GetDataGridView());
+                        position.Offset(Owner.Left + rectChild.Left + 10D, Owner.Top + rectChild.Top + (rectChild.Height / 2D));
+                    }
+                }
 
-            if (IsPointingToFolder)
-            {
-                ShellContextMenu.OpenShellContextMenu(new DirectoryInfo(Path), position);
-            }
-            else
-            {
-                ShellContextMenu.OpenShellContextMenu(FileInfo, position);
+                if (IsPointingToFolder)
+                {
+                    ShellContextMenu.OpenShellContextMenu(new DirectoryInfo(Path), position);
+                }
+                else
+                {
+                    ShellContextMenu.OpenShellContextMenu(FileInfo, position);
+                }
             }
 #endif
         }

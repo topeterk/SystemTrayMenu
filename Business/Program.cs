@@ -49,9 +49,7 @@ namespace SystemTrayMenu
 #endif
             {
                 Log.Initialize();
-#if WINDOWS
                 PrivilegeChecker.Initialize();
-#endif
                 Config.Initialize();
                 Translator.Initialize();
 

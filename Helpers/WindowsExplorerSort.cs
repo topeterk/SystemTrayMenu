@@ -2,14 +2,15 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-#if TODO_LINUX
 namespace SystemTrayMenu.Helpers
 {
     using System.Collections.Generic;
+    using System.Runtime.Versioning;
     using SystemTrayMenu.DllImports;
 
     internal class WindowsExplorerSort : IComparer<string?>
     {
+        [SupportedOSPlatform("Windows")]
         public int Compare(string? x, string? y)
         {
             if (x != null && y != null)
@@ -21,4 +22,3 @@ namespace SystemTrayMenu.Helpers
         }
     }
 }
-#endif

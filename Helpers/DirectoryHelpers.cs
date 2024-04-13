@@ -97,15 +97,12 @@ namespace SystemTrayMenu.Helpers
 
         internal static List<RowData> SortItems(List<RowData> rowDatas)
         {
-#if TODO_LINUX
-            if (Properties.Settings.Default.SortByTypeAndNameWindowsExplorerSort)
+            if (Properties.Settings.Default.SortByTypeAndNameWindowsExplorerSort && OperatingSystem.IsWindows())
             {
                 rowDatas = rowDatas.OrderByDescending(x => x.IsFolder)
                     .ThenBy(x => x.ColumnText, new WindowsExplorerSort()).ToList();
             }
-            else
-#endif
-            if (Properties.Settings.Default.SortByTypeAndDate)
+            else if (Properties.Settings.Default.SortByTypeAndDate)
             {
                 rowDatas = rowDatas.OrderByDescending(x => x.IsFolder)
                     .ThenByDescending(x => x.FileInfo.LastWriteTime).ToList();
@@ -154,7 +151,7 @@ namespace SystemTrayMenu.Helpers
             menuData.RowDatas = menuData.RowDatas.Except(rowDatasToRemove).ToList();
         }
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         private static void DiscoverNetworkRootDirectories(string path, ref MenuData menuData)
         {
             Process cmd = new();

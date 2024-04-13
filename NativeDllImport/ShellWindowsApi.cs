@@ -14,7 +14,7 @@ namespace SystemTrayMenu.DllImports
     /// </summary>
     internal static partial class NativeMethods
     {
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("Shell32.dll", EntryPoint = "SHGetFileInfo", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern IntPtr Shell32SHGetFileInfo(
@@ -25,18 +25,18 @@ namespace SystemTrayMenu.DllImports
            uint uFlags);
 
         // Retrieves the IShellFolder interface for the desktop folder, which is the root of the Shell's namespace.
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("shell32.dll", EntryPoint = "SHGetDesktopFolder", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern int Shell32SHGetDesktopFolder(out IntPtr ppshf);
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("shlwapi.dll", EntryPoint = "StrCmpLogicalW", ExactSpelling = true, SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern int ShlwapiStrCmpLogicalW(string x, string y);
 
         // Takes a STRRET structure returned by IShellFolder::GetDisplayNameOf, converts it to a string, and places the result in a buffer.
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("shlwapi.dll", EntryPoint = "StrRetToBuf", ExactSpelling = false, SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern int ShlwapiStrRetToBuf(IntPtr pstr, IntPtr pidl, StringBuilder pszBuf, int cchBuf);

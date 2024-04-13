@@ -36,7 +36,7 @@ namespace SystemTrayMenu.DllImports
             Bottom = 3,
         }
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("shell32.dll", EntryPoint = "SHAppBarMessage", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern IntPtr Shell32SHAppBarMessage(ABM dwMessage, [In] ref APPBARDATA pData);

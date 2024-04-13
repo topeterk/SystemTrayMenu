@@ -38,13 +38,13 @@ namespace SystemTrayMenu.DllImports
         }
 
         // The CreatePopupMenu function creates a drop-down menu, submenu, or shortcut menu. The menu is initially empty. You can insert or append menu items by using the InsertMenuItem function. You can also use the InsertMenu function to insert menu items and the AppendMenu function to append menu items.
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("user32", EntryPoint = "CreatePopupMenu", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern IntPtr User32CreatePopupMenu();
 
         // The DestroyMenu function destroys the specified menu and frees any memory that the menu occupies.
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("user32", EntryPoint = "DestroyMenu", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern bool User32DestroyMenu(IntPtr hMenu);
@@ -61,7 +61,7 @@ namespace SystemTrayMenu.DllImports
         /// <param name="hwnd">hwnd.</param>
         /// <param name="lptpm">lptpm.</param>
         /// <returns>uint.</returns>
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("user32.dll", EntryPoint = "TrackPopupMenuEx", ExactSpelling = true, SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern uint User32TrackPopupMenuEx(IntPtr hmenu, TPM flags, int x, int y, IntPtr hwnd, IntPtr lptpm);

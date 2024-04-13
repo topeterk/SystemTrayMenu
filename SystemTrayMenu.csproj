@@ -9,7 +9,7 @@
     <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net6.0' ">linux-x64</RuntimeIdentifier>                   <!-- Linux Avalonia -->
     <UseWPF Condition=" '$(TargetFramework)' != 'net7.0-windows10.0.22000.0' ">False</UseWPF>
     <UseWPF Condition=" '$(TargetFramework)' == 'net7.0-windows10.0.22000.0' ">True</UseWPF>
-	<!-- TODO_LINUX/TODO_AVALONIA define marks WPF/Windows code that needs to be ported to Avalonia/Linux -->
+    <!-- TODO_LINUX/TODO_AVALONIA define marks WPF/Windows code that needs to be ported to Avalonia/Linux -->
     <DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);TODO_LINUX</DefineConstants>
     <DefineConstants Condition="  '$(UseWPF)' ">$(DefineConstants);TODO_AVALONIA</DefineConstants>
     <DefineConstants Condition=" !'$(UseWPF)' ">$(DefineConstants);AVALONIA</DefineConstants>
@@ -55,7 +55,7 @@ EXIT 0</PreBuildEvent>
     <NoWarn>1701;1702;WFAC010;MSB3061</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" !'$(UseWPF)' ">
-	<NoWarn>$(NoWarn);CA2213;CS0649;CS8600;CS8601;CS8602;CS8603;CS8604;CS8605;CS8618;CS8622</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
+    <NoWarn>$(NoWarn);CA2213;CS0649;CS8600;CS8601;CS8602;CS8603;CS8604;CS8605;CS8618;CS8622</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
     <!-- TODO: Get rid of private API (https://github.com/AvaloniaUI/Avalonia/wiki/Using-private-apis-in-nuget-packages) -->
     <AvaloniaAccessUnstablePrivateApis>true</AvaloniaAccessUnstablePrivateApis>
     <Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>true</Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>
@@ -96,10 +96,6 @@ EXIT 0</PreBuildEvent>
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">
-	<Compile Remove="Utilities/PrivilegeChecker.cs" />
-	<None Include="Utilities/PrivilegeChecker.cs" />
   </ItemGroup>
   <ItemGroup Condition=" !'$(UseWPF)' ">
     <Page Remove="**/*.xaml" />

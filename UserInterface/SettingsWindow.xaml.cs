@@ -367,7 +367,7 @@ namespace SystemTrayMenu.UserInterface
 
         public static bool IsOpen() => singletonWindow != null;
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         private static void AddSetFolderByWindowsContextMenu()
         {
             RegistryKey? registryKeyContextMenu = null;
@@ -399,7 +399,7 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         private static void RemoveSetFolderByWindowsContextMenu()
         {
             try
@@ -452,13 +452,16 @@ namespace SystemTrayMenu.UserInterface
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e)
         {
-            if (checkBoxSetFolderByWindowsContextMenu.IsChecked ?? false)
+            if (OperatingSystem.IsWindows())
             {
-                AddSetFolderByWindowsContextMenu();
-            }
-            else
-            {
-                RemoveSetFolderByWindowsContextMenu();
+                if (checkBoxSetFolderByWindowsContextMenu.IsChecked ?? false)
+                {
+                    AddSetFolderByWindowsContextMenu();
+                }
+                else
+                {
+                    RemoveSetFolderByWindowsContextMenu();
+                }
             }
 
             Settings.Default.SaveLogFileInApplicationDirectory = checkBoxSaveLogFileInApplicationDirectory.IsChecked ?? false;

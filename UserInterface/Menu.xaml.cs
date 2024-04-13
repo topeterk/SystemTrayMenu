@@ -1052,15 +1052,45 @@ namespace SystemTrayMenu.UserInterface
         }
 
 #if AVALONIA
+        internal void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!isShellContextMenuOpen)
+            {
+                if (((StyledElement)sender).DataContext is RowData rowData)
+                {
+                    CellMouseEnter?.Invoke(rowData);
+                }
+            }
+        }
+
+        internal void ListViewItem_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (((StyledElement)sender).DataContext is RowData rowData)
+            {
+                rowData.IsClicked = false;
+                if (!isShellContextMenuOpen)
+                {
+                    CellMouseLeave?.Invoke();
+#if TODO_AVALONIA
+                    if (e.LeftButton == MouseButtonState.Pressed)
+                    {
+                        string[] files = new string[] { rowData.Path };
+                        DragDrop.DoDragDrop(this, new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
+                    }
+#endif
+                }
+            }
+        }
+#endif
+
+#if AVALONIA
         protected override void IsVisibleChanged(AvaloniaPropertyChangedEventArgs e)
         {
             VisibilityChanged?.Invoke(this);
 
             base.IsVisibleChanged(e);
         }
-#endif
 
-#if AVALONIA
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
@@ -1459,56 +1489,41 @@ namespace SystemTrayMenu.UserInterface
             labelStatus.Content = count.ToString() + " " + Translator.GetText(count == 1 ? "element" : "elements");
         }
 
-#if AVALONIA
-        internal void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
-#else
+#if !AVALONIA
         private void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
-#endif
         {
             if (!isShellContextMenuOpen)
             {
                 // "DisconnectedItem" protection
-#if !AVALONIA
                 if (((ListViewItem)sender).Content is RowData rowData)
-#else
-                if (((StyledElement)sender).DataContext is RowData rowData)
-#endif
                 {
                     CellMouseEnter?.Invoke(rowData);
                 }
             }
         }
 
-#if AVALONIA
-        internal void ListViewItem_MouseLeave(object sender, MouseEventArgs e)
-#else
         private void ListViewItem_MouseLeave(object sender, MouseEventArgs e)
-#endif
         {
-#if !AVALONIA
             // "DisconnectedItem" protection
             if (((ListViewItem)sender).Content is RowData rowData)
-#else
-            if (((StyledElement)sender).DataContext is RowData rowData)
-#endif
             {
                 rowData.IsClicked = false;
-#if !AVALONIA
+
                 countLeftMouseButtonClicked = 0;
-#endif
+
                 if (!isShellContextMenuOpen)
                 {
                     CellMouseLeave?.Invoke();
-#if TODO_AVALONIA
+
                     if (e.LeftButton == MouseButtonState.Pressed)
                     {
                         string[] files = new string[] { rowData.Path };
                         DragDrop.DoDragDrop(this, new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
                     }
-#endif
                 }
             }
         }
+#endif
 
 #if AVALONIA
         private void ListViewItem_PointerPressed(object sender, PointerPressedEventArgs e)

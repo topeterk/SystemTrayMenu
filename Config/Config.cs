@@ -6,12 +6,12 @@ namespace SystemTrayMenu
 {
     using System;
     using System.IO;
+    using System.Runtime.Versioning;
     using System.Threading.Tasks;
 #if WINDOWS
     using System.Windows;
-    using Microsoft.Win32;
-    using SystemTrayMenu.DllImports;
 #endif
+    using Microsoft.Win32;
 #if !AVALONIA
     using System.Windows.Media;
 #else
@@ -19,6 +19,7 @@ namespace SystemTrayMenu
     using Avalonia.Media;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
+    using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
@@ -176,21 +177,26 @@ namespace SystemTrayMenu
         {
             if (!readDarkModeDone)
             {
-#if TODO_LINUX
-                // 0 = Dark mode, 1 = Light mode
-                if (Settings.Default.IsDarkModeAlwaysOn ||
-                    IsRegistryValueThisValue(
-                    @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
-                    "AppsUseLightTheme",
-                    "0"))
+                if (Settings.Default.IsDarkModeAlwaysOn)
                 {
                     isDarkMode = true;
                 }
 
-                // Required for native UI rendering like the ShellContextMenu
-                NativeMethods.SetPreferredAppMode(isDarkMode ? NativeMethods.PreferredAppMode.ForceDark : NativeMethods.PreferredAppMode.ForceLight);
-                NativeMethods.FlushMenuThemes();
-#endif
+                if (OperatingSystem.IsWindows())
+                {
+                    // 0 = Dark mode, 1 = Light mode
+                    if (!isDarkMode && IsRegistryValueThisValue(
+                                            @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+                                            "AppsUseLightTheme",
+                                            "0"))
+                    {
+                        isDarkMode = true;
+                    }
+
+                    // Required for native UI rendering like the ShellContextMenu
+                    NativeMethods.SetPreferredAppMode(isDarkMode ? NativeMethods.PreferredAppMode.ForceDark : NativeMethods.PreferredAppMode.ForceLight);
+                    NativeMethods.FlushMenuThemes();
+                }
 
                 readDarkModeDone = true;
             }
@@ -212,23 +218,25 @@ namespace SystemTrayMenu
         {
             if (!readHideFileExtdone)
             {
-#if TODO_LINUX
-                // 0 = To show extensions, 1 = To hide extensions
-                if (IsRegistryValueThisValue(
-                    @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced",
-                    "HideFileExt",
-                    "1"))
+                if (OperatingSystem.IsWindows())
                 {
-                    isHideFileExtension = true;
+                    // 0 = To show extensions, 1 = To hide extensions
+                    if (IsRegistryValueThisValue(
+                            @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced",
+                            "HideFileExt",
+                            "1"))
+                    {
+                        isHideFileExtension = true;
+                    }
                 }
-#endif
+
                 readHideFileExtdone = true;
             }
 
             return isHideFileExtension;
         }
 
-#if TODO_LINUX
+        [SupportedOSPlatform("Windows")]
         private static bool IsRegistryValueThisValue(string keyName, string valueName, string value)
         {
             bool isRegistryValueThisValue = false;
@@ -261,7 +269,6 @@ namespace SystemTrayMenu
 
             return isRegistryValueThisValue;
         }
-#endif
 
         private static void UpgradeIfNotUpgraded()
         {

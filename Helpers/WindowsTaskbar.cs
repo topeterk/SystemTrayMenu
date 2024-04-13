@@ -20,40 +20,38 @@ namespace SystemTrayMenu.Helpers
 
     public sealed class WindowsTaskbar
     {
-#if TODO_LINUX
-        private const string ClassName = "Shell_TrayWnd";
-#endif
-
         public WindowsTaskbar()
         {
-#if TODO_LINUX
-            IntPtr taskbarHandle = User32FindWindow(ClassName, null);
-
-            APPBARDATA data = new()
-            {
-                cbSize = (uint)Marshal.SizeOf(typeof(APPBARDATA)),
-                hWnd = taskbarHandle,
-            };
-            IntPtr result = Shell32SHAppBarMessage(ABM.GetTaskbarPos, ref data);
-            if (result == IntPtr.Zero)
-            {
-                Bounds = new Rectangle(20, 20, 20, 20);
-            }
-            else
-            {
-                Position = (TaskbarPosition)data.uEdge;
-                Bounds = Rectangle.FromLTRB(data.rc.left, data.rc.top, data.rc.right, data.rc.bottom);
-
-                data.cbSize = (uint)Marshal.SizeOf(typeof(APPBARDATA));
-                result = Shell32SHAppBarMessage(ABM.GetState, ref data);
-                int state = result.ToInt32();
-                AlwaysOnTop = (state & ABS.AlwaysOnTop) == ABS.AlwaysOnTop;
-                AutoHide = (state & ABS.Autohide) == ABS.Autohide;
-            }
-#else
             Position = TaskbarPosition.Unknown;
             Bounds = default;
-#endif
+
+            if (OperatingSystem.IsWindows())
+            {
+                const string ClassName = "Shell_TrayWnd";
+                IntPtr taskbarHandle = User32FindWindow(ClassName, null);
+
+                APPBARDATA data = new()
+                {
+                    cbSize = (uint)Marshal.SizeOf(typeof(APPBARDATA)),
+                    hWnd = taskbarHandle,
+                };
+                IntPtr result = Shell32SHAppBarMessage(ABM.GetTaskbarPos, ref data);
+                if (result == IntPtr.Zero)
+                {
+                    Bounds = new Rectangle(20, 20, 20, 20);
+                }
+                else
+                {
+                    Position = (TaskbarPosition)data.uEdge;
+                    Bounds = Rectangle.FromLTRB(data.rc.left, data.rc.top, data.rc.right, data.rc.bottom);
+
+                    data.cbSize = (uint)Marshal.SizeOf(typeof(APPBARDATA));
+                    result = Shell32SHAppBarMessage(ABM.GetState, ref data);
+                    int state = result.ToInt32();
+                    AlwaysOnTop = (state & ABS.AlwaysOnTop) == ABS.AlwaysOnTop;
+                    AutoHide = (state & ABS.Autohide) == ABS.Autohide;
+                }
+            }
         }
 
         public Rectangle Bounds

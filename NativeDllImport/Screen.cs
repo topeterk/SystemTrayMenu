@@ -2,15 +2,15 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2022-2023 Peter Kirmeier
+// Copyright (c) 2022-2024 Peter Kirmeier
 
 namespace SystemTrayMenu.DllImports
 {
+    using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
 #if !AVALONIA
-    using System;
     using System.Linq;
     using System.Windows;
 #else
@@ -32,17 +32,17 @@ namespace SystemTrayMenu.DllImports
 
         internal static bool IsTouchEnabled()
         {
-#if TODO_LINUX
-            const int MAXTOUCHES_INDEX = 95;
-            int maxTouches = GetSystemMetrics(MAXTOUCHES_INDEX);
+            if (OperatingSystem.IsWindows())
+            {
+                const int SM_MAXIMUMTOUCHES = 95;
+                int maxTouches = GetSystemMetrics(SM_MAXIMUMTOUCHES);
+                return maxTouches > 0;
+            }
 
-            return maxTouches > 0;
-#else
             return false;
-#endif
         }
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         private static extern int GetSystemMetrics(int nIndex);
@@ -194,7 +194,7 @@ namespace SystemTrayMenu.DllImports
                 /// <summary>
                 /// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaymonitors .
                 /// </summary>
-                [SupportedOSPlatform("windows")]
+                [SupportedOSPlatform("Windows")]
                 [DllImport("user32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
                 [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
                 public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
@@ -202,7 +202,7 @@ namespace SystemTrayMenu.DllImports
                 /// <summary>
                 /// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getcursorpos .
                 /// </summary>
-                [SupportedOSPlatform("windows")]
+                [SupportedOSPlatform("Windows")]
                 [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
                 [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
                 public static extern bool GetCursorPos(out POINT lpPoint);

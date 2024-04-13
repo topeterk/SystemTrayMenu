@@ -2,7 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2023 Peter Kirmeier
+// Copyright (c) 2023-2024 Peter Kirmeier
 
 namespace SystemTrayMenu.DllImports
 {
@@ -30,7 +30,7 @@ namespace SystemTrayMenu.DllImports
         /// </summary>
         /// <param name="preferredAppMode">Desired mode.</param>
         /// <returns>Undocumented.</returns>
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("uxtheme.dll", EntryPoint = "#135", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         internal static extern int SetPreferredAppMode(PreferredAppMode preferredAppMode);
 
@@ -38,7 +38,7 @@ namespace SystemTrayMenu.DllImports
         /// No official documentation.
         /// Seems to switch UI mode which was set by SetPreferredAppMode.
         /// </summary>
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("uxtheme.dll", EntryPoint = "#136", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         internal static extern void FlushMenuThemes();
     }

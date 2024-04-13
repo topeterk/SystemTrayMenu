@@ -30,7 +30,7 @@ namespace SystemTrayMenu.DllImports
         /// <param name="i">i.</param>
         /// <param name="flags">flags.</param>
         /// <returns>IntPtr.</returns>
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("comctl32", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern IntPtr ImageList_GetIcon(
@@ -38,7 +38,7 @@ namespace SystemTrayMenu.DllImports
           int i,
           int flags);
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("User32.dll", EntryPoint = "DestroyIcon", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern int User32DestroyIcon(IntPtr hIcon);

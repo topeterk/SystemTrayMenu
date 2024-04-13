@@ -22,7 +22,7 @@ namespace SystemTrayMenu.DllImports
         internal const uint SIGDN_FILESYSPATH = 0x80058000;
 
         [ComImport]
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [Guid("42F85136-DB7E-439C-85F1-E4075D135FC8")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         internal interface IFileDialog
@@ -105,7 +105,7 @@ namespace SystemTrayMenu.DllImports
         }
 
         [ComImport]
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         internal interface IShellItem
@@ -130,7 +130,7 @@ namespace SystemTrayMenu.DllImports
             uint Compare([In, MarshalAs(UnmanagedType.Interface)] IShellItem psi, [In] uint hint, out int piOrder);
         }
 
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
         internal static extern int SHCreateItemFromParsingName(
@@ -140,7 +140,7 @@ namespace SystemTrayMenu.DllImports
             [MarshalAs(UnmanagedType.Interface)] out IShellItem ppv);
 
         [ComImport]
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
         [ClassInterface(ClassInterfaceType.None)]
         [TypeLibType(TypeLibTypeFlags.FCanCreate)]
         [Guid("DC1C5A9C-E88A-4DDE-A5A1-60F82A20AEF7")]

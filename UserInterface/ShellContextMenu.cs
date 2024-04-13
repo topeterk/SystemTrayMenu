@@ -9,12 +9,14 @@ namespace SystemTrayMenu.UserInterface
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
     using System.Text;
-    using System.Windows;
     using System.Windows.Input;
     using System.Windows.Interop;
 #if AVALONIA
     using Point = Avalonia.Point;
+#else
+    using System.Windows;
 #endif
 
     [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1124:Do not use regions", Justification = "Mark SystemTrayMenu modifications made to original source.")]
@@ -47,6 +49,7 @@ namespace SystemTrayMenu.UserInterface
     ///    files[0] = new FileInfo(@"c:\windows\notepad.exe");
     ///    scm.ShowContextMenu(this.Handle, files, Cursor.Position);.
     /// </example>
+    [SupportedOSPlatform("windows")]
     public class ShellContextMenu : HwndSource
     {
         private const int MaxPath = 260;

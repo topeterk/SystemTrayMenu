@@ -51,7 +51,7 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
         /// <param name="owner">The window the dialog is assigned to.</param>
         /// <returns>True is returned on successful user interaction and when not cancelled by the user otherwise false is returned.</returns>
 #if TODO_AVALONIA
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("Windows")]
 #endif
         public async Task<bool> ShowDialog(Window owner)
         {

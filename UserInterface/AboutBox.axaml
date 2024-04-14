@@ -8,8 +8,8 @@
         xmlns:stm="clr-namespace:SystemTrayMenu"
         x:Class="SystemTrayMenu.UserInterface.AboutBox"
         mc:Ignorable="d" d:Background="{x:Static stm:MenuDefines.ColorBackground}"
-        Title="{u:Translate 'About SystemTrayMenu'}" Height="513" Width="418" CanResize="False" SizeToContent="Height">
-    <DockPanel>
+        Title="{u:Translate 'About SystemTrayMenu'}" Width="780" Height="613" MinWidth="450" MinHeight="450" CanResize="False" SizeToContent="Height">
+    <DockPanel LastChildFill="true">
         <StackPanel VerticalAlignment="Center" Orientation="Horizontal" DockPanel.Dock="Top">
             <Image Width="32" Height="32" Margin="3" Source="{StaticResource ApplicationImage}" />
             <StackPanel VerticalAlignment="Center">
@@ -17,21 +17,26 @@
                 <Label x:Name="AppDescriptionLabel" Content="%description%" Padding="0" Margin="3"/>
             </StackPanel>
         </StackPanel>
+
         <Separator Height="6" Margin="0" DockPanel.Dock="Top"/>
         <Label x:Name="AppVersionLabel" Content="Version %title%" Padding="0" Margin="3" DockPanel.Dock="Top"/>
         <Label x:Name="AppDateLabel" Content="Built on %builddate%" Padding="0" Margin="3" DockPanel.Dock="Top"/>
         <Label x:Name="AppCopyrightLabel" Content="Copyright © %year%, %company%" Padding="0" Margin="3" DockPanel.Dock="Top"/>
 
+        <Separator Height="6" Margin="0" DockPanel.Dock="Top"/>
+        <ScrollViewer x:Name="MoreRichTextBox" Height="250" DockPanel.Dock="Top">
+            <TextBlock x:Name="AppMoreInfoLabel" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" TextWrapping="Wrap">
+                <TextBlock.Text>%product% is %copyright%, %trademark%"</TextBlock.Text>
+            </TextBlock>
+        </ScrollViewer>
+
         <StackPanel VerticalAlignment="Center" Orientation="Horizontal" DockPanel.Dock="Bottom">
-            <Button x:Name="buttonSystemInfo" Content="{u:Translate 'System Info'}" Click="SysInfoButton_Click"/>
+            <Button x:Name="buttonSystemInfo" Content="{u:Translate 'System Info'}" Click="SysInfoButton_Click" IsVisible="False"/>
             <Button x:Name="buttonDetails" Content="{u:Translate 'Details'}" Click="DetailsButton_Click"/>
             <Button x:Name="buttonOk" Content="{u:Translate 'OK'}" Click="OkButton_Click"/>
         </StackPanel>
 
-        <u:RichTextBox x:Name="MoreRichTextBox" Height="100" DockPanel.Dock="Top" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <u:RichTextBox.Text>%product% is %copyright%, %trademark%"</u:RichTextBox.Text>
-        </u:RichTextBox>
-        <TabControl x:Name="TabPanelDetails" Height="149" DockPanel.Dock="Top">
+        <TabControl x:Name="TabPanelDetails" Height="250">
             <TabItem x:Name="TabPageApplication" Header="Application">
                 <DataGrid x:Name="AppInfoListView">
                     <DataGrid.Columns>

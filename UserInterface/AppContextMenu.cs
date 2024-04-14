@@ -6,14 +6,14 @@
 namespace SystemTrayMenu.UserInterface
 {
     using System;
-    using System.Diagnostics;
-    using System.Reflection;
+    using System.Runtime.Versioning;
     using System.Windows;
     using System.Windows.Threading;
     using H.NotifyIcon.Core;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Utilities;
 
+    [SupportedOSPlatform("windows5.0")]
     internal class AppContextMenu
     {
         public PopupMenu Create()

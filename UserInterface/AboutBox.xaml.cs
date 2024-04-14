@@ -13,11 +13,10 @@ namespace SystemTrayMenu.UserInterface
     using System.Globalization;
     using System.IO;
     using System.Reflection;
+    using System.Runtime.Versioning;
     using System.Text.RegularExpressions;
-#if WINDOWS
     using System.Windows;
     using Microsoft.Win32;
-#endif
 #if !AVALONIA
     using System.ComponentModel;
     using System.Linq;
@@ -61,8 +60,169 @@ namespace SystemTrayMenu.UserInterface
             Closed += (_, _) => singletonWindow = null;
 
             TabPanelDetails.SetVisibility(Visibility.Collapsed);
+#if !AVALONIA
             buttonSystemInfo.SetVisibility(Visibility.Collapsed);
+#endif
         }
+
+        // <summary>
+        // single line of text to show in the application title section of the about box dialog
+        // </summary>
+        // <remarks>
+        // defaults to "%title%"
+        // %title% = Assembly: AssemblyTitle
+        // </remarks>
+        public string AppTitle
+        {
+            get => (string)AppTitleLabel.Content;
+            set => AppTitleLabel.Content = value;
+        }
+
+        // <summary>
+        // single line of text to show in the description section of the about box dialog
+        // </summary>
+        // <remarks>
+        // defaults to "%description%"
+        // %description% = Assembly: AssemblyDescription
+        // </remarks>
+        public string AppDescription
+        {
+            get => (string)AppDescriptionLabel.Content;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    AppDescriptionLabel.SetVisibility(Visibility.Collapsed);
+                }
+                else
+                {
+                    AppDescriptionLabel.SetVisibility(Visibility.Visible);
+                    AppDescriptionLabel.Content = value;
+                }
+            }
+        }
+
+        // <summary>
+        // single line of text to show in the version section of the about dialog
+        // </summary>
+        // <remarks>
+        // defaults to "Version %version%"
+        // %version% = Assembly: AssemblyVersion
+        // </remarks>
+        public string AppVersion
+        {
+            get => (string)AppVersionLabel.Content;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    AppVersionLabel.SetVisibility(Visibility.Collapsed);
+                }
+                else
+                {
+                    AppVersionLabel.SetVisibility(Visibility.Visible);
+                    AppVersionLabel.Content = value;
+                }
+            }
+        }
+
+        // <summary>
+        // single line of text to show in the copyright section of the about dialog
+        // </summary>
+        // <remarks>
+        // defaults to "Copyright © %year%, %company%"
+        // %company% = Assembly: AssemblyCompany
+        // %year% = current 4-digit year
+        // </remarks>
+        public string AppCopyright
+        {
+            get => (string)AppCopyrightLabel.Content;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    AppCopyrightLabel.SetVisibility(Visibility.Collapsed);
+                }
+                else
+                {
+                    AppCopyrightLabel.SetVisibility(Visibility.Visible);
+                    AppCopyrightLabel.Content = value;
+                }
+            }
+        }
+
+        // <summary>
+        // multiple lines of miscellaneous text to show in rich text box
+        // </summary>
+        // <remarks>
+        // defaults to "%product% is %copyright%, %trademark%"
+        // %product% = Assembly: AssemblyProduct
+        // %copyright% = Assembly: AssemblyCopyright
+        // %trademark% = Assembly: AssemblyTrademark
+        // </remarks>
+        public string AppMoreInfo
+        {
+#if TODO_AVALONIA
+            get => new TextRange(MoreRichTextBox.Document.ContentStart, MoreRichTextBox.Document.ContentEnd).Text;
+#else
+            get => AppMoreInfoLabel.Text ?? string.Empty;
+#endif
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    MoreRichTextBox.SetVisibility(Visibility.Collapsed);
+                }
+                else
+                {
+                    MoreRichTextBox.SetVisibility(Visibility.Visible);
+#if TODO_AVALONIA
+                    MoreRichTextBox.Document.Blocks.Clear();
+
+                    Paragraph para = new ();
+
+                    // Parse string to detect hyperlinks and add handlers to them
+                    // See: https://mycsharp.de/forum/threads/97560/erledigt-dynamische-hyperlinks-in-wpf-flowdocument?page=1
+                    int lastPos = 0;
+                    foreach (Match match in RegexUrl.Matches(value).Cast<Match>())
+                    {
+                        if (match.Index != lastPos)
+                        {
+                            para.Inlines.Add(value[lastPos..match.Index]);
+                        }
+
+                        var link = new Hyperlink(new Run(match.Value))
+                        {
+                            NavigateUri = new Uri(match.Value),
+                        };
+                        link.Click += MoreRichTextBox_LinkClicked;
+
+                        para.Inlines.Add(link);
+
+                        lastPos = match.Index + match.Length;
+                    }
+
+                    if (lastPos < value.Length)
+                    {
+                        para.Inlines.Add(value[lastPos..]);
+                    }
+
+                    MoreRichTextBox.Document.Blocks.Add(para);
+#else
+                    AppMoreInfoLabel.Text = value;
+#endif
+                }
+            }
+        }
+
+        // <summary>
+        // returns the entry assembly for the current application domain
+        // </summary>
+        // <remarks>
+        // This is usually read-only, but in some weird cases (Smart Client apps)
+        // you won't have an entry assembly, so you may want to set this manually.
+        // </remarks>
+        private Assembly? AppEntryAssembly { get; set; }
 
         public static bool IsOpen() => singletonWindow != null;
 
@@ -210,165 +370,6 @@ namespace SystemTrayMenu.UserInterface
                 AppMoreInfo = moreInfo,
             };
         }
-
-        // <summary>
-        // single line of text to show in the application title section of the about box dialog
-        // </summary>
-        // <remarks>
-        // defaults to "%title%"
-        // %title% = Assembly: AssemblyTitle
-        // </remarks>
-        public string AppTitle
-        {
-            get => (string)AppTitleLabel.Content;
-            set => AppTitleLabel.Content = value;
-        }
-
-        // <summary>
-        // single line of text to show in the description section of the about box dialog
-        // </summary>
-        // <remarks>
-        // defaults to "%description%"
-        // %description% = Assembly: AssemblyDescription
-        // </remarks>
-        public string AppDescription
-        {
-            get => (string)AppDescriptionLabel.Content;
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    AppDescriptionLabel.SetVisibility(Visibility.Collapsed);
-                }
-                else
-                {
-                    AppDescriptionLabel.SetVisibility(Visibility.Visible);
-                    AppDescriptionLabel.Content = value;
-                }
-            }
-        }
-
-        // <summary>
-        // single line of text to show in the version section of the about dialog
-        // </summary>
-        // <remarks>
-        // defaults to "Version %version%"
-        // %version% = Assembly: AssemblyVersion
-        // </remarks>
-        public string AppVersion
-        {
-            get => (string)AppVersionLabel.Content;
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    AppVersionLabel.SetVisibility(Visibility.Collapsed);
-                }
-                else
-                {
-                    AppVersionLabel.SetVisibility(Visibility.Visible);
-                    AppVersionLabel.Content = value;
-                }
-            }
-        }
-
-        // <summary>
-        // single line of text to show in the copyright section of the about dialog
-        // </summary>
-        // <remarks>
-        // defaults to "Copyright © %year%, %company%"
-        // %company% = Assembly: AssemblyCompany
-        // %year% = current 4-digit year
-        // </remarks>
-        public string AppCopyright
-        {
-            get => (string)AppCopyrightLabel.Content;
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    AppCopyrightLabel.SetVisibility(Visibility.Collapsed);
-                }
-                else
-                {
-                    AppCopyrightLabel.SetVisibility(Visibility.Visible);
-                    AppCopyrightLabel.Content = value;
-                }
-            }
-        }
-
-        // <summary>
-        // multiple lines of miscellaneous text to show in rich text box
-        // </summary>
-        // <remarks>
-        // defaults to "%product% is %copyright%, %trademark%"
-        // %product% = Assembly: AssemblyProduct
-        // %copyright% = Assembly: AssemblyCopyright
-        // %trademark% = Assembly: AssemblyTrademark
-        // </remarks>
-        public string AppMoreInfo
-        {
-#if TODO_AVALONIA
-            get => new TextRange(MoreRichTextBox.Document.ContentStart, MoreRichTextBox.Document.ContentEnd).Text;
-#else
-            get => MoreRichTextBox.Text ?? string.Empty;
-#endif
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    MoreRichTextBox.SetVisibility(Visibility.Collapsed);
-                }
-                else
-                {
-                    MoreRichTextBox.SetVisibility(Visibility.Visible);
-#if TODO_AVALONIA
-                    MoreRichTextBox.Document.Blocks.Clear();
-
-                    Paragraph para = new ();
-
-                    // Parse string to detect hyperlinks and add handlers to them
-                    // See: https://mycsharp.de/forum/threads/97560/erledigt-dynamische-hyperlinks-in-wpf-flowdocument?page=1
-                    int lastPos = 0;
-                    foreach (Match match in RegexUrl.Matches(value).Cast<Match>())
-                    {
-                        if (match.Index != lastPos)
-                        {
-                            para.Inlines.Add(value[lastPos..match.Index]);
-                        }
-
-                        var link = new Hyperlink(new Run(match.Value))
-                        {
-                            NavigateUri = new Uri(match.Value),
-                        };
-                        link.Click += MoreRichTextBox_LinkClicked;
-
-                        para.Inlines.Add(link);
-
-                        lastPos = match.Index + match.Length;
-                    }
-
-                    if (lastPos < value.Length)
-                    {
-                        para.Inlines.Add(value[lastPos..]);
-                    }
-
-                    MoreRichTextBox.Document.Blocks.Add(para);
-#else
-                    MoreRichTextBox.Text = value;
-#endif
-                }
-            }
-        }
-
-        // <summary>
-        // returns the entry assembly for the current application domain
-        // </summary>
-        // <remarks>
-        // This is usually read-only, but in some weird cases (Smart Client apps)
-        // you won't have an entry assembly, so you may want to set this manually.
-        // </remarks>
-        private Assembly? AppEntryAssembly { get; set; }
 
         // <summary>
         // exception-safe retrieval of LastWriteTime for this assembly.
@@ -582,9 +583,9 @@ namespace SystemTrayMenu.UserInterface
         // <summary>
         // reads an HKLM Windows Registry key value
         // </summary>
+        [SupportedOSPlatform("Windows")]
         private static string RegistryHklmValue(string keyName, string subKeyRef)
         {
-#if WINDOWS
             string strSysInfoPath = string.Empty;
             try
             {
@@ -600,9 +601,6 @@ namespace SystemTrayMenu.UserInterface
             }
 
             return strSysInfoPath;
-#else
-            return string.Empty;
-#endif
         }
 
         // <summary>
@@ -672,6 +670,7 @@ namespace SystemTrayMenu.UserInterface
         // <summary>
         // launch the MSInfo "system information" application (works on XP, 2003, and Vista)
         // </summary>
+        [SupportedOSPlatform("Windows")]
         private void ShowSysInfo()
         {
             string strSysInfoPath = RegistryHklmValue(@"SOFTWARE\Microsoft\Shared Tools Location", "MSINFO");
@@ -897,7 +896,11 @@ namespace SystemTrayMenu.UserInterface
 #endif
             MoreRichTextBox.SetVisibility(Visibility.Collapsed);
             TabPanelDetails.SetVisibility(Visibility.Visible);
-            buttonSystemInfo.SetVisibility(Visibility.Visible);
+            if (OperatingSystem.IsWindows())
+            {
+                buttonSystemInfo.SetVisibility(Visibility.Visible);
+            }
+
             buttonDetails.SetVisibility(Visibility.Collapsed);
             UpdateLayout(); // Force AutoSize to update the height before switching to manual mode
             SizeToContent = SizeToContent.Manual;
@@ -907,10 +910,12 @@ namespace SystemTrayMenu.UserInterface
             CanResize = true;
 #endif
             TabPanelDetails.Height = double.NaN;
+#if !AVALONIA
             if (Width < 580)
             {
                 Width = 580;
             }
+#endif
 
             PopulateAssemblies();
             PopulateAppInfo();
@@ -924,6 +929,7 @@ namespace SystemTrayMenu.UserInterface
         // <summary>
         // for detailed system info, launch the external Microsoft system info app
         // </summary>
+        [SupportedOSPlatform("Windows")]
         private void SysInfoButton_Click(object sender, RoutedEventArgs e)
         {
             ShowSysInfo();

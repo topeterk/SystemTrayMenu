@@ -44,9 +44,12 @@ namespace SystemTrayMenu.Utilities
                 {
                     Name = "IconFactory STA #" + i.ToString(),
                 };
-#if WINDOWS
-                thread.SetApartmentState(ApartmentState.STA);
-#endif
+
+                if (OperatingSystem.IsWindows())
+                {
+                    thread.SetApartmentState(ApartmentState.STA);
+                }
+
                 thread.Start();
                 IconFactoryThreadPoolSTA.Add(thread);
             }

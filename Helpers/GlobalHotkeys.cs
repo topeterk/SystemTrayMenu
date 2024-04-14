@@ -2,13 +2,14 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2023-2023 Peter Kirmeier
+// Copyright (c) 2023-2024 Peter Kirmeier
 
 #if TODO_AVALONIA
 namespace SystemTrayMenu.Helpers
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.Versioning;
     using System.Text;
     using System.Windows;
     using System.Windows.Input;
@@ -16,6 +17,7 @@ namespace SystemTrayMenu.Helpers
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
 
+    [SupportedOSPlatform("Windows")]
     internal static class GlobalHotkeys
     {
         private static readonly HwndSourceHook Hook = new (WndProc);

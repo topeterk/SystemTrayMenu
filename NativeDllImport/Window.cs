@@ -14,6 +14,7 @@ namespace SystemTrayMenu.DllImports
     using System.Windows.Interop;
 #else
     using Avalonia.Controls;
+    using Avalonia.Platform;
 #endif
 
     /// <summary>
@@ -26,22 +27,31 @@ namespace SystemTrayMenu.DllImports
 
         internal static void HideFromAltTab(Window window)
         {
-#if TODO_AVALONIA
-            WindowInteropHelper wndHelper = new WindowInteropHelper(window);
-
-            if (Environment.Is64BitProcess)
+            if (OperatingSystem.IsWindows())
             {
-                long exStyle = (long)GetWindowLongPtr(wndHelper.Handle, GWL_EXSTYLE);
-                exStyle |= WS_EX_TOOLWINDOW; // do not show when user presses alt + tab
-                SetWindowLongPtr(wndHelper.Handle, GWL_EXSTYLE, (IntPtr)exStyle);
-            }
-            else
-            {
-                int exStyle = (int)GetWindowLong(wndHelper.Handle, GWL_EXSTYLE);
-                exStyle |= WS_EX_TOOLWINDOW; // do not show when user presses alt + tab
-                SetWindowLong(wndHelper.Handle, GWL_EXSTYLE, (IntPtr)exStyle);
-            }
+#if AVALONIA
+                IPlatformHandle? wndHelper = window.TryGetPlatformHandle();
+                if (wndHelper is null)
+                {
+                    return;
+                }
+#else
+                WindowInteropHelper wndHelper = new WindowInteropHelper(window);
 #endif
+
+                if (Environment.Is64BitProcess)
+                {
+                    long exStyle = (long)GetWindowLongPtr(wndHelper.Handle, GWL_EXSTYLE);
+                    exStyle |= WS_EX_TOOLWINDOW; // do not show when user presses alt + tab
+                    SetWindowLongPtr(wndHelper.Handle, GWL_EXSTYLE, (IntPtr)exStyle);
+                }
+                else
+                {
+                    int exStyle = (int)GetWindowLong(wndHelper.Handle, GWL_EXSTYLE);
+                    exStyle |= WS_EX_TOOLWINDOW; // do not show when user presses alt + tab
+                    SetWindowLong(wndHelper.Handle, GWL_EXSTYLE, (IntPtr)exStyle);
+                }
+            }
         }
 
         /// <summary>

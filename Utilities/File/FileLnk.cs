@@ -30,9 +30,11 @@ namespace SystemTrayMenu.Utilities
                     resolvedFilename = GetShortcutFileNamePath(shortcutFilename, out isFolderByShell);
                 }
 
-#if WINDOWS
-                staThread.SetApartmentState(ApartmentState.STA);
-#endif
+                if (OperatingSystem.IsWindows())
+                {
+                    staThread.SetApartmentState(ApartmentState.STA);
+                }
+
                 staThread.Start(shortcutFilename);
                 staThread.Join();
             }

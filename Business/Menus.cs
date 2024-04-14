@@ -10,6 +10,7 @@ namespace SystemTrayMenu.Business
     using System.Data;
     using System.IO;
     using System.Linq;
+    using System.Runtime.Versioning;
 #if WINDOWS
     using System.Windows;
 #endif
@@ -39,6 +40,7 @@ namespace SystemTrayMenu.Business
     internal class Menus : IDisposable
     {
 #if !AVALONIA
+        [SupportedOSPlatform("windows5.1.2600")]
         private readonly AppNotifyIcon menuNotifyIcon = new();
 #endif
         private readonly BackgroundWorker workerMainMenu = new();
@@ -64,7 +66,10 @@ namespace SystemTrayMenu.Business
         {
             SingleAppInstance.Wakeup += SwitchOpenCloseByHotKey;
 #if !AVALONIA
-            menuNotifyIcon.Click += () => UserSwitchOpenClose(true);
+            if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(5, 1, 2600))
+            {
+                menuNotifyIcon.Click += () => UserSwitchOpenClose(true);
+            }
 #endif
 
             if (!keyboardInput.RegisterHotKey(Settings.Default.HotKey))
@@ -95,7 +100,10 @@ namespace SystemTrayMenu.Business
 #if AVALONIA
                 App.IsAppLoading = false;
 #else
-                menuNotifyIcon.LoadingStop();
+                if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(5, 1, 2600))
+                {
+                    menuNotifyIcon.LoadingStop();
+                }
 #endif
             }
 
@@ -189,7 +197,10 @@ namespace SystemTrayMenu.Business
             waitLeave.Stop();
             taskbarLogo?.Close();
 #if !AVALONIA
-            menuNotifyIcon.Dispose();
+            if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(5, 1, 2600))
+            {
+                menuNotifyIcon.Dispose();
+            }
 #endif
             mainMenu.Close();
         }
@@ -245,7 +256,10 @@ namespace SystemTrayMenu.Business
 #if AVALONIA
                 App.IsAppLoading = false;
 #else
-                menuNotifyIcon.LoadingStop();
+                if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(5, 1, 2600))
+                {
+                    menuNotifyIcon.LoadingStop();
+                }
 #endif
             }
             else if (mainMenu.GetVisibility() == Visibility.Visible)
@@ -267,7 +281,10 @@ namespace SystemTrayMenu.Business
 #if AVALONIA
                 App.IsAppLoading = true;
 #else
-                menuNotifyIcon.LoadingStart();
+                if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(5, 1, 2600))
+                {
+                    menuNotifyIcon.LoadingStart();
+                }
 #endif
                 workerMainMenu.RunWorkerAsync(null);
             }
@@ -333,7 +350,10 @@ namespace SystemTrayMenu.Business
 #if AVALONIA
             App.IsAppLoading = false;
 #else
-            menuNotifyIcon.LoadingStop();
+            if (OperatingSystem.IsWindows() && OperatingSystem.IsWindowsVersionAtLeast(5, 1, 2600))
+            {
+                menuNotifyIcon.LoadingStop();
+            }
 #endif
 
             if (e.Result == null)

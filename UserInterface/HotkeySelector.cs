@@ -9,6 +9,7 @@ namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.Versioning;
     using System.Text;
     using System.Windows;
     using System.Windows.Controls;
@@ -18,6 +19,7 @@ namespace SystemTrayMenu.UserInterface
     using SystemTrayMenu.Utilities;
     using static SystemTrayMenu.Helpers.GlobalHotkeys;
 
+    [SupportedOSPlatform("Windows")]
     public sealed class HotkeySelector : TextBox
     {
         // ArrayLists used to enforce the use of proper modifiers.

@@ -20,12 +20,12 @@ namespace SystemTrayMenu
     using Avalonia.Platform;
     using Avalonia.Styling;
     using Avalonia.Threading;
+    using SystemTrayMenu.UserInterface;
 #endif
     using SystemTrayMenu.Business;
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Properties;
-    using SystemTrayMenu.UserInterface;
     using SystemTrayMenu.Utilities;
 
     /// <summary>
@@ -138,10 +138,6 @@ namespace SystemTrayMenu
         }
 
 #if AVALONIA
-#if !TODO_LINUX // Check if workaround still required: implement or remove it
-        // It seems that on Ubuntu 22.04 the Clicked event on the icon does not fire?
-        // Find a workaround or fix! As a workaround add menu item to open the main menu instead
-#endif
         internal void TrayMenu_Clicked(object sender, EventArgs args) => menus?.UserSwitchOpenClose(true);
 
         internal void TrayMenu_OpenSettings(object sender, EventArgs args) => SettingsWindow.ShowSingleInstance();

@@ -120,19 +120,55 @@
 		<TrayIcons>
 			<TrayIcon Icon="{StaticResource ApplicationTrayIcon}" ToolTipText="SystemTrayMenu" Clicked="TrayMenu_Clicked">
 				<TrayIcon.Menu>
-					<NativeMenu>
-						<NativeMenuItem Header="{u:Translate 'Settings'}" Click="TrayMenu_OpenSettings" />
-						<NativeMenuItemSeparator />
-						<NativeMenuItem Header="{u:Translate 'Log File'}" Click="TrayMenu_OpenLog" />
-						<NativeMenuItemSeparator />
-						<NativeMenuItem Header="{u:Translate 'Frequently Asked Questions'}" Click="TrayMenu_OpenFAQ" />
-						<NativeMenuItem Header="{u:Translate 'Support SystemTrayMenu'}" Click="TrayMenu_OpenSupport" />
-						<NativeMenuItem Header="{u:Translate 'About SystemTrayMenu'}" Click="TrayMenu_OpenAbout" />
-						<NativeMenuItem Header="{u:Translate 'Check for updates'}" Click="TrayMenu_CheckUpdates" />
-						<NativeMenuItemSeparator />
-						<NativeMenuItem Header="{u:Translate 'Restart'}" Click="TrayMenu_Restart" />
-						<NativeMenuItem Header="{u:Translate 'Exit app'}" Click="TrayMenu_Exit" />
-					</NativeMenu>
+					<OnPlatform>
+						<OnPlatform.Default>
+							<NativeMenu>
+								<NativeMenuItem Header="{u:Translate 'Settings'}" Click="TrayMenu_OpenSettings" />
+								<NativeMenuItemSeparator />
+								<NativeMenuItem Header="{u:Translate 'Log File'}" Click="TrayMenu_OpenLog" />
+								<NativeMenuItemSeparator />
+								<NativeMenuItem Header="{u:Translate 'Frequently Asked Questions'}" Click="TrayMenu_OpenFAQ" />
+								<NativeMenuItem Header="{u:Translate 'Support SystemTrayMenu'}" Click="TrayMenu_OpenSupport" />
+								<NativeMenuItem Header="{u:Translate 'About SystemTrayMenu'}" Click="TrayMenu_OpenAbout" />
+								<NativeMenuItem Header="{u:Translate 'Check for updates'}" Click="TrayMenu_CheckUpdates" />
+								<NativeMenuItemSeparator />
+								<NativeMenuItem Header="{u:Translate 'Restart'}" Click="TrayMenu_Restart" />
+								<NativeMenuItem Header="{u:Translate 'Exit app'}" Click="TrayMenu_Exit" />
+							</NativeMenu>
+						</OnPlatform.Default>
+						<OnPlatform.Linux>
+							<NativeMenu>
+								<!-- Simulate Clicked aka "Activate" event via DBUS from commandline under Linux: -->
+								<!-- See: https://dbus.freedesktop.org/doc/dbus-send.1.html -->
+								<!-- See: https://www.freedesktop.org/wiki/Specifications/StatusNotifierItem/StatusNotifierItem/ -->
+								<!--   CONNECTION_NAME = TrayIcon._impl._connection.UniqueName -->
+								<!--   OBJECT_NAME = TrayIcon._impl._statusNotifierItemDbusObj.Path -->
+								<!--   METHOD_NAME = context.Request.InterfaceAsString "." context.Request.MemberAsString -->
+								<!--     See also source from Avalonia: src/Avalonia.FreeDesktop/DBusXml/org.kde.StatusNotifierItem.xml -->
+								<!--     Or the generated source from Avalonia: Tmds.DBus.SourceGenerator.OrgKdeStatusNotifierItem.g.cs @ HandleMethodAsync -->
+								<!--   PARAMETERS (two 32bit integers as x/y coordinates, based on context.Request.SignatureAsString) = int32:42 int32:18 -->
+								<!-- dbus-send -\-session -\-dest=<CONNECTION_NAME> -\-print-reply <OBJECT_NAME> <PARAMETERS> -->
+								<!-- dbus-send -\-session -\-dest=:1.125 -\-print-reply /StatusNotifierItem org.freedesktop.DBus.Introspectable.Introspect -->
+								<!-- dbus-send -\-session -\-dest=:1.125 -\-print-reply /StatusNotifierItem org.kde.StatusNotifierItem.Activate int32:42 int32:18 -->
+								<!--    It seams this helps (a bit): https://github.com/ubuntu/gnome-shell-extension-appindicator -->
+								<!--    But the click instead of doing nothing, it only opens the right click menu instead of firing Activate -->
+								<NativeMenuItem Header="{u:Translate 'Open'}" Click="TrayMenu_Clicked" />
+								<NativeMenuItemSeparator />
+
+								<NativeMenuItem Header="{u:Translate 'Settings'}" Click="TrayMenu_OpenSettings" />
+								<NativeMenuItemSeparator />
+								<NativeMenuItem Header="{u:Translate 'Log File'}" Click="TrayMenu_OpenLog" />
+								<NativeMenuItemSeparator />
+								<NativeMenuItem Header="{u:Translate 'Frequently Asked Questions'}" Click="TrayMenu_OpenFAQ" />
+								<NativeMenuItem Header="{u:Translate 'Support SystemTrayMenu'}" Click="TrayMenu_OpenSupport" />
+								<NativeMenuItem Header="{u:Translate 'About SystemTrayMenu'}" Click="TrayMenu_OpenAbout" />
+								<NativeMenuItem Header="{u:Translate 'Check for updates'}" Click="TrayMenu_CheckUpdates" />
+								<NativeMenuItemSeparator />
+								<NativeMenuItem Header="{u:Translate 'Restart'}" Click="TrayMenu_Restart" />
+								<NativeMenuItem Header="{u:Translate 'Exit app'}" Click="TrayMenu_Exit" />
+							</NativeMenu>
+						</OnPlatform.Linux>
+					</OnPlatform>
 				</TrayIcon.Menu>
 			</TrayIcon>
 		</TrayIcons>

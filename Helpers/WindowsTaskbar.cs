@@ -23,7 +23,7 @@ namespace SystemTrayMenu.Helpers
         public WindowsTaskbar()
         {
             Position = TaskbarPosition.Unknown;
-            Bounds = default;
+            Bounds = new Rectangle(50, 50, 50, 50);
 
             if (OperatingSystem.IsWindows())
             {
@@ -36,11 +36,7 @@ namespace SystemTrayMenu.Helpers
                     hWnd = taskbarHandle,
                 };
                 IntPtr result = Shell32SHAppBarMessage(ABM.GetTaskbarPos, ref data);
-                if (result == IntPtr.Zero)
-                {
-                    Bounds = new Rectangle(20, 20, 20, 20);
-                }
-                else
+                if (result != IntPtr.Zero)
                 {
                     Position = (TaskbarPosition)data.uEdge;
                     Bounds = Rectangle.FromLTRB(data.rc.left, data.rc.top, data.rc.right, data.rc.bottom);

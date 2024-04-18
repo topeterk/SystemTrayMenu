@@ -148,7 +148,6 @@ namespace SystemTrayMenu.Helpers
 
                 Stream stream = client.GetStreamAsync(urlGoogleIconDownload).Result;
                 using var fileStream = File.Create(pathIconPng);
-                stream.Seek(0, SeekOrigin.Begin);
                 stream.CopyTo(fileStream);
                 fileStream.Close();
 

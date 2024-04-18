@@ -8,6 +8,7 @@ namespace SystemTrayMenu.UserInterface
     using System;
     using System.Drawing;
     using System.Runtime.Versioning;
+    using System.Windows;
     using System.Windows.Threading;
     using H.NotifyIcon.Core;
     using SystemTrayMenu.Utilities;
@@ -39,7 +40,12 @@ namespace SystemTrayMenu.UserInterface
 
         public void Dispose()
         {
-            notifyIcon.Dispose();
+            // WPF/H.NotifyIcon Workaround: On application reset we get stuck here, so do this only on regular shutdown
+            if (Application.Current is null)
+            {
+                notifyIcon.Dispose();
+            }
+
             loadingIcon?.Dispose();
         }
 

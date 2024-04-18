@@ -11,6 +11,7 @@ namespace SystemTrayMenu.Utilities
     using System.Drawing;
     using System.IO;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
     using System.Threading;
 #if !AVALONIA
     using System.Windows;
@@ -204,15 +205,11 @@ namespace SystemTrayMenu.Utilities
             return true;
         }
 
-#if TODO_LINUX
 #if !AVALONIA
         private static BitmapSource? TryCreateBitmapSourceFromIcon(string path, Icon icon) => Application.Current.Dispatcher.Invoke(() =>
-#else
-        private static BitmapSource? TryCreateBitmapSourceFromIcon(string path, Icon icon) => WPFExtensions.CurrentDispatcher.Invoke(() =>
-#endif
         {
             BitmapSource? bitmap = null;
-#if TODO_AVALONIA
+
             try
             {
                 bitmap = Imaging.CreateBitmapSourceFromHIcon(
@@ -225,12 +222,13 @@ namespace SystemTrayMenu.Utilities
             {
                 Log.Warn($"Failed to {nameof(TryCreateBitmapSourceFromIcon)}: {path} ", ex);
             }
-#endif
+
             return bitmap;
         });
 #endif
 
 #if TODO_LINUX
+        [SupportedOSPlatform("Windows")]
         private static BitmapSource? TryGetIconAsBitmapSourceSTA(string path, string resolvedPath, bool linkOverlay, bool isFolder)
         {
             BitmapSource? result = null;
@@ -238,23 +236,15 @@ namespace SystemTrayMenu.Utilities
             if (!isFolder &&
                 Path.GetExtension(path).Equals(".ico", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (TryGetIconExtractAssociatedIcon(path, out Icon icon))
-                {
-                    result = TryCreateBitmapSourceFromIcon(path, icon);
-                    icon.Dispose();
-                }
+                result = TryGetIconExtractAssociatedIcon(path);
             }
             else if (!isFolder && File.Exists(resolvedPath) &&
                 Path.GetExtension(resolvedPath).Equals(".ico", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (TryGetIconExtractAssociatedIcon(resolvedPath, out Icon icon))
+                result = TryGetIconExtractAssociatedIcon(resolvedPath);
+                if (result != null && linkOverlay)
                 {
-                    result = TryCreateBitmapSourceFromIcon(resolvedPath, icon);
-                    icon.Dispose();
-                    if (result != null && linkOverlay)
-                    {
-                        result = ImagingHelper.CreateIconWithOverlay(result, OverlayImage);
-                    }
+                    result = ImagingHelper.CreateIconWithOverlay(result, OverlayImage);
                 }
             }
             else
@@ -271,7 +261,11 @@ namespace SystemTrayMenu.Utilities
                 Icon? icon = TryGetIcon(path, linkOverlay, shFileInfo, imageList);
                 if (icon != null)
                 {
+#if AVALONIA
+                    result = icon;
+#else
                     result = TryCreateBitmapSourceFromIcon(path, icon);
+#endif
                     icon.Dispose();
                 }
             }
@@ -279,8 +273,10 @@ namespace SystemTrayMenu.Utilities
             return result;
         }
 
-        private static bool TryGetIconExtractAssociatedIcon(string path, out Icon icon)
+        [SupportedOSPlatform("Windows")]
+        private static BitmapSource? TryGetIconExtractAssociatedIcon(string path)
         {
+            BitmapSource? result = null;
             Icon? iconOrNull = null;
             try
             {
@@ -291,14 +287,17 @@ namespace SystemTrayMenu.Utilities
                 Log.Warn($"Failed to {nameof(TryGetIconExtractAssociatedIcon)}: {path}", ex);
             }
 
-            if (iconOrNull != null)
+            if (iconOrNull is not null)
             {
-                icon = iconOrNull;
-                return true;
+#if AVALONIA
+                result = iconOrNull;
+#else
+                result = TryCreateBitmapSourceFromIcon(path, iconOrNull);
+#endif
+                iconOrNull.Dispose();
             }
 
-            icon = new Icon(string.Empty);
-            return false;
+            return result;
         }
 #endif
 

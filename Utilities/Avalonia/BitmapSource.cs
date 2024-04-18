@@ -2,12 +2,13 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2023-2023 Peter Kirmeier
+// Copyright (c) 2023-2024 Peter Kirmeier
 
 #if AVALONIA
 namespace SystemTrayMenu.Utilities
 {
     using System.IO;
+    using System.Runtime.Versioning;
     using Avalonia;
     using Avalonia.Media.Imaging;
     using Avalonia.Platform;
@@ -51,6 +52,35 @@ namespace SystemTrayMenu.Utilities
                 return new BitmapSource(memoryStream);
             }
         }
+
+#if WINDOWS
+        [SupportedOSPlatform("Windows")]
+        public static implicit operator BitmapSource(System.Drawing.Bitmap bitmap)
+        {
+            System.Drawing.Imaging.BitmapData bitmapdata = bitmap.LockBits(
+                new (0, 0, bitmap.Width, bitmap.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            BitmapSource result = new (
+                PixelFormat.Bgra8888,
+                Avalonia.Platform.AlphaFormat.Premul,
+                bitmapdata.Scan0,
+                new PixelSize(bitmapdata.Width, bitmapdata.Height),
+                new Vector(96, 96),
+                bitmapdata.Stride);
+            bitmap.UnlockBits(bitmapdata);
+            return result;
+        }
+
+        [SupportedOSPlatform("Windows")]
+        public static implicit operator BitmapSource(System.Drawing.Icon icon)
+        {
+            System.Drawing.Bitmap bitmap = icon.ToBitmap();
+            BitmapSource result = (BitmapSource)bitmap;
+            bitmap.Dispose();
+            return result;
+        }
+#endif
 
         internal void Freeze()
         {

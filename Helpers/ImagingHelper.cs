@@ -7,6 +7,7 @@ namespace SystemTrayMenu.Helpers
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
+    using System.Runtime.Versioning;
 #if !AVALONIA
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
@@ -26,6 +27,7 @@ namespace SystemTrayMenu.Helpers
     /// </summary>
     internal static class ImagingHelper
     {
+#if WINDOWS
         /// <summary>
         /// Converts a PNG image to a icon (ico).
         /// </summary>
@@ -34,9 +36,9 @@ namespace SystemTrayMenu.Helpers
         /// <param name="size">The size (16x16 px by default).</param>
         /// <param name="preserveAspectRatio">Preserve the aspect ratio.</param>
         /// <returns>Wether or not the icon was succesfully generated.</returns>
+        [SupportedOSPlatform("Windows")]
         internal static bool ConvertToIcon(Stream input, Stream output, int size = 16, bool preserveAspectRatio = false)
         {
-#if TODO_LINUX
             Bitmap inputBitmap = (Bitmap)Image.FromStream(input);
             if (inputBitmap != null)
             {
@@ -108,7 +110,7 @@ namespace SystemTrayMenu.Helpers
 
                 return false;
             }
-#endif
+
             return false;
         }
 
@@ -120,12 +122,14 @@ namespace SystemTrayMenu.Helpers
         /// <param name="size">The size (16x16 px by default).</param>
         /// <param name="preserveAspectRatio">Preserve the aspect ratio.</param>
         /// <returns>Wether or not the icon was succesfully generated.</returns>
+        [SupportedOSPlatform("Windows")]
         internal static bool ConvertToIcon(string inputPath, string outputPath, int size = 16, bool preserveAspectRatio = false)
         {
             using FileStream inputStream = new(inputPath, FileMode.Open);
             using FileStream outputStream = new(outputPath, FileMode.OpenOrCreate);
             return ConvertToIcon(inputStream, outputStream, size, preserveAspectRatio);
         }
+#endif
 
         /// <summary>
         /// Renders an image on top of an image.

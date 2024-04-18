@@ -41,6 +41,7 @@ namespace SystemTrayMenu.Helpers
 
         public static void DragDrop(object? sender, DragEventArgs e)
         {
+#if TODO_LINUX
             string path = ((Menu?)sender)?.RowDataParent?.ResolvedPath ?? Config.Path;
             object data = e.Data.GetData("UniformResourceLocator");
             if (data is not MemoryStream ms)
@@ -57,8 +58,10 @@ namespace SystemTrayMenu.Helpers
             {
                 CreateShortcut(url.Replace("\0", string.Empty), path);
             }
+#endif
         }
 
+#if TODO_LINUX // See: https://askubuntu.com/questions/353932/equivalent-of-url-file-on-ubuntu, https://wiki.ubuntuusers.de/.desktop-Dateien/
         private static void CreateShortcut(string url, string pathToStoreFile)
         {
             string title = GetUrlShortcutTitle(url);
@@ -151,11 +154,17 @@ namespace SystemTrayMenu.Helpers
                 stream.CopyTo(fileStream);
                 fileStream.Close();
 
+#if WINDOWS
+                // Convert PNG into ICO
                 pathIcon = Path.Combine(pathToStoreIcons, $"{hostname}.ico");
                 if (!ImagingHelper.ConvertToIcon(pathIconPng, pathIcon, 32))
                 {
-                    Log.Info("Failed to convert icon.");
+                    Log.Info($"Failed to convert icon {pathIcon}.");
                 }
+#else
+                // Just keep going with downloaded image
+                pathIcon = pathIconPng;
+#endif
             }
             catch (Exception ex)
             {
@@ -176,5 +185,6 @@ namespace SystemTrayMenu.Helpers
 
             return pathIcon;
         }
+#endif
     }
 }

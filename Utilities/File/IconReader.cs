@@ -207,6 +207,7 @@ namespace SystemTrayMenu.Utilities
         }
 
 #if !AVALONIA
+        [SupportedOSPlatform("Windows")]
         private static BitmapSource? TryCreateBitmapSourceFromIcon(string path, Icon icon) => Application.Current.Dispatcher.Invoke(() =>
         {
             BitmapSource? bitmap = null;
@@ -228,7 +229,7 @@ namespace SystemTrayMenu.Utilities
         });
 #endif
 
-#if TODO_LINUX
+#if WINDOWS
         [SupportedOSPlatform("Windows")]
         private static BitmapSource? TryGetIconAsBitmapSourceSTA(string path, string resolvedPath, bool linkOverlay, bool isFolder)
         {
@@ -304,11 +305,15 @@ namespace SystemTrayMenu.Utilities
 
         private static BitmapSource GetIconAsBitmapSourceSTA(string path, string resolvedPath, bool linkOverlay, bool isFolder)
         {
-#if TODO_LINUX
-            BitmapSource? bitmapSource = TryGetIconAsBitmapSourceSTA(path, resolvedPath, linkOverlay, isFolder);
-#else
             BitmapSource? bitmapSource = null;
+
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
+            {
+                bitmapSource = TryGetIconAsBitmapSourceSTA(path, resolvedPath, linkOverlay, isFolder);
+            }
 #endif
+
             bitmapSource ??= NotFoundImage;
             bitmapSource.Freeze(); // Make it accessible for any thread
             return bitmapSource;
@@ -350,6 +355,7 @@ namespace SystemTrayMenu.Utilities
         }
 
 #if TODO_LINUX
+        [SupportedOSPlatform("Windows")]
         private static Icon? TryGetIcon(
             string path, bool linkOverlay, NativeMethods.SHFILEINFO shFileInfo, IntPtr imageList)
         {

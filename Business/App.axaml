@@ -65,12 +65,6 @@
 			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
 		</Style>
 
-		<Style Selector="Border">
-			<!-- TODO: Make selector work for final GroupBox type -->
-			<Setter Property="Margin" Value="2" />
-			<Setter Property="Padding" Value="2" />
-			<!-- TODO: Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" / -->
-		</Style>
 		<Style Selector="TextBox">
 			<!-- Please update HotkeySelector as well -->
 			<Setter Property="Height" Value="21" />

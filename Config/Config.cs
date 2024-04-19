@@ -8,29 +8,25 @@ namespace SystemTrayMenu
     using System.IO;
     using System.Runtime.Versioning;
     using System.Threading.Tasks;
-#if WINDOWS
-    using System.Windows;
-#endif
     using Microsoft.Win32;
-#if !AVALONIA
-    using System.Windows.Media;
-#else
+#if AVALONIA
     using Avalonia.Controls;
-    using Avalonia.Media;
     using Window = SystemTrayMenu.Utilities.Window;
+#else
+    using System.Windows;
+    using Icon = System.Drawing.Icon;
 #endif
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
-#if TODO_LINUX
-    using Icon = System.Drawing.Icon;
-#endif
 
     public static class Config
     {
 #if AVALONIA
+#if WINDOWS
         private static WindowIcon? iconRootFolder;
+#endif
 #else
         private static Icon? iconRootFolder;
         private static Icon? applicationIcon;
@@ -85,20 +81,34 @@ namespace SystemTrayMenu
 #endif
         {
 #if AVALONIA
-            if (Settings.Default.UseIconFromRootFolder)
+#if WINDOWS
+            if (Settings.Default.UseIconFromRootFolder && OperatingSystem.IsWindows())
             {
-#if AVALONIA_TODO
-                iconRootFolder ??= IconReader.GetRootFolderIcon(Path);
-#endif
+                if (iconRootFolder is null)
+                {
+                    var icon = IconReader.GetRootFolderIcon(Path);
+                    if (icon is not null)
+                    {
+                        BitmapSource? bitmap = icon;
+                        icon.Dispose();
+                        iconRootFolder ??= new(bitmap);
+                        bitmap.Dispose();
+                    }
+                }
+
                 return iconRootFolder;
             }
+#endif
 
             return null;
 #else
             if (Settings.Default.UseIconFromRootFolder && iconRootFolder is null)
             {
                 // Load icon only once
-                iconRootFolder = IconReader.GetRootFolderIcon(Path);
+                if (OperatingSystem.IsWindows())
+                {
+                    iconRootFolder = IconReader.GetRootFolderIcon(Path);
+                }
             }
 
             if (Settings.Default.UseIconFromRootFolder && iconRootFolder is not null)

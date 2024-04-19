@@ -4,17 +4,19 @@
 
 namespace SystemTrayMenu.Helpers
 {
-    using System;
     using System.IO;
-    using System.Net.Http;
     using System.Text;
+#if TODO_LINUX
+    using System;
+    using System.Net.Http;
     using System.Threading;
+    using SystemTrayMenu.UserInterface;
+#endif
 #if !AVALONIA
     using System.Windows;
 #else
     using Avalonia.Input;
 #endif
-    using SystemTrayMenu.UserInterface;
     using SystemTrayMenu.Utilities;
 
     public static class DragDropHelper
@@ -155,12 +157,19 @@ namespace SystemTrayMenu.Helpers
                 fileStream.Close();
 
 #if WINDOWS
+#if TODO_LINUX
+                if (OperatingSystem.IsWindows())
+                {
+#endif
                 // Convert PNG into ICO
                 pathIcon = Path.Combine(pathToStoreIcons, $"{hostname}.ico");
                 if (!ImagingHelper.ConvertToIcon(pathIconPng, pathIcon, 32))
                 {
                     Log.Info($"Failed to convert icon {pathIcon}.");
                 }
+#if TODO_LINUX
+                }
+#endif
 #else
                 // Just keep going with downloaded image
                 pathIcon = pathIconPng;

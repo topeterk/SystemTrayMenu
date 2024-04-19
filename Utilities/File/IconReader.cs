@@ -162,7 +162,8 @@ namespace SystemTrayMenu.Utilities
             }
         }
 
-#if TODO_LINUX
+#if WINDOWS
+        [SupportedOSPlatform("Windows")]
         internal static Icon? GetRootFolderIcon(string path)
         {
             NativeMethods.SHFILEINFO shFileInfo = default;

@@ -42,24 +42,31 @@ namespace SystemTrayMenu.UserInterface
         {
             InitializeComponent();
 
-#if TODO_AVALONIA
-            PreviewKeyDown += HandlePreviewKeyDown;
-#endif
+            // TODO: Find a way to escape ' within inline single quotes markup string in XAML
+            buttonAddSampleStartMenuFolder.Content = Translator.GetText("Add sample directory 'Start Menu'");
+            checkBoxShowFunctionKeyOpenFolder.Content = Translator.GetText("Show function key 'Open Folder'");
+            checkBoxShowFunctionKeyPinMenu.Content = Translator.GetText("Show function key 'Pin menu'");
+            checkBoxShowFunctionKeySettings.Content = Translator.GetText("Show function key 'Settings'");
+            checkBoxShowFunctionKeyRestart.Content = Translator.GetText("Show function key 'Restart'");
 
-            Translate();
-            void Translate()
+            switch (GetAutostartMode())
             {
-                if (!HasAutostartSupport())
-                {
+                case AutostartMode.StartupTask:
                     groupBoxAutostart.Content = $"{(string)groupBoxAutostart.Content} ({Translator.GetText("Task Manager")})";
-                }
-
-                // TODO: Find a way to escape ' within inline single quotes markup string in XAML
-                buttonAddSampleStartMenuFolder.Content = Translator.GetText("Add sample directory 'Start Menu'");
-                checkBoxShowFunctionKeyOpenFolder.Content = Translator.GetText("Show function key 'Open Folder'");
-                checkBoxShowFunctionKeyPinMenu.Content = Translator.GetText("Show function key 'Pin menu'");
-                checkBoxShowFunctionKeySettings.Content = Translator.GetText("Show function key 'Settings'");
-                checkBoxShowFunctionKeyRestart.Content = Translator.GetText("Show function key 'Restart'");
+                    checkBoxAutostart.SetVisibility(Visibility.Collapsed);
+                    labelStartupStatus.Content = string.Empty;
+                    break;
+                case AutostartMode.Win32Registry:
+                    checkBoxAutostart.IsChecked = Settings.Default.IsAutostartActivated;
+                    buttonAddStartup.SetVisibility(Visibility.Collapsed);
+                    labelStartupStatus.SetVisibility(Visibility.Collapsed);
+                    break;
+                case AutostartMode.None:
+                default:
+                    checkBoxAutostart.SetVisibility(Visibility.Collapsed);
+                    buttonAddStartup.SetVisibility(Visibility.Collapsed);
+                    labelStartupStatus.SetVisibility(Visibility.Collapsed);
+                    break;
             }
 
             textBoxFolder.Text = Config.Path;
@@ -67,101 +74,85 @@ namespace SystemTrayMenu.UserInterface
             checkBoxSaveConfigInApplicationDirectory.IsChecked = CustomSettingsProvider.IsActivatedConfigPathAssembly();
             checkBoxSaveLogFileInApplicationDirectory.IsChecked = Settings.Default.SaveLogFileInApplicationDirectory;
 
-            if (!HasAutostartSupport())
-            {
-                checkBoxAutostart.SetVisibility(Visibility.Collapsed);
-                labelStartupStatus.Content = string.Empty;
-            }
-            else
-            {
-                buttonAddStartup.SetVisibility(Visibility.Collapsed);
-                labelStartupStatus.SetVisibility(Visibility.Collapsed);
-                checkBoxAutostart.IsChecked = Settings.Default.IsAutostartActivated;
-            }
-
             checkBoxCheckForUpdates.IsChecked = Settings.Default.CheckForUpdates;
 
 #if TODO_AVALONIA
             textBoxHotkey.SetHotkeyRegistration(GlobalHotkeys.GetLastCreatedHotkeyFunction());
 #endif
 
-            InitializeLanguage();
-            void InitializeLanguage()
+            List<LanguageID> languages = new()
             {
-                List<LanguageID> dataSource = new()
-                {
-                    new ("Afrikaans", "af"),
-                    new ("Azərbaycan", "az"),
-                    new ("bahasa Indonesia", "id"),
-                    new ("català", "ca"),
-                    new ("čeština", "cs"),
-                    new ("Cymraeg", "cy"),
-                    new ("dansk", "da"),
-                    new ("Deutsch", "de"),
-                    new ("eesti keel", "et"),
-                    new ("English", "en"),
-                    new ("English (United Kingdom)", "en-GB"),
-                    new ("Español", "es"),
-                    new ("Esperanto", "eo"),
-                    new ("euskara", "eu"),
-                    new ("Filipino", "fil"),
-                    new ("Français", "fr"),
-                    new ("Italian", "it"),
-                    new ("galego", "gl"),
-                    new ("Hrvatski", "hr"),
-                    new ("Gaeilge", "ga"),
-                    new ("íslenskur", "is"),
-                    new ("kiswahili", "sw"),
-                    new ("Kreyòl ayisyen", "ht"),
-                    new ("Latinus", "la"),
-                    new ("latviski", "lv"),
-                    new ("lietuvių", "lt"),
-                    new ("Magyar", "hu"),
-                    new ("Malti", "mt"),
-                    new ("Melayu", "ms"),
-                    new ("Nederlands", "nl"),
-                    new ("norsk", "nb"),
-                    new ("Polski", "pl"),
-                    new ("Português (Brasil)", "pt-BR"),
-                    new ("português (Portugal)", "pt-PT"),
-                    new ("Română", "ro"),
-                    new ("shqiptare", "sq"),
-                    new ("Slovenščina", "sl"),
-                    new ("slovenský", "sk"),
-                    new ("Suorittaa loppuun", "fi"),
-                    new ("svenska", "sv"),
-                    new ("Tiếng Việt", "vi"),
-                    new ("Türkçe ", "tr"),
-                    new ("Ελληνικά", "el"),
-                    new ("беларуская", "bg"),
-                    new ("македонски", "mk"),
-                    new ("русский", "ru"),
-                    new ("Српски", "sr"),
-                    new ("український", "uk"),
-                    new ("ქართული", "ka"),
-                    new ("հայերեն", "hy"),
-                    new ("יידיש", "yi"),
-                    new ("עִברִית", "he"),
-                    new ("اردو", "ur"),
-                    new ("عربي", "ar"),
-                    new ("فارسی", "fa"),
-                    new ("हिन्दी", "hi"),
-                    new ("ગુજરાતી", "gu"),
-                    new ("தமிழ்", "ta"),
-                    new ("తెలుగు", "te"),
-                    new ("ಕನ್ನಡ", "kn"),
-                    new ("ไทย", "th"),
-                    new ("ພາສາລາວ", "lo"),
-                    new ("ខ្មែរ", "km"),
-                    new ("한국어", "ko"),
-                    new ("中文(正體)", "zh-TW"),
-                    new ("中文(简体)", "zh-CN"),
-                    new ("日本語", "ja"),
-                };
-                comboBoxLanguage.ItemsSource = dataSource;
-                comboBoxLanguage.SelectedValue = Settings.Default.CurrentCultureInfoName;
-                comboBoxLanguage.SelectedValue ??= "en";
-            }
+                new ("Afrikaans", "af"),
+                new ("Azərbaycan", "az"),
+                new ("bahasa Indonesia", "id"),
+                new ("català", "ca"),
+                new ("čeština", "cs"),
+                new ("Cymraeg", "cy"),
+                new ("dansk", "da"),
+                new ("Deutsch", "de"),
+                new ("eesti keel", "et"),
+                new ("English", "en"),
+                new ("English (United Kingdom)", "en-GB"),
+                new ("Español", "es"),
+                new ("Esperanto", "eo"),
+                new ("euskara", "eu"),
+                new ("Filipino", "fil"),
+                new ("Français", "fr"),
+                new ("Italian", "it"),
+                new ("galego", "gl"),
+                new ("Hrvatski", "hr"),
+                new ("Gaeilge", "ga"),
+                new ("íslenskur", "is"),
+                new ("kiswahili", "sw"),
+                new ("Kreyòl ayisyen", "ht"),
+                new ("Latinus", "la"),
+                new ("latviski", "lv"),
+                new ("lietuvių", "lt"),
+                new ("Magyar", "hu"),
+                new ("Malti", "mt"),
+                new ("Melayu", "ms"),
+                new ("Nederlands", "nl"),
+                new ("norsk", "nb"),
+                new ("Polski", "pl"),
+                new ("Português (Brasil)", "pt-BR"),
+                new ("português (Portugal)", "pt-PT"),
+                new ("Română", "ro"),
+                new ("shqiptare", "sq"),
+                new ("Slovenščina", "sl"),
+                new ("slovenský", "sk"),
+                new ("Suorittaa loppuun", "fi"),
+                new ("svenska", "sv"),
+                new ("Tiếng Việt", "vi"),
+                new ("Türkçe ", "tr"),
+                new ("Ελληνικά", "el"),
+                new ("беларуская", "bg"),
+                new ("македонски", "mk"),
+                new ("русский", "ru"),
+                new ("Српски", "sr"),
+                new ("український", "uk"),
+                new ("ქართული", "ka"),
+                new ("հայերեն", "hy"),
+                new ("יידיש", "yi"),
+                new ("עִברִית", "he"),
+                new ("اردو", "ur"),
+                new ("عربي", "ar"),
+                new ("فارسی", "fa"),
+                new ("हिन्दी", "hi"),
+                new ("ગુજરાતી", "gu"),
+                new ("தமிழ்", "ta"),
+                new ("తెలుగు", "te"),
+                new ("ಕನ್ನಡ", "kn"),
+                new ("ไทย", "th"),
+                new ("ພາສາລາວ", "lo"),
+                new ("ខ្មែរ", "km"),
+                new ("한국어", "ko"),
+                new ("中文(正體)", "zh-TW"),
+                new ("中文(简体)", "zh-CN"),
+                new ("日本語", "ja"),
+            };
+            comboBoxLanguage.ItemsSource = languages;
+            comboBoxLanguage.SelectedValue = Settings.Default.CurrentCultureInfoName;
+            comboBoxLanguage.SelectedValue ??= "en";
 
             numericUpDownSizeInPercent.Value = Settings.Default.SizeInPercent;
             numericUpDownIconSizeInPercent.Value = Settings.Default.IconSizeInPercent;
@@ -350,6 +341,28 @@ namespace SystemTrayMenu.UserInterface
             textBoxColorArrowHoverBackgroundDarkMode.Text = Settings.Default.ColorArrowHoverBackgroundDarkMode;
 
             Closed += (_, _) => singletonWindow = null;
+
+#if TODO_AVALONIA
+            PreviewKeyDown += HandlePreviewKeyDown;
+#endif
+        }
+
+        private enum AutostartMode
+        {
+            /// <summary>
+            /// No Autostart support available.
+            /// </summary>
+            None,
+
+            /// <summary>
+            /// Windows registry entry.
+            /// </summary>
+            Win32Registry,
+
+            /// <summary>
+            /// Windows UWP or Desktop application startup entry.
+            /// </summary>
+            StartupTask,
         }
 
         public static void ShowSingleInstance()
@@ -426,18 +439,18 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
-        [SupportedOSPlatformGuard("Windows")]
-        private static bool HasAutostartSupport()
+        private static AutostartMode GetAutostartMode()
         {
-            if (!OperatingSystem.IsWindows())
+            if (OperatingSystem.IsWindows())
             {
-                return false;
-            }
-#if RELEASEPACKAGE // Windows Store version
-            return false;
+#if RELEASEPACKAGE // Windows app package
+                return AutostartMode.StartupTask;
 #else
-            return true;
+                return AutostartMode.Win32Registry;
 #endif
+            }
+
+            return AutostartMode.None;
         }
 
 #if TODO_AVALONIA
@@ -481,7 +494,7 @@ namespace SystemTrayMenu.UserInterface
                 }
             }
 
-            if (HasAutostartSupport())
+            if ((GetAutostartMode() == AutostartMode.Win32Registry) && OperatingSystem.IsWindows())
             {
                 if (checkBoxAutostart.IsChecked ?? false)
                 {
@@ -654,55 +667,34 @@ namespace SystemTrayMenu.UserInterface
             Close();
         }
 
-#if TODO_LINUX
+#if !WINDOWS
+        private void ButtonAddStartup_Click(object sender, RoutedEventArgs e)
+        {
+        }
+#else
+        [SupportedOSPlatform("Windows")]
         private async void ButtonAddStartup_Click(object sender, RoutedEventArgs e)
         {
             // Pass the task ID you specified in the appxmanifest file
             StartupTask startupTask = await StartupTask.GetAsync("MyStartupId");
-            Log.Info($"Autostart {startupTask.State}.");
+            StartupTaskState startupState = startupTask.State;
 
-            switch (startupTask.State)
-            {
-                case StartupTaskState.Enabled:
-                case StartupTaskState.EnabledByPolicy:
-                    UpdateLabelStartupStatus(startupTask.State);
-                    break;
-                case StartupTaskState.Disabled:
-                    // Task is disabled but can be enabled.
-                    StartupTaskState newState = await startupTask.RequestEnableAsync();
-                    UpdateLabelStartupStatus(newState);
-                    break;
-                case StartupTaskState.DisabledByUser:
-                    UpdateLabelStartupStatus(startupTask.State);
-                    break;
-                case StartupTaskState.DisabledByPolicy:
-                    UpdateLabelStartupStatus(startupTask.State);
-                    break;
-                default:
-                    break;
-            }
-        }
+            Log.Info($"Autostart {startupState}.");
 
-        private void UpdateLabelStartupStatus(StartupTaskState newState)
-        {
-            switch (newState)
+            if (startupState == StartupTaskState.Disabled)
             {
-                case StartupTaskState.Disabled:
-                case StartupTaskState.DisabledByUser:
-                case StartupTaskState.DisabledByPolicy:
-                    labelStartupStatus.Content = Translator.GetText("Deactivated");
-                    break;
-                case StartupTaskState.Enabled:
-                case StartupTaskState.EnabledByPolicy:
-                    labelStartupStatus.Content = Translator.GetText("Activated");
-                    break;
-                default:
-                    break;
+                // Task is disabled but can be enabled.
+                startupState = await startupTask.RequestEnableAsync();
             }
-        }
-#else
-        private void ButtonAddStartup_Click(object sender, RoutedEventArgs e)
-        {
+
+            if ((startupState == StartupTaskState.Enabled) || (startupState == StartupTaskState.EnabledByPolicy))
+            {
+                labelStartupStatus.Content = Translator.GetText("Activated");
+            }
+            else
+            {
+                labelStartupStatus.Content = Translator.GetText("Deactivated");
+            }
         }
 #endif
 

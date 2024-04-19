@@ -1135,35 +1135,44 @@ namespace SystemTrayMenu.UserInterface
 #endif
 
             // Shrink the usable space depending on taskbar location
-            taskbarPosition = new WindowsTaskbar().Position;
+            WindowsTaskbar taskbar = new();
+            taskbarPosition = taskbar.Position;
             switch (taskbarPosition)
             {
-#if TODO // Avalonia Taskbar Offset
                 case TaskbarPosition.Left:
-                    screenBounds.X += taskbar.Size.Width;
-                    screenBounds.Width -= taskbar.Size.Width;
+                    screenBounds = new (
+                        screenBounds.X + taskbar.Size.Width,
+                        screenBounds.Y,
+                        screenBounds.Width - taskbar.Size.Width,
+                        screenBounds.Height);
                     startLocation = StartLocation.BottomLeft;
                     break;
                 case TaskbarPosition.Right:
-                    screenBounds.Width -= taskbar.Size.Width;
+                    screenBounds = new(
+                        screenBounds.X,
+                        screenBounds.Y,
+                        screenBounds.Width - taskbar.Size.Width,
+                        screenBounds.Height);
+                    screenBounds.Translate(new(-taskbar.Size.Width, 0));
                     startLocation = StartLocation.BottomRight;
                     break;
                 case TaskbarPosition.Top:
-                    screenBounds.Y += taskbar.Size.Height;
-                    screenBounds.Height -= taskbar.Size.Height;
+                    screenBounds = new(
+                        screenBounds.X,
+                        screenBounds.Y + taskbar.Size.Height,
+                        screenBounds.Width,
+                        screenBounds.Height - taskbar.Size.Height);
                     startLocation = StartLocation.TopRight;
                     break;
                 case TaskbarPosition.Bottom:
                 default:
-                    screenBounds.Height -= taskbar.Size.Height;
+                    screenBounds = new(
+                        screenBounds.X,
+                        screenBounds.Y,
+                        screenBounds.Width,
+                        screenBounds.Height - taskbar.Size.Height);
                     startLocation = StartLocation.BottomRight;
                     break;
-#else
-                default:
-                    screenBounds.Translate(new(0, -50));
-                    startLocation = StartLocation.BottomRight;
-                    break;
-#endif
             }
 
             if (Settings.Default.AppearAtTheBottomLeft)

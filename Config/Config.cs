@@ -77,6 +77,7 @@ namespace SystemTrayMenu
 #if AVALONIA
         public static WindowIcon? GetCustomAppIcon()
 #else
+        [SupportedOSPlatform("windows")]
         public static Icon GetCustomAppIcon()
 #endif
         {

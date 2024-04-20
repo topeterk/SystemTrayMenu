@@ -126,7 +126,10 @@ namespace SystemTrayMenu.Business
             };
 
 #if TODO_AVALONIA
-            SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
+            if (OperatingSystem.IsWindows())
+            {
+                SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
+            }
 #endif
 
             mainMenu = new(null, string.IsNullOrEmpty(Config.Path) ? null : Config.Path);
@@ -173,7 +176,10 @@ namespace SystemTrayMenu.Business
         {
             SingleAppInstance.Wakeup -= SwitchOpenCloseByHotKey;
 #if TODO_AVALONIA
-            SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
+            if (OperatingSystem.IsWindows())
+            {
+                SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
+            }
 #endif
             workerMainMenu.Dispose();
             foreach (BackgroundWorker worker in workersSubMenu)

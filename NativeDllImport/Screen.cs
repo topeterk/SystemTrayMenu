@@ -73,7 +73,10 @@ namespace SystemTrayMenu.DllImports
 #if !AVALONIA
                     if ((screens == null) || (screens.Count == 0))
                     {
-                        FetchScreens();
+                        if (OperatingSystem.IsWindows())
+                        {
+                            FetchScreens();
+                        }
                     }
 
                     if ((screens == null) || (screens.Count == 0))
@@ -125,10 +128,13 @@ namespace SystemTrayMenu.DllImports
                         Mouse.Capture(null);
                     }
 #else
-                    NativeMethods.POINT lpPoint;
-                    if (NativeMethods.GetCursorPos(out lpPoint))
+                    if (OperatingSystem.IsWindows())
                     {
-                        LastCursorPosition = new(lpPoint.X, lpPoint.Y);
+                        NativeMethods.POINT lpPoint;
+                        if (NativeMethods.GetCursorPos(out lpPoint))
+                        {
+                            LastCursorPosition = new(lpPoint.X, lpPoint.Y);
+                        }
                     }
 #endif
                     return LastCursorPosition;
@@ -157,6 +163,7 @@ namespace SystemTrayMenu.DllImports
 #if AVALONIA
             private static Rect ScreenToRect(Avalonia.Platform.Screen screen) => new(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height);
 #else
+            [SupportedOSPlatform("windows")]
             internal static void FetchScreens()
             {
                 var backup = screens;

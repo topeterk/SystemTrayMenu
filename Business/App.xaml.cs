@@ -8,9 +8,9 @@ namespace SystemTrayMenu
     using System.IO;
 #if !AVALONIA
     using System.Drawing;
+    using System.Runtime.Versioning;
     using System.Windows;
     using System.Windows.Threading;
-    using SystemTrayMenu.DllImports;
 #else
     using System.Reflection;
     using Avalonia;
@@ -123,6 +123,7 @@ namespace SystemTrayMenu
 #if AVALONIA
         internal static WindowIcon LoadIconFromResource(string resourceName)
 #else
+        [SupportedOSPlatform("windows")]
         internal static Icon LoadIconFromResource(string resourceName)
 #endif
         {

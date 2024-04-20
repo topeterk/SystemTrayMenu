@@ -109,15 +109,15 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <local:NumericUpDown Grid.Row="0" Grid.Column="0" x:Name="numericUpDownSizeInPercent" Minimum="100" Maximum="200" Increment="5" />
+                                <NumericUpDown Grid.Row="0" Grid.Column="0" x:Name="numericUpDownSizeInPercent" Minimum="100" Maximum="200" Increment="5" />
                                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{u:Translate 'Application size'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                                <local:NumericUpDown Grid.Row="1" Grid.Column="0" x:Name="numericUpDownIconSizeInPercent" Minimum="100" Maximum="200" Increment="5" />
+                                <NumericUpDown Grid.Row="1" Grid.Column="0" x:Name="numericUpDownIconSizeInPercent" Minimum="100" Maximum="200" Increment="5" />
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{u:Translate 'Icon size'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                                <local:NumericUpDown Grid.Row="2" Grid.Column="0" x:Name="numericUpDownRowHeightInPercentage" Minimum="50" Maximum="200" Increment="5" />
+                                <NumericUpDown Grid.Row="2" Grid.Column="0" x:Name="numericUpDownRowHeightInPercentage" Minimum="50" Maximum="200" Increment="5" />
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{u:Translate 'Row height'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                                <local:NumericUpDown Grid.Row="3" Grid.Column="0" x:Name="numericUpDownMenuWidth" Minimum="0" Maximum="400" Increment="5" />
+                                <NumericUpDown Grid.Row="3" Grid.Column="0" x:Name="numericUpDownMenuWidth" Minimum="0" Maximum="400" Increment="5" />
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{u:Translate 'Maximum menu width'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                                <local:NumericUpDown Grid.Row="4" Grid.Column="0" x:Name="numericUpDownMenuHeight" Minimum="25" Maximum="400" Increment="5" />
+                                <NumericUpDown Grid.Row="4" Grid.Column="0" x:Name="numericUpDownMenuHeight" Minimum="25" Maximum="400" Increment="5" />
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{u:Translate 'Maximum menu height'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                             </Grid>
                         </HeaderedContentControl>
@@ -134,7 +134,7 @@
                                 <RadioButton x:Name="radioButtonNextToPreviousMenu" GroupName="SubMenuAppearsAt" Content="{u:Translate 'Next to the previous one'}" />
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton x:Name="radioButtonOverlapping" GroupName="SubMenuAppearsAt" Content="{u:Translate 'Overlapping'}" Checked="RadioButtonOverlapping_Checked" Unchecked="RadioButtonOverlapping_Unchecked" />
-                                    <local:NumericUpDown x:Name="numericUpDownOverlappingOffsetPixels" Margin="10,0,0,0" Minimum="0" Maximum="500" Increment="10" />
+                                    <NumericUpDown x:Name="numericUpDownOverlappingOffsetPixels" Margin="10,0,0,0" Minimum="0" Maximum="500" Increment="10" />
                                     <TextBlock Text="{u:Translate 'Offset by pixels'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </StackPanel>
@@ -249,7 +249,7 @@
                     <StackPanel>
                         <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Time until a menu opens'}">
                             <StackPanel Orientation="Horizontal">
-                                <local:NumericUpDown x:Name="numericUpDownTimeUntilOpens" Minimum="20" Maximum="1000" Increment="10" />
+                                <NumericUpDown x:Name="numericUpDownTimeUntilOpens" Minimum="20" Maximum="1000" Increment="10" />
                                 <TextBlock Text="{u:Translate 'Milliseconds until a menu opens when the mouse is on it'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                             </StackPanel>
                         </HeaderedContentControl>
@@ -269,16 +269,16 @@
 
                                 <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" x:Name="checkBoxStayOpenWhenItemClicked" Content="{u:Translate 'If an element was clicked'}"/>
                                 <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="checkBoxStayOpenWhenFocusLost" Content="{u:Translate 'If the focus is lost and the mouse is still on the menu'}" Checked="CheckBoxStayOpenWhenFocusLost_CheckedChanged" Unchecked="CheckBoxStayOpenWhenFocusLost_CheckedChanged"/>
-                                <local:NumericUpDown Grid.Row="2" Grid.Column="0" x:Name="numericUpDownTimeUntilClose" Minimum="200" Maximum="5000" Increment="10" />
+                                <NumericUpDown Grid.Row="2" Grid.Column="0" x:Name="numericUpDownTimeUntilClose" Minimum="200" Maximum="5000" Increment="10" />
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{u:Translate 'Milliseconds until the menu closes if the mouse then leaves the menu'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                                 <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="checkBoxStayOpenWhenFocusLostAfterEnterPressed" Content="{u:Translate 'If the focus is lost and the Enter key was pressed'}" Checked="CheckBoxStayOpenWhenFocusLostAfterEnterPressed_CheckedChanged" Unchecked="CheckBoxStayOpenWhenFocusLostAfterEnterPressed_CheckedChanged"/>
-                                <local:NumericUpDown Grid.Row="4" Grid.Column="0" x:Name="numericUpDownTimeUntilClosesAfterEnterPressed" Minimum="20" Maximum="1000" Increment="10" />
+                                <NumericUpDown Grid.Row="4" Grid.Column="0" x:Name="numericUpDownTimeUntilClosesAfterEnterPressed" Minimum="20" Maximum="1000" Increment="10" />
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{u:Translate 'Milliseconds until the menu closes if the menu is not reactivated'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                             </Grid>
                         </HeaderedContentControl>
                         <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Cache'}">
                             <StackPanel Orientation="Horizontal">
-                                <local:NumericUpDown x:Name="numericUpDownClearCacheIfMoreThanThisNumberOfItems" Minimum="200" Maximum="5000" Increment="1" />
+                                <NumericUpDown x:Name="numericUpDownClearCacheIfMoreThanThisNumberOfItems" Minimum="200" Maximum="5000" Increment="1" />
                                 <TextBlock Text="{u:Translate 'Clear cache if more than this number of items'}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                             </StackPanel>
                         </HeaderedContentControl>

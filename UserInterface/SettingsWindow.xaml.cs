@@ -526,19 +526,37 @@ namespace SystemTrayMenu.UserInterface
 #endif
 
             Settings.Default.CurrentCultureInfoName = comboBoxLanguage.SelectedValue.ToString();
-            Settings.Default.SizeInPercent = numericUpDownSizeInPercent.Value;
-            Settings.Default.IconSizeInPercent = numericUpDownIconSizeInPercent.Value;
-            if (DllImports.NativeMethods.IsTouchEnabled())
+            if (numericUpDownSizeInPercent.Value.HasValue)
             {
-                Settings.Default.RowHeighteInPercentageTouch = numericUpDownRowHeightInPercentage.Value;
-            }
-            else
-            {
-                Settings.Default.RowHeighteInPercentage = numericUpDownRowHeightInPercentage.Value;
+                Settings.Default.SizeInPercent = (int)numericUpDownSizeInPercent.Value;
             }
 
-            Settings.Default.WidthMaxInPercent = numericUpDownMenuWidth.Value;
-            Settings.Default.HeightMaxInPercent = numericUpDownMenuHeight.Value;
+            if (numericUpDownIconSizeInPercent.Value.HasValue)
+            {
+                Settings.Default.IconSizeInPercent = (int)numericUpDownIconSizeInPercent.Value;
+            }
+
+            if (numericUpDownRowHeightInPercentage.Value.HasValue)
+            {
+                if (DllImports.NativeMethods.IsTouchEnabled())
+                {
+                    Settings.Default.RowHeighteInPercentageTouch = (int)numericUpDownRowHeightInPercentage.Value;
+                }
+                else
+                {
+                    Settings.Default.RowHeighteInPercentage = (int)numericUpDownRowHeightInPercentage.Value;
+                }
+            }
+
+            if (numericUpDownMenuWidth.Value.HasValue)
+            {
+                Settings.Default.WidthMaxInPercent = (int)numericUpDownMenuWidth.Value;
+            }
+
+            if (numericUpDownMenuHeight.Value.HasValue)
+            {
+                Settings.Default.HeightMaxInPercent = (int)numericUpDownMenuHeight.Value;
+            }
 
             if (radioButtonUseCustomLocation.IsChecked ?? true)
             {
@@ -565,7 +583,10 @@ namespace SystemTrayMenu.UserInterface
                 Settings.Default.AppearAtTheBottomLeft = false;
             }
 
-            Settings.Default.OverlappingOffsetPixels = numericUpDownOverlappingOffsetPixels.Value;
+            if (numericUpDownOverlappingOffsetPixels.Value.HasValue)
+            {
+                Settings.Default.OverlappingOffsetPixels = (int)numericUpDownOverlappingOffsetPixels.Value;
+            }
 
             if (radioButtonNextToPreviousMenu.IsChecked ?? true)
             {
@@ -619,11 +640,27 @@ namespace SystemTrayMenu.UserInterface
 
             Settings.Default.StaysOpenWhenItemClicked = checkBoxStayOpenWhenItemClicked.IsChecked ?? true;
             Settings.Default.StaysOpenWhenFocusLost = checkBoxStayOpenWhenFocusLost.IsChecked ?? true;
-            Settings.Default.TimeUntilCloses = numericUpDownTimeUntilClose.Value;
-            Settings.Default.TimeUntilOpens = numericUpDownTimeUntilOpens.Value;
+            if (numericUpDownTimeUntilClose.Value.HasValue)
+            {
+                Settings.Default.TimeUntilCloses = (int)numericUpDownTimeUntilClose.Value;
+            }
+
+            if (numericUpDownTimeUntilOpens.Value.HasValue)
+            {
+                Settings.Default.TimeUntilOpens = (int)numericUpDownTimeUntilOpens.Value;
+            }
+
             Settings.Default.StaysOpenWhenFocusLostAfterEnterPressed = checkBoxStayOpenWhenFocusLostAfterEnterPressed.IsChecked ?? true;
-            Settings.Default.TimeUntilClosesAfterEnterPressed = numericUpDownTimeUntilClosesAfterEnterPressed.Value;
-            Settings.Default.ClearCacheIfMoreThanThisNumberOfItems = numericUpDownClearCacheIfMoreThanThisNumberOfItems.Value;
+            if (numericUpDownTimeUntilClosesAfterEnterPressed.Value.HasValue)
+            {
+                Settings.Default.TimeUntilClosesAfterEnterPressed = (int)numericUpDownTimeUntilClosesAfterEnterPressed.Value;
+            }
+
+            if (numericUpDownClearCacheIfMoreThanThisNumberOfItems.Value.HasValue)
+            {
+                Settings.Default.ClearCacheIfMoreThanThisNumberOfItems = (int)numericUpDownClearCacheIfMoreThanThisNumberOfItems.Value;
+            }
+
             Settings.Default.SearchPattern = textBoxSearchPattern.Text;
 
             Settings.Default.UseIconFromRootFolder = checkBoxUseIconFromRootFolder.IsChecked ?? false;
@@ -838,18 +875,31 @@ namespace SystemTrayMenu.UserInterface
             buttonAddSampleStartMenuFolder.IsEnabled = !doesStartMenuFolderExist;
         }
 
+        private T? GetSettingsDefaultValue<T>(string name)
+        {
+            return (T?)Convert.ChangeType(Settings.Default.Properties[name].DefaultValue, typeof(T));
+        }
+
         private void ButtonSizeAndLocationDefault_Click(object sender, RoutedEventArgs e)
         {
-            numericUpDownSizeInPercent.Value = 100;
-            numericUpDownIconSizeInPercent.Value = 100;
-            numericUpDownRowHeightInPercentage.Value = 100;
-            numericUpDownMenuWidth.Value = 100;
-            numericUpDownMenuHeight.Value = 100;
+            numericUpDownSizeInPercent.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.SizeInPercent));
+            numericUpDownIconSizeInPercent.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.IconSizeInPercent));
+            if (DllImports.NativeMethods.IsTouchEnabled())
+            {
+                numericUpDownRowHeightInPercentage.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.RowHeighteInPercentageTouch));
+            }
+            else
+            {
+                numericUpDownRowHeightInPercentage.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.RowHeighteInPercentage));
+            }
+
+            numericUpDownMenuWidth.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.WidthMaxInPercent));
+            numericUpDownMenuHeight.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.HeightMaxInPercent));
 
             radioButtonAppearAtTheBottomLeft.IsChecked = true;
 
             radioButtonNextToPreviousMenu.IsChecked = true;
-            numericUpDownOverlappingOffsetPixels.Value = 150;
+            numericUpDownOverlappingOffsetPixels.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.OverlappingOffsetPixels));
         }
 
         private void ButtonAdvancedDefault_Click(object sender, RoutedEventArgs e)
@@ -900,11 +950,11 @@ namespace SystemTrayMenu.UserInterface
         {
             checkBoxStayOpenWhenItemClicked.IsChecked = true;
             checkBoxStayOpenWhenFocusLost.IsChecked = true;
-            numericUpDownTimeUntilClose.Value = 400;
-            numericUpDownTimeUntilOpens.Value = 100;
+            numericUpDownTimeUntilClose.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.TimeUntilCloses));
+            numericUpDownTimeUntilOpens.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.TimeUntilOpens));
             checkBoxStayOpenWhenFocusLostAfterEnterPressed.IsChecked = true;
-            numericUpDownTimeUntilClosesAfterEnterPressed.Value = 200;
-            numericUpDownClearCacheIfMoreThanThisNumberOfItems.Value = 200;
+            numericUpDownTimeUntilClosesAfterEnterPressed.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.TimeUntilClosesAfterEnterPressed));
+            numericUpDownClearCacheIfMoreThanThisNumberOfItems.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.ClearCacheIfMoreThanThisNumberOfItems));
             textBoxSearchPattern.Text = string.Empty;
         }
 

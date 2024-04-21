@@ -89,7 +89,11 @@ namespace SystemTrayMenu
 
         internal static void Initialize(bool save)
         {
+#if AVALONIA
+            object converter = new(); // TODO: Remove
+#else
             ColorConverter converter = new();
+#endif
             ColorAndCode colorAndCode = default;
             bool resetDefaults = false;
 
@@ -303,14 +307,25 @@ namespace SystemTrayMenu
             }
         }
 
+#if AVALONIA
+        private static void ProcessColorAndCode(
+            object obsolete, // TODO: Remove argument
+            ref ColorAndCode colorAndCode,
+            ref bool resetDefaults)
+#else
         private static void ProcessColorAndCode(
             ColorConverter colorConverter,
             ref ColorAndCode colorAndCode,
             ref bool resetDefaults)
+#endif
         {
             try
             {
+#if AVALONIA
+                Color? color = Color.Parse(colorAndCode.HtmlColorCode);
+#else
                 Color? color = (Color?)colorConverter.ConvertFromInvariantString(colorAndCode.HtmlColorCode);
+#endif
                 if (color != null)
                 {
                     colorAndCode.Color = color.Value;

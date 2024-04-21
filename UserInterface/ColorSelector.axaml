@@ -5,12 +5,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              x:Class="SystemTrayMenu.UserInterface.ColorSelector"
-             mc:Ignorable="d" Margin="1">
-    <StackPanel Orientation="Horizontal">
-        <Border x:Name="pane" x:FieldModifier="private" d:Background="#FF007F" BorderThickness="1" BorderBrush="Gray" CornerRadius="3"
-                Height="{Binding RelativeSource={RelativeSource Self}, Path=Parent.Bounds.Height}"
-                Width="{Binding Path=Height, RelativeSource={RelativeSource Self}}" PointerReleased="Shape_PointerReleased"/>
-        <TextBox x:Name="txtbox" x:FieldModifier="private" Margin="3,0,0,0" VerticalContentAlignment="Center" Width="70" TextChanged="Txtbox_TextChanged" d:Text="#FF007F"/>
+             mc:Ignorable="d">
+    <StackPanel Orientation="Horizontal" Margin="1">
+        <ColorPicker x:Name="picker" IsAlphaEnabled="False" IsAlphaVisible="False" IsColorModelVisible="False" IsColorPaletteVisible="False"
+                     Height="{Binding RelativeSource={RelativeSource Self}, Path=Parent.Bounds.Height}"
+                     Width="{Binding Path=Height, RelativeSource={RelativeSource Self}}" MinWidth="0"
+                     ColorChanged="Picker_ColorChanged">
+            <ColorPicker.Styles>
+                <Style Selector="ColorPicker /template/ DropDownButton /template/ PathIcon#DropDownGlyph">
+                    <Setter Property="IsVisible" Value="False" />
+                </Style>
+            </ColorPicker.Styles>
+        </ColorPicker>
+        <TextBox x:Name="txtbox" x:FieldModifier="private" Margin="3,0,0,0" VerticalContentAlignment="Center" Width="100" TextChanged="Txtbox_TextChanged" d:Text="#FF007F"/>
         <Label x:Name="label" x:FieldModifier="private" Margin="5,0,0,0" Padding="0" VerticalContentAlignment="Center" />
     </StackPanel>
 </UserControl>

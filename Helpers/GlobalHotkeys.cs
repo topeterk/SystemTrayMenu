@@ -47,7 +47,7 @@ namespace SystemTrayMenu.Helpers
 
             void Register(ModifierKeys modifiers, Key key);
 
-            void Register(string hotKeyString);
+            void Register(string? hotKeyString);
 
             void Unregister();
         }
@@ -64,7 +64,7 @@ namespace SystemTrayMenu.Helpers
         //       Only this ensures caller and registrator are talking about the SAME registration.
         internal static IHotkeyFunction? GetLastCreatedHotkeyFunction() => lastCreatedHotkeyFunction;
 
-        internal static (ModifierKeys Modifiers, Key Key) ModifiersAndKeyFromInvariantString(string hotKeyString)
+        internal static (ModifierKeys Modifiers, Key Key) ModifiersAndKeyFromInvariantString(string? hotKeyString)
         {
             if (string.IsNullOrEmpty(hotKeyString))
             {
@@ -419,7 +419,7 @@ namespace SystemTrayMenu.Helpers
                 }
             }
 
-            public void Register(string hotKeyString)
+            public void Register(string? hotKeyString)
             {
                 var (modifiers, key) = ModifiersAndKeyFromInvariantString(hotKeyString);
                 Register(modifiers, key);

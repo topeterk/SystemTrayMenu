@@ -4,17 +4,25 @@
 //
 // Origin of some parts: http://www.codeproject.com/KB/buttons/hotkeycontrol.aspx
 
-#if TODO_AVALONIA
+#if WINDOWS
 namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Collections.Generic;
     using System.Runtime.Versioning;
     using System.Text;
+    using System.Windows.Input;
+#if AVALONIA
+    using Avalonia.Controls;
+    using Avalonia.Interactivity;
+    using Avalonia.Media;
+    using Key = System.Windows.Input.Key;
+    using KeyEventArgs = Avalonia.Input.KeyEventArgs;
+#else
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Input;
     using System.Windows.Media;
+#endif
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Utilities;
     using static SystemTrayMenu.Helpers.GlobalHotkeys;
@@ -39,7 +47,11 @@ namespace SystemTrayMenu.UserInterface
             // Disable right-clicking
             ContextMenu = new()
             {
+#if AVALONIA
+                IsVisible = false,
+#else
                 Visibility = Visibility.Collapsed,
+#endif
                 IsEnabled = false,
             };
 
@@ -47,10 +59,14 @@ namespace SystemTrayMenu.UserInterface
             Height = 21;
 
             // Handle events that occurs when keys are pressed
+#if TODO_AVALONIA
             KeyUp += HotkeyControl_KeyUp;
             KeyDown += HotkeyControl_KeyDown;
             PreviewKeyDown += HandlePreviewKeyDown;
             PreviewTextInput += HandlePreviewTextInput;
+#else
+            AddHandler(KeyDownEvent, OnPreviewKeyDown, RoutingStrategies.Tunnel);
+#endif
 
             GotFocus += (_, _) => GlobalHotkeys.IsEnabled = false;
             LostFocus += (_, _) => GlobalHotkeys.IsEnabled = true;
@@ -62,6 +78,10 @@ namespace SystemTrayMenu.UserInterface
         internal bool WasHotkeyChanged { get; private set; }
 
         internal IHotkeyFunction? HotkeyFunction { get; private set; }
+
+#if AVALONIA
+        protected override Type StyleKeyOverride => typeof(TextBox);
+#endif
 
         public static string HotkeyToString(ModifierKeys modifierKeyCode, Key key)
         {
@@ -112,7 +132,7 @@ namespace SystemTrayMenu.UserInterface
 
             if (modifiers == ModifierKeys.None && hotkey == Key.None)
             {
-                Background = SystemColors.ControlBrush;
+                Background = MenuDefines.ColorSystemControlDefault;
             }
             else if (HotkeyFunction != null)
             {
@@ -130,7 +150,7 @@ namespace SystemTrayMenu.UserInterface
         /// Change the hotkey to given combination.
         /// </summary>
         /// <param name="hotkeyString">Hotkey combination string.</param>
-        internal void ChangeHotkey(string hotkeyString)
+        internal void ChangeHotkey(string? hotkeyString)
         {
             try
             {
@@ -173,6 +193,7 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
+#if TODO_AVALONIA
         private void HandlePreviewKeyDown(object sender, KeyEventArgs e)
         {
             ModifierKeys modifiers = Keyboard.Modifiers;
@@ -196,6 +217,7 @@ namespace SystemTrayMenu.UserInterface
                     break;
             }
         }
+#endif
 
         private void FilterCombinations(ref ModifierKeys modifiers, ref Key key)
         {
@@ -293,6 +315,7 @@ namespace SystemTrayMenu.UserInterface
             needNonShiftModifier.Add(Key.NumLock);
         }
 
+#if TODO_AVALONIA
         /// <summary>
         /// Fires when a key is pushed down. Here, we'll want to update the text in the box
         /// to notify the user what combination is currently pressed.
@@ -315,7 +338,9 @@ namespace SystemTrayMenu.UserInterface
 
             UpdateHotkeyRegistration();
         }
+#endif
 
+#if TODO_AVALONIA
         /// <summary>
         /// Fires when all keys are released. If the current hotkey isn't valid, reset it.
         /// Otherwise, do nothing and keep the text and hotkey as it was.
@@ -338,12 +363,23 @@ namespace SystemTrayMenu.UserInterface
                 UpdateHotkeyRegistration();
             }
         }
+#endif
 
+#if !AVALONIA
         /// <summary>
         /// Prevents the letter/whatever entered to show up in the TextBox
         /// Without this, a "A" key press would appear as "aControl, Alt + A".
         /// </summary>
         private void HandlePreviewTextInput(object sender, TextCompositionEventArgs e) => e.Handled = true;
+#else
+        private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
+        {
+            // Prevents the letter/whatever entered to show up in the TextBox
+            // Without this, a "A" key press would appear as "aControl, Alt + A".
+            e.Handled = true;
+        }
+#endif
+
     }
 }
 #endif

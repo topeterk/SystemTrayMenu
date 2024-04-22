@@ -39,9 +39,29 @@ namespace SystemTrayMenu.UserInterface
 
         private static SettingsWindow? singletonWindow;
 
+#if AVALONIA
+#if WINDOWS
+        [SupportedOSPlatform("Windows")]
+        private HotkeySelector textBoxHotkey;
+#endif
+#endif
+
         public SettingsWindow()
         {
             InitializeComponent();
+#if AVALONIA
+#if WINDOWS
+            // As the control has compile time dependencies and XAML cannot handle this, we have to add this control by hand
+            if (OperatingSystem.IsWindows())
+            {
+                textBoxHotkey = new();
+                textBoxHotkey.AcceptsTab = false;
+                textBoxHotkey.MinWidth = 200;
+                textBoxHotkey.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
+                stackpanelHotkey.Children.Insert(0, textBoxHotkey);
+            }
+#endif
+#endif
 
             // TODO: Find a way to escape ' within inline single quotes markup string in XAML
             buttonAddSampleStartMenuFolder.Content = Translator.GetText("Add sample directory 'Start Menu'");
@@ -77,8 +97,11 @@ namespace SystemTrayMenu.UserInterface
 
             checkBoxCheckForUpdates.IsChecked = Settings.Default.CheckForUpdates;
 
-#if TODO_AVALONIA
-            textBoxHotkey.SetHotkeyRegistration(GlobalHotkeys.GetLastCreatedHotkeyFunction());
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
+            {
+                textBoxHotkey.SetHotkeyRegistration(GlobalHotkeys.GetLastCreatedHotkeyFunction());
+            }
 #endif
 
             List<LanguageID> languages = new()
@@ -524,10 +547,13 @@ namespace SystemTrayMenu.UserInterface
 
             Settings.Default.CheckForUpdates = checkBoxCheckForUpdates.IsChecked ?? false;
 
-#if TODO_AVALONIA
-            if (textBoxHotkey.WasHotkeyChanged)
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
             {
-                Settings.Default.HotKey = textBoxHotkey.HotkeyFunction?.GetHotkeyInvariantString() ?? string.Empty;
+                if (textBoxHotkey.WasHotkeyChanged)
+                {
+                    Settings.Default.HotKey = textBoxHotkey.HotkeyFunction?.GetHotkeyInvariantString() ?? string.Empty;
+                }
             }
 #endif
 
@@ -788,8 +814,11 @@ namespace SystemTrayMenu.UserInterface
 
         private void ButtonHotkeyDefault_Click(object sender, RoutedEventArgs e)
         {
-#if TODO_AVALONIA
-            textBoxHotkey.ChangeHotkey((string)Settings.Default.Properties["HotKey"].DefaultValue); // see Settings.Default.HotKey
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
+            {
+                textBoxHotkey.ChangeHotkey(GetSettingsDefaultValue<string>(nameof(Settings.Default.HotKey)));
+            }
 #endif
         }
 

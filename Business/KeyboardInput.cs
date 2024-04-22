@@ -58,7 +58,7 @@ namespace SystemTrayMenu.Business
 
 #if WINDOWS
         [SupportedOSPlatform("windows")]
-        internal bool RegisterHotKey(string hotKeyString)
+        internal bool RegisterHotKey(string? hotKeyString)
         {
             if (!string.IsNullOrEmpty(hotKeyString))
             {

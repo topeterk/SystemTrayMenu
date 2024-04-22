@@ -5,29 +5,36 @@
 namespace SystemTrayMenu.Business
 {
     using System;
+    using System.Runtime.Versioning;
 #if !AVALONIA
     using System.Windows.Input;
-    using SystemTrayMenu.Utilities;
-    using static SystemTrayMenu.Helpers.GlobalHotkeys;
 #else
     using Avalonia.Input;
     using ModifierKeys = Avalonia.Input.KeyModifiers;
 #endif
+#if WINDOWS
+    using static SystemTrayMenu.Helpers.GlobalHotkeys;
+#endif
     using SystemTrayMenu.DataClasses;
     using SystemTrayMenu.UserInterface;
+    using SystemTrayMenu.Utilities;
 
     internal class KeyboardInput : IDisposable
     {
-#if TODO_AVALONIA
+#if WINDOWS
+        [SupportedOSPlatform("windows")]
         private readonly IHotkeyFunction hotkeyFunction = Create();
 #endif
 
         private Menu? focussedMenu;
 
-#if TODO_AVALONIA
+#if WINDOWS
         public KeyboardInput()
         {
-            hotkeyFunction.KeyPressed += (_) => HotKeyPressed?.Invoke();
+            if (OperatingSystem.IsWindows())
+            {
+                hotkeyFunction.KeyPressed += (_) => HotKeyPressed?.Invoke();
+            }
         }
 
         internal event Action? HotKeyPressed;
@@ -41,14 +48,18 @@ namespace SystemTrayMenu.Business
 
         public void Dispose()
         {
-#if TODO_AVALONIA
-            hotkeyFunction.Unregister();
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
+            {
+                hotkeyFunction.Unregister();
+            }
 #endif
         }
 
+#if WINDOWS
+        [SupportedOSPlatform("windows")]
         internal bool RegisterHotKey(string hotKeyString)
         {
-#if TODO_AVALONIA
             if (!string.IsNullOrEmpty(hotKeyString))
             {
                 try
@@ -63,10 +74,8 @@ namespace SystemTrayMenu.Business
             }
 
             return true;
-#else
-            return false;
-#endif
         }
+#endif
 
         internal void ResetSelectedByKey() => focussedMenu = null;
 

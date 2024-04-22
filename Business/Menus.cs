@@ -72,11 +72,16 @@ namespace SystemTrayMenu.Business
             }
 #endif
 
-            if (!keyboardInput.RegisterHotKey(Settings.Default.HotKey))
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
             {
-                Settings.Default.HotKey = string.Empty;
-                Settings.Default.Save();
+                if (!keyboardInput.RegisterHotKey(Settings.Default.HotKey))
+                {
+                    Settings.Default.HotKey = string.Empty;
+                    Settings.Default.Save();
+                }
             }
+#endif
 
 #if TODO_AVALONIA
             keyboardInput.HotKeyPressed += SwitchOpenCloseByHotKey;

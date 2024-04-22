@@ -4,18 +4,18 @@
 //
 // Copyright (c) 2023-2024 Peter Kirmeier
 
-#if TODO_AVALONIA
+#if WINDOWS
 namespace SystemTrayMenu.Helpers
 {
     using System;
     using System.Collections.Generic;
     using System.Runtime.Versioning;
     using System.Text;
-    using System.Windows;
     using System.Windows.Input;
     using System.Windows.Interop;
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
+    using Window = System.Windows.Window;
 
     [SupportedOSPlatform("Windows")]
     internal static class GlobalHotkeys

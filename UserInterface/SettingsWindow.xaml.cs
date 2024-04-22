@@ -17,13 +17,14 @@ namespace SystemTrayMenu.UserInterface
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
-    using SystemTrayMenu.Helpers;
 #else
     using Avalonia.Controls;
+    using Avalonia.Input;
     using Avalonia.Interactivity;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
     using Microsoft.Win32;
+    using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
@@ -342,7 +343,7 @@ namespace SystemTrayMenu.UserInterface
 
             Closed += (_, _) => singletonWindow = null;
 
-#if TODO_AVALONIA
+#if !AVALONIA
             PreviewKeyDown += HandlePreviewKeyDown;
 #endif
         }
@@ -453,15 +454,20 @@ namespace SystemTrayMenu.UserInterface
             return AutostartMode.None;
         }
 
-#if TODO_AVALONIA
         private void HandlePreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape && GlobalHotkeys.IsEnabled)
+            if (e.Key == Key.Escape)
             {
+#if WINDOWS
+                // When hotkeys are not enabled, we are not allowed to handle it
+                if (OperatingSystem.IsWindows() && !GlobalHotkeys.IsEnabled)
+                {
+                    return;
+                }
+#endif
                 Close();
             }
         }
-#endif
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e)
         {
@@ -780,12 +786,12 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
-#if TODO_AVALONIA
         private void ButtonHotkeyDefault_Click(object sender, RoutedEventArgs e)
         {
+#if TODO_AVALONIA
             textBoxHotkey.ChangeHotkey((string)Settings.Default.Properties["HotKey"].DefaultValue); // see Settings.Default.HotKey
-        }
 #endif
+        }
 
         private void ButtonGeneralDefault_Click(object sender, RoutedEventArgs e)
         {

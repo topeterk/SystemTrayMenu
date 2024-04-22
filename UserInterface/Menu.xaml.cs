@@ -16,7 +16,6 @@ namespace SystemTrayMenu.UserInterface
     using System.Windows.Media;
     using System.Windows.Media.Animation;
 #else
-    using System.Drawing;
     using Avalonia;
     using Avalonia.Controls;
     using Avalonia.Input;
@@ -27,8 +26,6 @@ namespace SystemTrayMenu.UserInterface
     using ModifierKeys = Avalonia.Input.KeyModifiers;
     using MouseEventArgs = Avalonia.Input.PointerEventArgs;
     using Point = Avalonia.Point;
-    using RoutingStrategy = Avalonia.Interactivity.RoutingStrategies;
-    using Size = Avalonia.Size;
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
     using SystemTrayMenu.Business;

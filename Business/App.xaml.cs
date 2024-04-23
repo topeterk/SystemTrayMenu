@@ -130,8 +130,7 @@ namespace SystemTrayMenu
 #if !AVALONIA
             using (Stream stream = GetResourceStream(new("pack://application:,,,/" + resourceName, UriKind.Absolute)).Stream)
 #else
-            using (Stream stream = AvaloniaLocator.Current.GetService<IAssetLoader>()!.Open(
-                new Uri($"avares://{Assembly.GetEntryAssembly()!.GetName().Name!}{"/" + resourceName}")))
+            using (Stream stream = AssetLoader.Open(new Uri($"avares://{Assembly.GetEntryAssembly()!.GetName().Name!}{"/" + resourceName}")))
 #endif
             {
                 return new(stream);

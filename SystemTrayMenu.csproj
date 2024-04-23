@@ -56,8 +56,6 @@ EXIT 0</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" !'$(UseWPF)' ">
     <NoWarn>$(NoWarn);CA2213;CS0649;CS8600;CS8601;CS8602;CS8603;CS8604;CS8605;CS8618;CS8622</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
-    <!-- TODO: Get rid of private API (https://github.com/AvaloniaUI/Avalonia/wiki/Using-private-apis-in-nuget-packages) -->
-    <AvaloniaAccessUnstablePrivateApis>true</AvaloniaAccessUnstablePrivateApis>
     <Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>true</Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

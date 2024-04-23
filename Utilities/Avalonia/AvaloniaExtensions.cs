@@ -58,9 +58,7 @@ namespace SystemTrayMenu.Utilities
     internal class LocalResourceBitmap : BitmapSource
     {
         public LocalResourceBitmap(string path)
-            : base(
-            AvaloniaLocator.Current.GetService<IAssetLoader>()!.Open(
-                new Uri($"avares://{Assembly.GetEntryAssembly()!.GetName().Name!}{path}")))
+            : base(AssetLoader.Open(new Uri($"avares://{Assembly.GetEntryAssembly()!.GetName().Name!}{path}")))
         {
         }
     }

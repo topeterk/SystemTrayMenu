@@ -10,17 +10,17 @@ namespace SystemTrayMenu.UserInterface
     using System;
     using System.Collections.Generic;
     using System.Runtime.Versioning;
-    using System.Text;
-    using System.Windows.Input;
 #if AVALONIA
     using Avalonia.Controls;
+    using Avalonia.Input;
     using Avalonia.Interactivity;
-    using Avalonia.Media;
-    using Key = System.Windows.Input.Key;
     using KeyEventArgs = Avalonia.Input.KeyEventArgs;
+    using ModifierKeys = Avalonia.Input.KeyModifiers;
 #else
+    using System.Text;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Input;
     using System.Windows.Media;
 #endif
     using SystemTrayMenu.Helpers;
@@ -55,17 +55,20 @@ namespace SystemTrayMenu.UserInterface
                 IsEnabled = false,
             };
 
+#if !AVALONIA
             // Set style defaults from App.xaml (TODO: Fix XAML styles to also apply for this class)
             Height = 21;
+#endif
 
             // Handle events that occurs when keys are pressed
-#if TODO_AVALONIA
+#if !AVALONIA
             KeyUp += HotkeyControl_KeyUp;
             KeyDown += HotkeyControl_KeyDown;
             PreviewKeyDown += HandlePreviewKeyDown;
             PreviewTextInput += HandlePreviewTextInput;
 #else
             AddHandler(KeyDownEvent, OnPreviewKeyDown, RoutingStrategies.Tunnel);
+            AddHandler(KeyUpEvent, OnPreviewKeyUp, RoutingStrategies.Tunnel);
 #endif
 
             GotFocus += (_, _) => GlobalHotkeys.IsEnabled = false;
@@ -83,6 +86,7 @@ namespace SystemTrayMenu.UserInterface
         protected override Type StyleKeyOverride => typeof(TextBox);
 #endif
 
+#if !AVALONIA
         public static string HotkeyToString(ModifierKeys modifierKeyCode, Key key)
         {
             StringBuilder hotkeyString = new();
@@ -110,6 +114,7 @@ namespace SystemTrayMenu.UserInterface
         }
 
         public override string ToString() => HotkeyToString(modifiers, hotkey);
+#endif
 
         /// <summary>
         /// Set the hotkey function the control is working on.
@@ -130,6 +135,7 @@ namespace SystemTrayMenu.UserInterface
             hotkey = HotkeyFunction?.GetKey() ?? Key.None;
             modifiers = HotkeyFunction?.GetModifierKeys() ?? ModifierKeys.None;
 
+#if TODO // Keep the colors - looks weird in dark mode but how to adjust to fitting colors? Maybe color gradient with fadeout on right side into green/red/none?
             if (modifiers == ModifierKeys.None && hotkey == Key.None)
             {
                 Background = MenuDefines.ColorSystemControlDefault;
@@ -142,6 +148,7 @@ namespace SystemTrayMenu.UserInterface
             {
                 Background = Brushes.IndianRed;
             }
+#endif
 
             Text = ModifiersAndKeyToString(modifiers, hotkey);
         }
@@ -193,7 +200,7 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
-#if TODO_AVALONIA
+#if !AVALONIA
         private void HandlePreviewKeyDown(object sender, KeyEventArgs e)
         {
             ModifierKeys modifiers = Keyboard.Modifiers;
@@ -315,7 +322,7 @@ namespace SystemTrayMenu.UserInterface
             needNonShiftModifier.Add(Key.NumLock);
         }
 
-#if TODO_AVALONIA
+#if !AVALONIA
         /// <summary>
         /// Fires when a key is pushed down. Here, we'll want to update the text in the box
         /// to notify the user what combination is currently pressed.
@@ -338,9 +345,7 @@ namespace SystemTrayMenu.UserInterface
 
             UpdateHotkeyRegistration();
         }
-#endif
 
-#if TODO_AVALONIA
         /// <summary>
         /// Fires when all keys are released. If the current hotkey isn't valid, reset it.
         /// Otherwise, do nothing and keep the text and hotkey as it was.
@@ -363,9 +368,7 @@ namespace SystemTrayMenu.UserInterface
                 UpdateHotkeyRegistration();
             }
         }
-#endif
 
-#if !AVALONIA
         /// <summary>
         /// Prevents the letter/whatever entered to show up in the TextBox
         /// Without this, a "A" key press would appear as "aControl, Alt + A".
@@ -375,8 +378,38 @@ namespace SystemTrayMenu.UserInterface
         private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
         {
             // Prevents the letter/whatever entered to show up in the TextBox
-            // Without this, a "A" key press would appear as "aControl, Alt + A".
+            // Without this, a "A" key press would appear as "Control, Alt + A".
+            // Further, it will also disable any gestures like Copy/Paste.
             e.Handled = true;
+
+            // Clear the current hotkey
+            if (e.Key == Key.Back || e.Key == Key.Delete)
+            {
+                HotkeyFunction?.Unregister();
+                WasHotkeyChanged = true;
+            }
+            else
+            {
+                modifiers = e.KeyModifiers;
+                hotkey = e.Key;
+                FilterCombinations(ref modifiers, ref hotkey);
+                ChangeHotkey(modifiers, hotkey);
+            }
+
+            UpdateHotkeyRegistration();
+        }
+
+        private void OnPreviewKeyUp(object? sender, KeyEventArgs e)
+        {
+            // Somehow the PrintScreen only comes as a keyup, therefore we handle it here.
+            if (e.Key == Key.PrintScreen)
+            {
+                modifiers = e.KeyModifiers;
+                hotkey = e.Key;
+                FilterCombinations(ref modifiers, ref hotkey);
+                ChangeHotkey(modifiers, hotkey);
+                UpdateHotkeyRegistration();
+            }
         }
 #endif
 

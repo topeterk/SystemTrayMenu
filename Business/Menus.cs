@@ -83,7 +83,7 @@ namespace SystemTrayMenu.Business
             }
 #endif
 
-#if TODO_AVALONIA
+#if WINDOWS
             keyboardInput.HotKeyPressed += SwitchOpenCloseByHotKey;
 #endif
             keyboardInput.RowSelectionChanged += waitToOpenMenu.RowSelectionChanged;

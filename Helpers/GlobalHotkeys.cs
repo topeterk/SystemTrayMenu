@@ -11,8 +11,14 @@ namespace SystemTrayMenu.Helpers
     using System.Collections.Generic;
     using System.Runtime.Versioning;
     using System.Text;
-    using System.Windows.Input;
     using System.Windows.Interop;
+#if AVALONIA
+    using Avalonia.Input;
+    using Avalonia.Win32.Input;
+    using ModifierKeys = Avalonia.Input.KeyModifiers;
+#else
+    using System.Windows.Input;
+#endif
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
     using Window = System.Windows.Window;
@@ -85,7 +91,26 @@ namespace SystemTrayMenu.Helpers
             }
 
             ModifierKeys modifiers = ModifierKeys.None;
-            Key key;
+            Key key = Key.None;
+#if AVALONIA
+            bool success = false;
+            if (modifiersString != null)
+            {
+                success = Enum.TryParse(modifiersString.Replace("+", ", "), out modifiers);
+            }
+
+            if (success)
+            {
+                success = Enum.TryParse(keyString, out key);
+            }
+
+            if (!success)
+            {
+                Log.Info("Could not parse key and modifiers for \"" + hotKeyString + "\".");
+                modifiers = ModifierKeys.None;
+                key = Key.None;
+            }
+#else
             try
             {
                 if (modifiersString != null)
@@ -100,12 +125,15 @@ namespace SystemTrayMenu.Helpers
                 Log.Info("Could not parse key and modifiers for \"" + hotKeyString + "\" with modifiers. Cause: " + ex.Message);
                 return (ModifierKeys.None, Key.None);
             }
+#endif
 
+#if TODO_AVALONIA
             if (key == Key.LWin || key == Key.RWin)
             {
                 // It seems we have to add the Windows modifier when the major key is a Windows key
                 modifiers |= ModifierKeys.Windows;
             }
+#endif
 
             return (modifiers, key);
         }
@@ -115,6 +143,7 @@ namespace SystemTrayMenu.Helpers
             string? keyString = null;
             string? modifiersString = null;
 
+#if !AVALONIA
             if (modifiers != ModifierKeys.None)
             {
                 modifiersString = new ModifierKeysConverter().ConvertToInvariantString(modifiers);
@@ -124,6 +153,17 @@ namespace SystemTrayMenu.Helpers
             {
                 keyString = new KeyConverter().ConvertToInvariantString(key);
             }
+#else
+            if (modifiers != ModifierKeys.None)
+            {
+                modifiersString = modifiers.ToString().Replace(", ", "+");
+            }
+
+            if (key != Key.None)
+            {
+                keyString = key.ToString();
+            }
+#endif
 
             if (string.IsNullOrEmpty(modifiersString) && string.IsNullOrEmpty(keyString))
             {
@@ -131,7 +171,7 @@ namespace SystemTrayMenu.Helpers
             }
             else if (string.IsNullOrEmpty(modifiersString))
             {
-                return keyString!;
+                return keyString;
             }
             else if (string.IsNullOrEmpty(keyString))
             {
@@ -161,11 +201,28 @@ namespace SystemTrayMenu.Helpers
             {
                 hotkeyString.Append(GetKeyName(Key.LeftShift)).Append(" + ");
             }
-
+#if AVALONIA
+            if ((modifiers & ModifierKeys.Meta) != 0)
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    hotkeyString.Append("Win").Append(" + ");
+                }
+                else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
+                {
+                    hotkeyString.Append("Cmd").Append(" + ");
+                }
+                else
+                {
+                    hotkeyString.Append("Meta").Append(" + ");
+                }
+            }
+#else
             if ((modifiers & ModifierKeys.Windows) != 0)
             {
                 hotkeyString.Append("Win").Append(" + ");
             }
+#endif
 
             return key == Key.None ? hotkeyString.ToString().Replace(" + ", string.Empty) : hotkeyString.ToString() + GetKeyName(key);
         }

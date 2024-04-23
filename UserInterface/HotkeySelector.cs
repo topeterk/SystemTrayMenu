@@ -4,12 +4,10 @@
 //
 // Origin of some parts: http://www.codeproject.com/KB/buttons/hotkeycontrol.aspx
 
-#if WINDOWS
 namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Versioning;
 #if AVALONIA
     using Avalonia.Controls;
     using Avalonia.Input;
@@ -21,13 +19,11 @@ namespace SystemTrayMenu.UserInterface
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
-    using System.Windows.Media;
 #endif
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Utilities;
     using static SystemTrayMenu.Helpers.GlobalHotkeys;
 
-    [SupportedOSPlatform("Windows")]
     public sealed class HotkeySelector : TextBox
     {
         // ArrayLists used to enforce the use of proper modifiers.
@@ -55,7 +51,9 @@ namespace SystemTrayMenu.UserInterface
                 IsEnabled = false,
             };
 
-#if !AVALONIA
+#if AVALONIA
+            AcceptsTab = false;
+#else
             // Set style defaults from App.xaml (TODO: Fix XAML styles to also apply for this class)
             Height = 21;
 #endif
@@ -149,8 +147,16 @@ namespace SystemTrayMenu.UserInterface
                 Background = Brushes.IndianRed;
             }
 #endif
-
-            Text = ModifiersAndKeyToString(modifiers, hotkey);
+#if WINDOWS
+            if (OperatingSystem.IsWindows())
+            {
+                Text = ModifiersAndKeyToString(modifiers, hotkey);
+            }
+            else
+#endif
+            {
+                Text = ModifiersAndKeyToInvariantString(modifiers, hotkey);
+            }
         }
 
         /// <summary>
@@ -415,4 +421,3 @@ namespace SystemTrayMenu.UserInterface
 
     }
 }
-#endif

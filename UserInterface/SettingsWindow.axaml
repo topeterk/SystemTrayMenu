@@ -33,6 +33,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Margin" Value="0,0,5,0" />
+        </Style>
     </Window.Styles>
     <Grid>
         <Grid.RowDefinitions>
@@ -78,8 +81,8 @@
                             <OnPlatform.Windows>
                                 <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Hotkey'}">
                                     <StackPanel x:Name="stackpanelHotkey" Orientation="Horizontal">
-                                        <!-- Added by code-behind: <local:HotkeySelector x:Name="textBoxHotkey" AcceptsTab="False" MinWidth="200" VerticalAlignment="Center"/> -->
-                                        <Button x:Name="buttonHotkeyDefault" Content="{u:Translate 'Default'}" Click="ButtonHotkeyDefault_Click" VerticalAlignment="Center"/>
+                                        <local:HotkeySelector x:Name="textBoxHotkey" MinWidth="250" VerticalAlignment="Center"/>
+                                        <Button x:Name="buttonHotkeyDefault" Margin="3,0,0,0" Content="{u:Translate 'Default'}" Click="ButtonHotkeyDefault_Click" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </HeaderedContentControl>
                             </OnPlatform.Windows>

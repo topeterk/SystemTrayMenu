@@ -4,14 +4,12 @@
 //
 // Copyright (c) 2023-2024 Peter Kirmeier
 
-#if WINDOWS
 namespace SystemTrayMenu.Helpers
 {
     using System;
     using System.Collections.Generic;
     using System.Runtime.Versioning;
     using System.Text;
-    using System.Windows.Interop;
 #if AVALONIA
     using Avalonia.Input;
     using Avalonia.Win32.Input;
@@ -19,13 +17,17 @@ namespace SystemTrayMenu.Helpers
 #else
     using System.Windows.Input;
 #endif
+#if WINDOWS
+    using System.Windows.Interop;
+    using Window = System.Windows.Window;
+#endif
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
-    using Window = System.Windows.Window;
 
-    [SupportedOSPlatform("Windows")]
     internal static class GlobalHotkeys
     {
+#if WINDOWS
+        [SupportedOSPlatform("Windows")]
         private static readonly HwndSourceHook Hook = new (WndProc);
         private static readonly Window Window = new();
         private static readonly HwndSource HWnd;
@@ -35,11 +37,13 @@ namespace SystemTrayMenu.Helpers
 
         private static IHotkeyFunction? lastCreatedHotkeyFunction; // TODO: Remove this hack! See: GetLastCreatedHotkeyFunction
 
+        [SupportedOSPlatform("Windows")]
         static GlobalHotkeys()
         {
             HWnd = HwndSource.FromHwnd(new WindowInteropHelper(Window).EnsureHandle());
             HWnd.AddHook(Hook);
         }
+#endif
 
         internal interface IHotkeyFunction
         {
@@ -64,11 +68,14 @@ namespace SystemTrayMenu.Helpers
         /// </summary>
         internal static bool IsEnabled { get; set; } = true;
 
+#if WINDOWS
+        [SupportedOSPlatform("Windows")]
         internal static IHotkeyFunction Create() => lastCreatedHotkeyFunction = new HotkeyFunction();
 
         // TODO: Instead of searching for the registration, it should be passed to the caller instead.
         //       Only this ensures caller and registrator are talking about the SAME registration.
         internal static IHotkeyFunction? GetLastCreatedHotkeyFunction() => lastCreatedHotkeyFunction;
+#endif
 
         internal static (ModifierKeys Modifiers, Key Key) ModifiersAndKeyFromInvariantString(string? hotKeyString)
         {
@@ -93,10 +100,20 @@ namespace SystemTrayMenu.Helpers
             ModifierKeys modifiers = ModifierKeys.None;
             Key key = Key.None;
 #if AVALONIA
-            bool success = false;
+            bool success = true;
             if (modifiersString != null)
             {
-                success = Enum.TryParse(modifiersString.Replace("+", ", "), out modifiers);
+                foreach (string entry in modifiersString.Split('+'))
+                {
+                    switch (entry)
+                    {
+                        case "Alt": modifiers |= ModifierKeys.Alt; break;
+                        case "Ctrl": modifiers |= ModifierKeys.Control; break;
+                        case "Shift": modifiers |= ModifierKeys.Shift; break;
+                        case "Win": modifiers |= ModifierKeys.Meta; break;
+                        default: success = false; break;
+                    }
+                }
             }
 
             if (success)
@@ -156,7 +173,25 @@ namespace SystemTrayMenu.Helpers
 #else
             if (modifiers != ModifierKeys.None)
             {
-                modifiersString = modifiers.ToString().Replace(", ", "+");
+                if (modifiers.HasFlag(ModifierKeys.Alt))
+                {
+                    modifiersString = (string.IsNullOrEmpty(modifiersString) ? string.Empty : modifiersString + "+") + "Alt";
+                }
+
+                if (modifiers.HasFlag(ModifierKeys.Control))
+                {
+                    modifiersString = (string.IsNullOrEmpty(modifiersString) ? string.Empty : modifiersString + "+") + "Ctrl";
+                }
+
+                if (modifiers.HasFlag(ModifierKeys.Shift))
+                {
+                    modifiersString = (string.IsNullOrEmpty(modifiersString) ? string.Empty : modifiersString + "+") + "Shift";
+                }
+
+                if (modifiers.HasFlag(ModifierKeys.Meta))
+                {
+                    modifiersString = (string.IsNullOrEmpty(modifiersString) ? string.Empty : modifiersString + "+") + "Win";
+                }
             }
 
             if (key != Key.None)
@@ -171,7 +206,7 @@ namespace SystemTrayMenu.Helpers
             }
             else if (string.IsNullOrEmpty(modifiersString))
             {
-                return keyString;
+                return keyString!;
             }
             else if (string.IsNullOrEmpty(keyString))
             {
@@ -181,9 +216,11 @@ namespace SystemTrayMenu.Helpers
             return modifiersString + "+" + keyString;
         }
 
+#if WINDOWS
         // Should be same as ModifiersAndKeyToInvariantString() just with non-Invariant convertion
         // but the converters seems not to convert every key into a user firendly string,
         // so we use old fashioned native Windows API to fetch the localized strings.
+        [SupportedOSPlatform("Windows")]
         internal static string ModifiersAndKeyToString(ModifierKeys modifiers, Key key)
         {
             StringBuilder hotkeyString = new();
@@ -227,6 +264,7 @@ namespace SystemTrayMenu.Helpers
             return key == Key.None ? hotkeyString.ToString().Replace(" + ", string.Empty) : hotkeyString.ToString() + GetKeyName(key);
         }
 
+        [SupportedOSPlatform("Windows")]
         private static string GetKeyName(Key key)
         {
             const uint MAPVK_VK_TO_VSC = 0;
@@ -316,6 +354,7 @@ namespace SystemTrayMenu.Helpers
             }
         }
 
+        [SupportedOSPlatform("Windows")]
         private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             const int WmHotkey = 0x0312;
@@ -351,6 +390,7 @@ namespace SystemTrayMenu.Helpers
         /// <param name="modifiers">Hotkey modifiers.</param>
         /// <param name="key">Hotkey major key.</param>
         /// <returns>Hotkey registration.</returns>
+        [SupportedOSPlatform("Windows")]
         private static HotkeyRegistration Register(ModifierKeys modifiers, Key key)
         {
             HotkeyRegistration registration;
@@ -387,6 +427,7 @@ namespace SystemTrayMenu.Helpers
         /// Function is thread safe.
         /// </summary>
         /// <param name="registration">Hotkey registration.</param>
+        [SupportedOSPlatform("Windows")]
         private static void Unregister(HotkeyRegistration registration)
         {
             lock (CriticalSectionLock)
@@ -418,6 +459,7 @@ namespace SystemTrayMenu.Helpers
         /// <param name="modifiers">Hotkey modifiers.</param>
         /// <param name="key">Hotkey key.</param>
         /// <returns>New hotkey registration or null (nothing changed).</returns>
+        [SupportedOSPlatform("Windows")]
         private static HotkeyRegistration? Reassign(HotkeyRegistration registration, ModifierKeys modifiers, Key key)
         {
             if (!Registrations.ContainsValue(registration) ||
@@ -446,6 +488,7 @@ namespace SystemTrayMenu.Helpers
             internal void OnKeyPressed() => KeyPressed?.Invoke();
         }
 
+        [SupportedOSPlatform("Windows")]
         private class HotkeyFunction : IHotkeyFunction
         {
             public event Action<IHotkeyFunction>? KeyPressed;
@@ -491,6 +534,6 @@ namespace SystemTrayMenu.Helpers
                 }
             }
         }
+#endif
     }
 }
-#endif

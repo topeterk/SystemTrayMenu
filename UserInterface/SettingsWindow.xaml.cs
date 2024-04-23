@@ -39,29 +39,9 @@ namespace SystemTrayMenu.UserInterface
 
         private static SettingsWindow? singletonWindow;
 
-#if AVALONIA
-#if WINDOWS
-        [SupportedOSPlatform("Windows")]
-        private HotkeySelector textBoxHotkey;
-#endif
-#endif
-
         public SettingsWindow()
         {
             InitializeComponent();
-#if AVALONIA
-#if WINDOWS
-            // As the control has compile time dependencies and XAML cannot handle this, we have to add this control by hand
-            if (OperatingSystem.IsWindows())
-            {
-                textBoxHotkey = new();
-                textBoxHotkey.AcceptsTab = false;
-                textBoxHotkey.MinWidth = 200;
-                textBoxHotkey.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center;
-                stackpanelHotkey.Children.Insert(0, textBoxHotkey);
-            }
-#endif
-#endif
 
             // TODO: Find a way to escape ' within inline single quotes markup string in XAML
             buttonAddSampleStartMenuFolder.Content = Translator.GetText("Add sample directory 'Start Menu'");

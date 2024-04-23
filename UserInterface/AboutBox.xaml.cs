@@ -659,7 +659,7 @@ namespace SystemTrayMenu.UserInterface
             return null;
         }
 
-        private void TabPanelDetails_SelectedIndexChanged(object sender, SelectionChangedEventArgs e)
+        private void TabPanelDetails_SelectedIndexChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (TabPanelDetails.SelectedItem == TabPageAssemblyDetails)
             {
@@ -848,7 +848,7 @@ namespace SystemTrayMenu.UserInterface
         // <summary>
         // things to do when form is loaded
         // </summary>
-        private void AboutBox_Load(object sender, RoutedEventArgs e)
+        private void AboutBox_Load(object? sender, RoutedEventArgs e)
         {
             // if the user didn't provide an assembly, try to guess which one is the entry assembly
             AppEntryAssembly ??= Assembly.GetEntryAssembly()!;

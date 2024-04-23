@@ -68,6 +68,8 @@ namespace SystemTrayMenu.UserInterface
         {
             // Dummy constructor to resolve this issue:
             // Avalonia warning AVLN:0005: XAML resource "avares://SystemTrayMenu/UserInterface/Menu.axaml" won't be reachable via runtime loader, as no public constructor was found
+            // See: https://github.com/AvaloniaUI/Avalonia/issues/11312
+            MainMenu = this;
         }
 #endif
 
@@ -1045,7 +1047,11 @@ namespace SystemTrayMenu.UserInterface
 #endif
 
             // All childs are using same width and height, so we simply fill in values from parent instead of individual child
+#if AVALONIA
+            return new(0D, offsetY, dgv.ActualWidth, (double?)Resources["RowHeight"] ?? 20D);
+#else
             return new(0D, offsetY, dgv.ActualWidth, (double)Resources["RowHeight"]);
+#endif
         }
 
 #if AVALONIA
@@ -1412,7 +1418,7 @@ namespace SystemTrayMenu.UserInterface
             AppRestart.ByMenuButton();
         }
 
-        private void MainMenu_MoveStart(object sender, EventArgs e)
+        private void MainMenu_MoveStart(object? sender, EventArgs e)
         {
             // Hide all sub menus to clear the view for repositioning of the main menu
             if (SubMenu != null)
@@ -1430,7 +1436,7 @@ namespace SystemTrayMenu.UserInterface
 #endif
         }
 
-        private void MainMenu_MoveRelocate(object sender, MouseEventArgs e)
+        private void MainMenu_MoveRelocate(object? sender, MouseEventArgs e)
         {
             Point mousePos = NativeMethods.Screen.CursorPosition;
             Left = Left + mousePos.X - lastLocation.X;

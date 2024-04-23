@@ -55,7 +55,7 @@ EXIT 0</PreBuildEvent>
     <NoWarn>1701;1702;WFAC010;MSB3061</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" !'$(UseWPF)' ">
-    <NoWarn>$(NoWarn);CA2213;CS0649;CS8600;CS8601;CS8602;CS8603;CS8604;CS8605;CS8618;CS8622</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
     <Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>true</Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -137,7 +137,7 @@ EXIT 0</PreBuildEvent>
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.10" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.10.4" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.10.6" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
   </ItemGroup>
   <!-- References Native -->

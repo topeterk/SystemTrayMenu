@@ -161,6 +161,9 @@ namespace SystemTrayMenu
         {
             if (!isDisposed)
             {
+#if AVALONIA
+                updateCheckTimer?.Dispose();
+#endif
                 IconReader.Shutdown();
 
                 if (joystickHelper != null)
@@ -211,11 +214,9 @@ namespace SystemTrayMenu
 #if AVALONIA
         private void AppExitHandler(object? sender, ControlledApplicationLifetimeExitEventArgs e)
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                updateCheckTimer?.Dispose();
-            }
-
+            // if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            // {
+            // }
             Dispose();
         }
 #endif

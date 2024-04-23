@@ -50,74 +50,74 @@ namespace SystemTrayMenu.UserInterface.FolderBrowseDialog
         /// </summary>
         /// <param name="owner">The window the dialog is assigned to.</param>
         /// <returns>True is returned on successful user interaction and when not cancelled by the user otherwise false is returned.</returns>
-#if TODO_AVALONIA
-        [SupportedOSPlatform("Windows")]
-#endif
         public async Task<bool> ShowDialog(Window owner)
         {
-#if TODO_AVALONIA
-            NativeMethods.IFileDialog frm = (NativeMethods.IFileDialog)new NativeMethods.FileOpenDialogRCW();
-            frm.GetOptions(out uint options);
-            options |= NativeMethods.FOS_PICKFOLDERS |
-                       NativeMethods.FOS_FORCEFILESYSTEM |
-                       NativeMethods.FOS_NOVALIDATE |
-                       NativeMethods.FOS_NOTESTFILECREATE |
-                       NativeMethods.FOS_DONTADDTORECENT;
-            frm.SetOptions(options);
-            if (InitialFolder != null)
+#if !AVALONIA
+            if (OperatingSystem.IsWindows())
             {
-                Guid riid = new("43826D1E-E718-42EE-BC55-A1E261C37BFE"); // IShellItem
-                if (NativeMethods.SHCreateItemFromParsingName(
-                    InitialFolder,
-                    IntPtr.Zero,
-                    ref riid,
-                    out NativeMethods.IShellItem directoryShellItem) == NativeMethods.S_OK)
+                NativeMethods.IFileDialog frm = (NativeMethods.IFileDialog)new NativeMethods.FileOpenDialogRCW();
+                frm.GetOptions(out uint options);
+                options |= NativeMethods.FOS_PICKFOLDERS |
+                           NativeMethods.FOS_FORCEFILESYSTEM |
+                           NativeMethods.FOS_NOVALIDATE |
+                           NativeMethods.FOS_NOTESTFILECREATE |
+                           NativeMethods.FOS_DONTADDTORECENT;
+                frm.SetOptions(options);
+                if (InitialFolder != null)
                 {
-                    frm.SetFolder(directoryShellItem);
-                }
-            }
-
-            if (DefaultFolder != null)
-            {
-                Guid riid = new("43826D1E-E718-42EE-BC55-A1E261C37BFE"); // IShellItem
-                if (NativeMethods.SHCreateItemFromParsingName(
-                    DefaultFolder,
-                    IntPtr.Zero,
-                    ref riid,
-                    out NativeMethods.IShellItem directoryShellItem) == NativeMethods.S_OK)
-                {
-                    frm.SetDefaultFolder(directoryShellItem);
-                }
-            }
-
-            if (frm.Show(new WindowInteropHelper(owner).Handle) == NativeMethods.S_OK)
-            {
-                try
-                {
-                    if (frm.GetResult(out NativeMethods.IShellItem shellItem) == NativeMethods.S_OK)
+                    Guid riid = new("43826D1E-E718-42EE-BC55-A1E261C37BFE"); // IShellItem
+                    if (NativeMethods.SHCreateItemFromParsingName(
+                        InitialFolder,
+                        IntPtr.Zero,
+                        ref riid,
+                        out NativeMethods.IShellItem directoryShellItem) == NativeMethods.S_OK)
                     {
-                        if (shellItem.GetDisplayName(
-                            NativeMethods.SIGDN_FILESYSPATH,
-                            out IntPtr pszString) == NativeMethods.S_OK)
+                        frm.SetFolder(directoryShellItem);
+                    }
+                }
+
+                if (DefaultFolder != null)
+                {
+                    Guid riid = new("43826D1E-E718-42EE-BC55-A1E261C37BFE"); // IShellItem
+                    if (NativeMethods.SHCreateItemFromParsingName(
+                        DefaultFolder,
+                        IntPtr.Zero,
+                        ref riid,
+                        out NativeMethods.IShellItem directoryShellItem) == NativeMethods.S_OK)
+                    {
+                        frm.SetDefaultFolder(directoryShellItem);
+                    }
+                }
+
+                if (frm.Show(new WindowInteropHelper(owner).Handle) == NativeMethods.S_OK)
+                {
+                    try
+                    {
+                        if (frm.GetResult(out NativeMethods.IShellItem shellItem) == NativeMethods.S_OK)
                         {
-                            if (pszString != IntPtr.Zero)
+                            if (shellItem.GetDisplayName(
+                                NativeMethods.SIGDN_FILESYSPATH,
+                                out IntPtr pszString) == NativeMethods.S_OK)
                             {
-                                try
+                                if (pszString != IntPtr.Zero)
                                 {
-                                    Folder = Marshal.PtrToStringAuto(pszString);
-                                    return await Task.FromResult(true);
-                                }
-                                finally
-                                {
-                                    Marshal.FreeCoTaskMem(pszString);
+                                    try
+                                    {
+                                        Folder = Marshal.PtrToStringAuto(pszString);
+                                        return await Task.FromResult(true);
+                                    }
+                                    finally
+                                    {
+                                        Marshal.FreeCoTaskMem(pszString);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Log.Warn("Folder Dialog failed", ex);
+                    catch (Exception ex)
+                    {
+                        Log.Warn("Folder Dialog failed", ex);
+                    }
                 }
             }
 #else

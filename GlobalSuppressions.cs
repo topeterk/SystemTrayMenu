@@ -14,5 +14,3 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:Closing parenthesis should be spaced correctly", Justification = "Weird look when used by null-forgiving operator")]
 [assembly: SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1011:Closing square brackets should be spaced correctly", Justification = "Conflicts with SA1018:A nullable type symbol within a C# element is not spaced correctly.")]
 [assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1101:Prefix local calls with this", Justification = "Standard codecleanup removes the this")]
-
-[assembly: SuppressMessage("Interoperability", "CA1416:Check platform compatibility", Justification = "this is a long way to get platform compatibility")]

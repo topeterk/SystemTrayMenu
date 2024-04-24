@@ -1150,11 +1150,6 @@ namespace SystemTrayMenu.UserInterface
                 screenBounds = NativeMethods.Screen.PrimaryScreen;
                 useCustomLocation = false;
             }
-#if TODO // Avalonia Native Screens
-#else
-            screenBounds = new Rect(0, 0, 1920, 1080);
-            useCustomLocation = false;
-#endif
 
             // Shrink the usable space depending on taskbar location
             WindowsTaskbar taskbar = new();

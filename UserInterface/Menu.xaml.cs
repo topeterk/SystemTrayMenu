@@ -56,12 +56,14 @@ namespace SystemTrayMenu.UserInterface
 
 #if !AVALONIA
         private int countLeftMouseButtonClicked;
+        private Point lastLocation;
 #else
         private TaskbarPosition taskbarPosition = TaskbarPosition.Unknown; // TODO: Optimize away?
+        private IPointer? pointer;
+        private Point? lastLocation;
 #endif
         private bool isShellContextMenuOpen;
         private bool directionToRight;
-        private Point lastLocation;
 
 #if AVALONIA
         public Menu()
@@ -474,11 +476,25 @@ namespace SystemTrayMenu.UserInterface
         internal bool IsMouseOver()
 #endif
         {
-            Point mousePos = NativeMethods.Screen.CursorPosition;
-            bool isMouseOver = this.GetVisibility() == Visibility.Visible &&
-                mousePos.X >= 0 && mousePos.X < Width &&
-                mousePos.Y >= 0 && mousePos.Y < Height;
-            return isMouseOver;
+            if (this.GetVisibility() == Visibility.Visible)
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    Point mousePos = NativeMethods.Screen.CursorPosition;
+                    Rect bounds = new(Left, Top, Width, Height);
+                    return bounds.Contains(mousePos);
+                }
+#if !TODO_AVALONIA
+                else
+                {
+                    // This is required that menus keep being open as it would otherwise close them thinking the mouse is "outside"
+                    // At least we fixed this for Windows, but for other OSes we need to find a way to get mouse position outside of mouse events
+                    return true;
+                }
+#endif
+            }
+
+            return false;
         }
 
         internal ListView GetDataGridView() => dgv; // TODO WPF Replace Forms wrapper
@@ -740,7 +756,7 @@ namespace SystemTrayMenu.UserInterface
                 startLocation = StartLocation.Point;
                 originLocation = new(Settings.Default.CustomLocationX, Settings.Default.CustomLocationY);
             }
-            else if (Settings.Default.AppearAtMouseLocation)
+            else if (Settings.Default.AppearAtMouseLocation && OperatingSystem.IsWindows())
             {
                 if (!RelocateOnNextShow)
                 {
@@ -908,7 +924,7 @@ namespace SystemTrayMenu.UserInterface
                 {
                     case StartLocation.Point:
                         y = originLocation.Y;
-                        if (Settings.Default.AppearAtMouseLocation)
+                        if (Settings.Default.AppearAtMouseLocation && OperatingSystem.IsWindows())
                         {
 #if !AVALONIA
                             y -= labelTitle.ActualHeight; // Mouse should point below title
@@ -1112,8 +1128,10 @@ namespace SystemTrayMenu.UserInterface
 #if AVALONIA
         private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation)
         {
-#if TODO // Avalonia Native Screens
-            if (Settings.Default.AppearAtMouseLocation)
+#if TODO_AVALONIA
+            // Find out, how cursor position can be found without any open windows
+#endif
+            if (Settings.Default.AppearAtMouseLocation && OperatingSystem.IsWindows())
             {
                 screenBounds = NativeMethods.Screen.FromPoint(NativeMethods.Screen.CursorPosition);
                 useCustomLocation = false;
@@ -1132,6 +1150,7 @@ namespace SystemTrayMenu.UserInterface
                 screenBounds = NativeMethods.Screen.PrimaryScreen;
                 useCustomLocation = false;
             }
+#if TODO // Avalonia Native Screens
 #else
             screenBounds = new Rect(0, 0, 1920, 1080);
             useCustomLocation = false;
@@ -1418,30 +1437,61 @@ namespace SystemTrayMenu.UserInterface
             AppRestart.ByMenuButton();
         }
 
-        private void MainMenu_MoveStart(object? sender, EventArgs e)
-        {
-            // Hide all sub menus to clear the view for repositioning of the main menu
-            if (SubMenu != null)
-            {
-                SubMenu?.HideWithFade(true);
-                RefreshSelection();
-            }
-
-            lastLocation = NativeMethods.Screen.CursorPosition;
-            MouseMove += MainMenu_MoveRelocate;
-            MouseUp += MainMenu_MoveEnd;
-            Deactivated += MainMenu_MoveEnd;
-#if TODO_AVALONIA
-            Mouse.Capture(this);
+#if AVALONIA
+        private void MainMenu_MoveStart(object? sender, PointerPressedEventArgs e)
+#else
+        private void MainMenu_MoveStart(object? sender, MouseButtonEventArgs e)
 #endif
+        {
+#if AVALONIA
+            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonPressed)
+#endif
+            {
+                // Hide all sub menus to clear the view for repositioning of the main menu
+                if (SubMenu != null)
+                {
+                    SubMenu?.HideWithFade(true);
+                    RefreshSelection();
+                }
+
+#if AVALONIA
+                lastLocation = null;
+#else
+                if (OperatingSystem.IsWindows())
+                {
+                    lastLocation = NativeMethods.Screen.CursorPosition;
+                }
+#endif
+                MouseMove += MainMenu_MoveRelocate;
+                MouseUp += MainMenu_MoveEnd;
+                Deactivated += MainMenu_MoveEnd;
+            }
         }
 
         private void MainMenu_MoveRelocate(object? sender, MouseEventArgs e)
         {
-            Point mousePos = NativeMethods.Screen.CursorPosition;
-            Left = Left + mousePos.X - lastLocation.X;
-            Top = Top + mousePos.Y - lastLocation.Y;
+#if AVALONIA
+            Point mousePos = NativeMethods.Screen.GetCursorPosition(this, e);
+            if (lastLocation is not null)
+            {
+                pointer?.Capture(null); // release previous capture (if any) - just for safety, unknown if this is actually helpful
+                pointer = e.Pointer;
+                pointer.Capture(this); // Important: This capture will bypass click events on list view, search bar or buttons!
+                Position = new(
+                    (int)(Position.X + mousePos.X - lastLocation.Value.X),
+                    (int)(Position.Y + mousePos.Y - lastLocation.Value.Y));
+            }
+
             lastLocation = mousePos;
+#else
+            if (OperatingSystem.IsWindows())
+            {
+                Point mousePos = NativeMethods.Screen.CursorPosition;
+                Left = Left + mousePos.X - lastLocation.X;
+                Top = Top + mousePos.Y - lastLocation.Y;
+                lastLocation = mousePos;
+            }
+#endif
 
             Settings.Default.CustomLocationX = (int)Left;
             Settings.Default.CustomLocationY = (int)Top;
@@ -1449,8 +1499,13 @@ namespace SystemTrayMenu.UserInterface
 
         private void MainMenu_MoveEnd(object? sender, EventArgs? e)
         {
-#if TODO_AVALONIA
-            Mouse.Capture(null);
+#if AVALONIA
+            pointer?.Capture(null); // release previous capture (if any)
+#else
+            if (OperatingSystem.IsWindows())
+            {
+                lastLocation = NativeMethods.Screen.CursorPosition;
+            }
 #endif
             MouseMove -= MainMenu_MoveRelocate;
             MouseUp -= MainMenu_MoveEnd;
@@ -1608,17 +1663,20 @@ namespace SystemTrayMenu.UserInterface
         private void ListViewItem_PointerReleased(object sender, PointerReleasedEventArgs e)
         {
             if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased &&
-                ((StyledElement)sender).DataContext is RowData rowData)
+                (((StyledElement)sender).DataContext is RowData rowData))
+            {
+                // At mouse location
+                Point position = NativeMethods.Screen.GetCursorPosition(this, e);
 #else
         private void ListViewItem_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             // "DisconnectedItem" protection
             if (((ListViewItem)sender).Content is RowData rowData)
-#endif
             {
                 // At mouse location
                 Point position = Mouse.GetPosition(this);
                 position.Offset(Left, Top);
+#endif
 
                 isShellContextMenuOpen = true;
                 rowData.OpenShellContextMenu(position);

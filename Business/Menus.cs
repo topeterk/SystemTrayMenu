@@ -692,7 +692,7 @@ namespace SystemTrayMenu.Business
 #if !AVALONIA
         private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation)
         {
-            if (Settings.Default.AppearAtMouseLocation)
+            if (Settings.Default.AppearAtMouseLocation && OperatingSystem.IsWindows())
             {
                 screenBounds = NativeMethods.Screen.FromPoint(NativeMethods.Screen.CursorPosition);
                 useCustomLocation = false;

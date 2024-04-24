@@ -130,7 +130,7 @@
                                 <RadioButton x:Name="radioButtonAppearAtTheBottomRight" GroupName="MainMenuAppearsAt" Content="{u:Translate 'Bottom right'}" />
                                 <RadioButton x:Name="radioButtonAppearAtTheBottomLeft" GroupName="MainMenuAppearsAt" Content="{u:Translate 'Bottom left'}" />
                                 <RadioButton x:Name="radioButtonUseCustomLocation" GroupName="MainMenuAppearsAt" Content="{u:Translate 'Custom (drag it to the appropriate position)'}" />
-                                <RadioButton x:Name="radioButtonAppearAtMouseLocation" GroupName="MainMenuAppearsAt" Content="{u:Translate 'At mouse location'}" />
+                                <RadioButton x:Name="radioButtonAppearAtMouseLocation" GroupName="MainMenuAppearsAt" Content="{u:Translate 'At mouse location'}" IsEnabled="{OnPlatform False, Windows=True}" />
                             </StackPanel>
                         </HeaderedContentControl>
                         <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Sub menu appears'}">

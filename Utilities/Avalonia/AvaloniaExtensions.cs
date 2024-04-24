@@ -35,7 +35,6 @@ namespace SystemTrayMenu.Utilities
     using Avalonia.Controls.ApplicationLifetimes;
     using Avalonia.Input;
     using Avalonia.Interactivity;
-    using Avalonia.Markup.Xaml;
     using Avalonia.Platform;
 
     public delegate void RoutedEventHandler(object sender, RoutedEventArgs e);

@@ -16,8 +16,7 @@ namespace SystemTrayMenu.DllImports
 #else
     using Avalonia;
     using Avalonia.Controls;
-    using SystemTrayMenu.Utilities;
-    using Rect = System.Drawing.Rectangle;
+    using Avalonia.Input;
     using Window = Avalonia.Controls.Window;
 #endif
 
@@ -26,10 +25,6 @@ namespace SystemTrayMenu.DllImports
     /// </summary>
     internal static partial class NativeMethods
     {
-#if AVALONIA
-        internal static bool Contains(this Rect rect, Point pt) => rect.Contains((int)pt.X, (int)pt.Y);
-#endif
-
         internal static bool IsTouchEnabled()
         {
             if (OperatingSystem.IsWindows())
@@ -51,9 +46,8 @@ namespace SystemTrayMenu.DllImports
         {
             private static List<Rect>? screens;
 
-#if !AVALONIA
-            private static Point LastCursorPosition = default(Point);
-#else
+            private static Point LastCursorPosition = default;
+#if AVALONIA
             private static Window? screensWrapperWindow;
 
             internal static Screens DesktopScreens
@@ -115,19 +109,11 @@ namespace SystemTrayMenu.DllImports
             internal static Rect PrimaryScreen => ScreenToRect(DesktopScreens.Primary);
 #endif
 
+            [SupportedOSPlatform("Windows")]
             internal static Point CursorPosition
             {
                 get
                 {
-#if !AVALONIA
-#if TODO // Maybe use Windows.Desktop instead of Win32 API?
-         // See: https://learn.microsoft.com/en-us/dotnet/api/system.windows.input.mouse.getposition?view=windowsdesktop-8.0
-                    if (Mouse.Capture(menu))
-                    {
-                        LastCursorPosition = Mouse.GetPosition(menu);
-                        Mouse.Capture(null);
-                    }
-#else
                     if (OperatingSystem.IsWindows())
                     {
                         NativeMethods.POINT lpPoint;
@@ -136,15 +122,24 @@ namespace SystemTrayMenu.DllImports
                             LastCursorPosition = new(lpPoint.X, lpPoint.Y);
                         }
                     }
-#endif
+
                     return LastCursorPosition;
-#else
-                    // TODO: Based on another window as mainWindow is no longer set?
-                    //  ((IClassicDesktopStyleApplicationLifetime?)Application.Current!.ApplicationLifetime)!.MainWindow!
-                    return Mouse.GetPosition(new Window());
-#endif
                 }
             }
+
+#if AVALONIA
+            /// <summary>
+            /// Get Screen position from a the pointer event data associated to the given window.
+            /// </summary>
+            /// <param name="window">Window the event occured.</param>
+            /// <param name="e">Pointer event data.</param>
+            /// <returns>Point with cursor screen coordinates.</returns>
+            internal static Point GetCursorPosition(Window window, PointerEventArgs e)
+            {
+                // TODO: Is calulation correct as window position is PixelPoint and we convert it without taking Dpi into account?
+                return e.GetPosition(window) + new Point(window.Position.X, window.Position.Y);
+            }
+#endif
 
             internal static Rect FromPoint(Point pt)
             {
@@ -193,6 +188,7 @@ namespace SystemTrayMenu.DllImports
 
                 return true;
             }
+#endif
 
             private class NativeMethods
             {
@@ -230,7 +226,6 @@ namespace SystemTrayMenu.DllImports
                     public int Y;
                 }
             }
-#endif
         }
     }
 }

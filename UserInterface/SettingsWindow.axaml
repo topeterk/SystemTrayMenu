@@ -77,16 +77,12 @@
                                 <CheckBox x:Name="checkBoxCheckForUpdates" Content="{u:Translate 'Check for updates'}"/>
                             </StackPanel>
                         </HeaderedContentControl>
-                        <OnPlatform>
-                            <OnPlatform.Windows>
-                                <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Hotkey'}">
-                                    <StackPanel x:Name="stackpanelHotkey" Orientation="Horizontal">
-                                        <local:HotkeySelector x:Name="textBoxHotkey" MinWidth="250" VerticalAlignment="Center"/>
-                                        <Button x:Name="buttonHotkeyDefault" Margin="3,0,0,0" Content="{u:Translate 'Default'}" Click="ButtonHotkeyDefault_Click" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </HeaderedContentControl>
-                            </OnPlatform.Windows>
-                        </OnPlatform>
+                        <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Hotkey'}" IsVisible="{OnPlatform False, Windows=True}">
+                            <StackPanel x:Name="stackpanelHotkey" Orientation="Horizontal">
+                                <local:HotkeySelector x:Name="textBoxHotkey" MinWidth="250" VerticalAlignment="Center"/>
+                                <Button x:Name="buttonHotkeyDefault" Margin="3,0,0,0" Content="{u:Translate 'Default'}" Click="ButtonHotkeyDefault_Click" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </HeaderedContentControl>
                         <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Language'}">
                             <ComboBox x:Name="comboBoxLanguage" HorizontalAlignment="Left" MinWidth="120" DisplayMemberBinding="{Binding Path=DisplayName}" SelectedValueBinding="{Binding Path=Code}">
                                 <ComboBox.ItemsPanel>

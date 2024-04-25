@@ -912,7 +912,7 @@ namespace SystemTrayMenu.UserInterface
                     case StartLocation.TopRight:
                     case StartLocation.BottomRight:
                     default:
-                        x = bounds.Width - menuFrameWidth;
+                        x = bounds.X + bounds.Width - menuFrameWidth;
                         directionToRight = false;
                         break;
                 }
@@ -987,7 +987,7 @@ namespace SystemTrayMenu.UserInterface
                     case StartLocation.BottomLeft:
                     case StartLocation.BottomRight:
                     default:
-                        y = bounds.Height - menuFrameHeight;
+                        y = bounds.Y + bounds.Height - menuFrameHeight;
                         break;
                 }
 

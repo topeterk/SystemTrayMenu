@@ -58,7 +58,6 @@ namespace SystemTrayMenu.UserInterface
         private int countLeftMouseButtonClicked;
         private Point lastLocation;
 #else
-        private TaskbarPosition taskbarPosition = TaskbarPosition.Unknown; // TODO: Optimize away?
         private IPointer? pointer;
         private Point? lastLocation;
 #endif
@@ -681,10 +680,10 @@ namespace SystemTrayMenu.UserInterface
         {
             if (Level == 0)
             {
-                GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation);
+                GetScreenBounds(out Rect boundsMainMenu, out bool useCustomLocation, out StartLocation startLocation);
+                Rect boundsSubMenu = boundsMainMenu;
 
-                MenuBounds = screenBounds;
-
+                // Exclude the main menu space from sub menus that they cannot ever overlap it
                 if (!Settings.Default.AppearAtTheBottomLeft &&
                     !Settings.Default.AppearAtMouseLocation &&
                     !Settings.Default.UseCustomLocation)
@@ -692,20 +691,19 @@ namespace SystemTrayMenu.UserInterface
                     const double overlapTolerance = 4D;
 
                     // Remember width of the initial menu as we don't want to overlap with it
-                    if (taskbarPosition == TaskbarPosition.Left)
-                    {
-                        screenBounds.Translate(new(screenBounds.X + (Width - overlapTolerance), 0));
-                    }
-
-                    screenBounds.Translate(new Vector(screenBounds.Width - (Width - overlapTolerance), 0));
+                    boundsSubMenu = boundsSubMenu.WithWidth(boundsSubMenu.Width - (Width - overlapTolerance));
                 }
 
-                AdjustSizeAndLocation(MenuBounds, ParentMenu, startLocation, useCustomLocation);
+                // Remember the bounds for telling sub menus the available space
+                MenuBounds = boundsSubMenu;
+
+                AdjustSizeAndLocation(boundsMainMenu, ParentMenu, startLocation, useCustomLocation);
             }
             else
             {
                 if (ParentMenu is not null)
                 {
+                    // Calculate based on the available space given by the parent menu
                     MenuBounds = ParentMenu.MenuBounds;
                     AdjustSizeAndLocation(MenuBounds, ParentMenu, StartLocation.Predecessor, false /* TODO unused */);
                 }
@@ -768,6 +766,9 @@ namespace SystemTrayMenu.UserInterface
                 originLocation = NativeMethods.Screen.CursorPosition;
             }
 
+#if AVALONIA
+            AdjustWindowPositionInternal(originLocation);
+#else
             if (IsLoaded)
             {
                 AdjustWindowPositionInternal(originLocation);
@@ -777,6 +778,7 @@ namespace SystemTrayMenu.UserInterface
                 // Layout cannot be calculated during loading, postpone this event
                 Loaded += (_, _) => AdjustWindowPositionInternal(originLocation);
             }
+#endif
 
             void AdjustWindowPositionInternal(in Point originLocation)
             {
@@ -1110,9 +1112,9 @@ namespace SystemTrayMenu.UserInterface
             base.IsVisibleChanged(e);
         }
 
-        protected override void OnOpened(EventArgs e)
+        protected override void OnLoaded(RoutedEventArgs e)
         {
-            base.OnOpened(e);
+            base.OnLoaded(e);
 
             AdjustMenusSizeAndLocation();
         }
@@ -1121,7 +1123,10 @@ namespace SystemTrayMenu.UserInterface
         {
             base.OnResized(e);
 
-            AdjustMenusSizeAndLocation();
+            if (IsLoaded)
+            {
+                AdjustMenusSizeAndLocation();
+            }
         }
 #endif
 
@@ -1153,45 +1158,24 @@ namespace SystemTrayMenu.UserInterface
 
             // Shrink the usable space depending on taskbar location
             WindowsTaskbar taskbar = new();
-            taskbarPosition = taskbar.Position;
-            switch (taskbarPosition)
+            switch (taskbar.Position)
             {
                 case TaskbarPosition.Left:
-                    screenBounds = new (
-                        screenBounds.X + taskbar.Size.Width,
-                        screenBounds.Y,
-                        screenBounds.Width - taskbar.Size.Width,
-                        screenBounds.Height);
                     startLocation = StartLocation.BottomLeft;
                     break;
-                case TaskbarPosition.Right:
-                    screenBounds = new(
-                        screenBounds.X,
-                        screenBounds.Y,
-                        screenBounds.Width - taskbar.Size.Width,
-                        screenBounds.Height);
-                    screenBounds.Translate(new(-taskbar.Size.Width, 0));
-                    startLocation = StartLocation.BottomRight;
-                    break;
                 case TaskbarPosition.Top:
-                    screenBounds = new(
-                        screenBounds.X,
-                        screenBounds.Y + taskbar.Size.Height,
-                        screenBounds.Width,
-                        screenBounds.Height - taskbar.Size.Height);
                     startLocation = StartLocation.TopRight;
                     break;
+                case TaskbarPosition.Right:
                 case TaskbarPosition.Bottom:
                 default:
-                    screenBounds = new(
-                        screenBounds.X,
-                        screenBounds.Y,
-                        screenBounds.Width,
-                        screenBounds.Height - taskbar.Size.Height);
                     startLocation = StartLocation.BottomRight;
                     break;
             }
 
+#if TODO_AVALONIA
+            // Let the user decide which corner should be used regardless of taskbar position?
+#endif
             if (Settings.Default.AppearAtTheBottomLeft)
             {
                 startLocation = StartLocation.BottomLeft;

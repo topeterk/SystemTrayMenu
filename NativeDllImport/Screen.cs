@@ -47,15 +47,14 @@ namespace SystemTrayMenu.DllImports
             private static List<Rect>? screens;
 
             private static Point LastCursorPosition = default;
-#if AVALONIA
-            private static Window? screensWrapperWindow;
 
+#if AVALONIA
             internal static Screens DesktopScreens
             {
                 get
                 {
-                    screensWrapperWindow ??= new Window();
-                    return screensWrapperWindow.Screens;
+                    // TODO: Is there a better way as creating a new Window just to get updated the Screens?
+                    return new Window().Screens;
                 }
             }
 #endif

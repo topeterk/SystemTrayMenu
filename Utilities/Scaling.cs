@@ -5,7 +5,7 @@
 namespace SystemTrayMenu.Utilities
 {
     using System;
-#if TODO_AVALONIA
+#if TODO_AVALONIA // make use of..?   Screens.Primary?.Scaling
     using System.Windows;
     using System.Windows.Media;
 #endif

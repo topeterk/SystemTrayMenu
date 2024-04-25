@@ -1003,8 +1003,12 @@ namespace SystemTrayMenu.UserInterface
                 }
 
                 // Update position
+#if AVALONIA
+                Position = new PixelPoint((int)x, (int)y);
+#else
                 Left = x;
                 Top = y;
+#endif
 
                 if (Settings.Default.RoundCorners)
                 {

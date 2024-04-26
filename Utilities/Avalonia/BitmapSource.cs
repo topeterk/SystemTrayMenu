@@ -7,41 +7,29 @@
 #if AVALONIA
 namespace SystemTrayMenu.Utilities
 {
+    using System;
     using System.IO;
+    using System.Reflection;
     using System.Runtime.Versioning;
     using Avalonia;
     using Avalonia.Media.Imaging;
     using Avalonia.Platform;
 
+#pragma warning disable SA1402 // File may only contain a single type
+
     public class BitmapSource : Avalonia.Media.Imaging.Bitmap
     {
-        public BitmapSource(string fileName)
-            : base(fileName)
-        {
-        }
-
         public BitmapSource(Stream stream)
             : base(stream)
         {
         }
 
+#if WINDOWS
         public BitmapSource(PixelFormat format, AlphaFormat alphaFormat, nint data, PixelSize size, Vector dpi, int stride)
             : base(format, alphaFormat, data, size, dpi, stride)
         {
         }
-
-        protected BitmapSource(IBitmapImpl impl)
-            : base(impl)
-        {
-        }
-
-        internal int PixelWidth => PixelSize.Width;
-
-        internal int PixelHeight => PixelSize.Height;
-
-        internal double DpiX => Dpi.X;
-
-        internal double DpiY => Dpi.Y;
+#endif
 
         public static implicit operator BitmapSource(RenderTargetBitmap source)
         {
@@ -81,8 +69,15 @@ namespace SystemTrayMenu.Utilities
             return result;
         }
 #endif
+    }
 
-        internal void Freeze()
+    /// <summary>
+    /// Loads an image (Bitmap) from local resources (avares://).
+    /// </summary>
+    internal class LocalResourceBitmap : BitmapSource
+    {
+        public LocalResourceBitmap(string path)
+            : base(AssetLoader.Open(new Uri($"avares://{Assembly.GetEntryAssembly()!.GetName().Name!}{path}")))
         {
         }
     }

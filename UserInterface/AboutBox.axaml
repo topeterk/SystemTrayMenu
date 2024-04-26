@@ -46,7 +46,7 @@
                 </DataGrid>
             </TabItem>
             <TabItem x:Name="TabPageAssemblies" Header="Assemblies">
-                <DataGrid x:Name="AssemblyInfoListView"> <!-- TODO: MouseDoubleClick="AssemblyInfoListView_DoubleClick" -->
+                <DataGrid x:Name="AssemblyInfoListView" DoubleTapped="AssemblyInfoListView_DoubleClick">
                     <!-- TODO: GridViewColumnHeader.Click="AssemblyInfoListView_ColumnClick" -->
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Assembly" Binding="{Binding Name}"/>

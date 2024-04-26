@@ -108,6 +108,23 @@ namespace SystemTrayMenu.DllImports
             internal static Rect PrimaryScreen => ScreenToRect(DesktopScreens.Primary);
 #endif
 
+            internal static double VirtualScreenHeight
+            {
+                get
+                {
+                    double maxBottom = 0D;
+                    foreach (var screen in Screens)
+                    {
+                        if (maxBottom < screen.Bottom)
+                        {
+                            maxBottom = screen.Bottom;
+                        }
+                    }
+
+                    return maxBottom;
+                }
+            }
+
             [SupportedOSPlatform("Windows")]
             internal static Point CursorPosition
             {

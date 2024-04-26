@@ -2,7 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2023-2023 Peter Kirmeier
+// Copyright (c) 2023-2024 Peter Kirmeier
 
 #if AVALONIA
 namespace SystemTrayMenu.Utilities
@@ -23,10 +23,6 @@ namespace SystemTrayMenu.Utilities
                 selectedItem = value;
             }
         }
-
-        internal double ActualHeight => DesiredSize.Height;
-
-        internal double ActualWidth => DesiredSize.Width;
 
         internal IList SelectedItems
         {

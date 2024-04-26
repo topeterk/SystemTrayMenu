@@ -773,6 +773,9 @@ namespace SystemTrayMenu.UserInterface
             }
 #endif
 
+#if !TODO_AVALONIA
+            // Better use Bounds instead of DesiredSize?
+#endif
             void AdjustWindowPositionInternal(in Point originLocation)
             {
                 double scaling = Math.Round(Scaling.Factor, 0, MidpointRounding.AwayFromZero);
@@ -953,7 +956,11 @@ namespace SystemTrayMenu.UserInterface
                             {
                                 ListView dgv = menuPredecessor.GetDataGridView();
                                 double offsetList = menuPredecessor.GetRelativeChildPositionTo(dgv).Y;
+#if AVALONIA
+                                offsetList += DesiredSize.Height;
+#else
                                 offsetList += dgv.ActualHeight;
+#endif
                                 if (offsetList < offset)
                                 {
                                     // Do not allow to show window below last entry position of list
@@ -1014,6 +1021,19 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
+#if AVALONIA
+        /// <summary>
+        /// Gets the rectangle of the list visual item.
+        /// </summary>
+        /// <param name="rowData">Data of the element to be looked for.</param>
+        /// <returns>Return the Rect in client coordinates of the menu.</returns>
+#else
+        /// <summary>
+        /// Gets the rectangle of the list visual item.
+        /// </summary>
+        /// <param name="rowData">Data of the element to be looked for.</param>
+        /// <returns>Return the Rect in client coordinates of the list visual.</returns>
+#endif
         internal Rect GetDataGridViewChildRect(RowData rowData)
         {
 #if AVALONIA

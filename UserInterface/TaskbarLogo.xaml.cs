@@ -2,16 +2,16 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2022-2023 Peter Kirmeier
+// Copyright (c) 2022-2024 Peter Kirmeier
 
 namespace SystemTrayMenu.UserInterface
 {
     using System;
     using System.Reflection;
-#if WINDOWS
+#if !AVALONIA
     using System.Windows;
-#endif
-#if AVALONIA
+#else
+    using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Utilities;
     using Application = Avalonia.Application;
     using Window = SystemTrayMenu.Utilities.Window;
@@ -43,8 +43,11 @@ namespace SystemTrayMenu.UserInterface
             ContentRendered -= LateInitialize;
 
             // Move the window out of screen, just for safety
+#if AVALONIA
+            Top += NativeMethods.Screen.VirtualScreenHeight * 2;
+#else
             Top += SystemParameters.VirtualScreenHeight * 2;
-#if !AVALONIA
+
             // There is nothing to see, so no need to show this window.
             // Therefore it shall always be in minimized state.
             // Further, we then can rely on every activating event.

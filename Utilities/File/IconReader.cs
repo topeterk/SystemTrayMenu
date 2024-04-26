@@ -315,7 +315,9 @@ namespace SystemTrayMenu.Utilities
 #endif
 
             bitmapSource ??= NotFoundImage;
+#if !AVALONIA
             bitmapSource.Freeze(); // Make it accessible for any thread
+#endif
             return bitmapSource;
         }
 

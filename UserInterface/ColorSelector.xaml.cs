@@ -16,7 +16,6 @@ namespace SystemTrayMenu.UserInterface
     using Avalonia.Controls.Presenters;
     using Avalonia.Media;
     using SystemTrayMenu.Utilities;
-    using UserControl = SystemTrayMenu.Utilities.UserControl;
 #endif
 
     /// <summary>

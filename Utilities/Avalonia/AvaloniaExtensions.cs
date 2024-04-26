@@ -24,19 +24,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma warning disable SA1402 // File may only contain a single type
-
 #if AVALONIA
 namespace SystemTrayMenu.Utilities
 {
-    using System;
-    using System.Reflection;
     using Avalonia;
     using Avalonia.Controls;
     using Avalonia.Controls.ApplicationLifetimes;
     using Avalonia.Input;
     using Avalonia.Interactivity;
-    using Avalonia.Platform;
 
     public delegate void RoutedEventHandler(object sender, RoutedEventArgs e);
 
@@ -48,8 +43,6 @@ namespace SystemTrayMenu.Utilities
         }
 
         internal static object GetData(this IDataObject obj, string dataFormat) => obj.Get(dataFormat) ?? new (); // TODO
-
-        internal static void Offset(this Point point, double x, double y) => point += new Vector(x, y);
 
         // TODO: Optimize out searching for childrn by datacontext
         internal static Control? FindControlByDataContext(this Panel parent, object? context)
@@ -65,46 +58,5 @@ namespace SystemTrayMenu.Utilities
             return null;
         }
     }
-
-    /// <summary>
-    /// Loads an image (Bitmap) from local resources (avares://).
-    /// </summary>
-    internal class LocalResourceBitmap : BitmapSource
-    {
-        public LocalResourceBitmap(string path)
-            : base(AssetLoader.Open(new Uri($"avares://{Assembly.GetEntryAssembly()!.GetName().Name!}{path}")))
-        {
-        }
-    }
-
-#pragma warning disable SA1201 // ElementsMustAppearInTheCorrectOrder
-    internal enum MouseEvent
-    {
-        IconLeftMouseUp,
-        IconLeftDoubleClick,
-    }
-
-    // TODO TODO TODO:
-    internal enum MouseButtonState
-    {
-        Released = 0,
-        Pressed = 1,
-    }
-
-    internal class MouseButtonEventArgs
-    {
-        internal bool Handled { get; set; }
-
-        internal MouseButtonState LeftButton { get; }
-    }
-
-    internal class TextCompositionEventArgs
-    {
-        internal bool Handled { get; set; }
-
-        internal string Text => "TODO: TextCompositionEventArgs.Text";
-    }
-
-#pragma warning restore SA1201 // ElementsMustAppearInTheCorrectOrder
 }
 #endif

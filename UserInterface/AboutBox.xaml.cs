@@ -946,7 +946,11 @@ namespace SystemTrayMenu.UserInterface
         // <summary>
         // if an assembly is double-clicked, go to the detail page for that assembly
         // </summary>
+#if AVALONIA
+        private void AssemblyInfoListView_DoubleClick(object sender, TappedEventArgs e)
+#else
         private void AssemblyInfoListView_DoubleClick(object sender, MouseButtonEventArgs e)
+#endif
         {
             if (AssemblyInfoListView.SelectedItems.Count > 0)
             {

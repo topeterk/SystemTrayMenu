@@ -307,10 +307,14 @@ namespace SystemTrayMenu.DataClasses
                 {
                     if (Owner != null)
                     {
-                        // Snap context menu left aligned to the ListViewItem with a small padding, but keep it vertically centered
+                        // Snap context menu left aligned with a small padding, but keep it vertically centered
                         Rect rectChild = Owner.GetDataGridViewChildRect(this);
+#if AVALONIA
+                        position = new (Owner.Left + rectChild.Left + 10D, Owner.Top + rectChild.Top + (rectChild.Height / 2D));
+#else
                         position = Owner.GetRelativeChildPositionTo(Owner.GetDataGridView());
                         position.Offset(Owner.Left + rectChild.Left + 10D, Owner.Top + rectChild.Top + (rectChild.Height / 2D));
+#endif
                     }
                 }
 
@@ -390,7 +394,9 @@ namespace SystemTrayMenu.DataClasses
             if (HiddenEntry)
             {
                 icon = ImagingHelper.ApplyOpactiy(icon, 0.5d);
+#if !AVALONIA
                 icon.Freeze(); // Make it accessible for any thread
+#endif
             }
 
             IconLoading = false;

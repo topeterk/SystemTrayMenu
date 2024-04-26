@@ -142,19 +142,22 @@ namespace SystemTrayMenu.Helpers
 #if !AVALONIA
             DrawingVisual dVisual = new ();
             using (DrawingContext dc = dVisual.RenderOpen())
-#else
-            // TODO: ???? https://stackoverflow.com/questions/66124655/drawing-a-geometry-onto-a-bitmap-avalonia
-            Visual dVisual = new();
-            RenderTargetBitmap targetBitmap = new(originalBitmap.PixelSize, originalBitmap.Dpi);
-            using (DrawingContext dc = targetBitmap.CreateDrawingContext())
-#endif
             {
                 dc.DrawImage(originalBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
                 dc.DrawImage(overlayBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
             }
 
-#if !AVALONIA
             RenderTargetBitmap targetBitmap = new (originalBitmap.PixelWidth, originalBitmap.PixelHeight, originalBitmap.DpiX, originalBitmap.DpiY, PixelFormats.Default);
+#else
+            // TODO: ???? https://stackoverflow.com/questions/66124655/drawing-a-geometry-onto-a-bitmap-avalonia
+            Visual dVisual = new();
+            RenderTargetBitmap targetBitmap = new(originalBitmap.PixelSize, originalBitmap.Dpi);
+            using (DrawingContext dc = targetBitmap.CreateDrawingContext())
+            {
+                Rect rect = new(0, 0, originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height);
+                dc.DrawImage(originalBitmap, rect);
+                dc.DrawImage(overlayBitmap, rect);
+            }
 #endif
             targetBitmap.Render(dVisual);
             return targetBitmap;

@@ -295,7 +295,9 @@ namespace SystemTrayMenu.UserInterface
 
         internal event Action<RowData>? StartLoadSubMenu;
 
+#if !AVALONIA
         internal event Action? MenuScrolled;
+#endif
 
         internal event Action<Menu, Key, ModifierKeys>? CmdKeyProcessed;
 
@@ -392,22 +394,13 @@ namespace SystemTrayMenu.UserInterface
         internal void RiseItemExecuted(RowData rowData)
         {
 #if AVALONIA
-            // TODO: Optimize out search of parent visual control
-            foreach (Control item in dgv.Children)
+            Control? control = dgv.FindControlByDataContext(rowData);
+            SolidBorder openAnimationBorder = control?.FindVisualChildOfType<SolidBorder>();
+            if (openAnimationBorder is not null)
             {
-                if (item.DataContext == rowData)
-                {
-                    SolidBorder openAnimationBorder = item.FindVisualChildOfType<SolidBorder>();
-                    if (openAnimationBorder is not null)
-                    {
-                        openAnimationBorder.StartOpenAnimation();
-                    }
-
-                    return;
-                }
+                openAnimationBorder.StartOpenAnimation();
             }
-#endif
-#if TODO_AVALONIA
+#else
             ListViewItem? lvi;
             int i = 0;
             while ((lvi = dgv.FindVisualChildOfType<ListViewItem>(i++)) != null)
@@ -1023,7 +1016,11 @@ namespace SystemTrayMenu.UserInterface
 
         internal Rect GetDataGridViewChildRect(RowData rowData)
         {
-#if TODO_AVALONIA
+#if AVALONIA
+            Control? control = dgv.FindControlByDataContext(rowData);
+            Point position = control?.TranslatePoint(default, this) ?? default;
+            return new Rect(position, control?.Bounds.Size ?? default(Size));
+#else
             // When scrolled, we have to reduce the index number as we calculate based on visual tree
             int rowIndex = rowData.RowIndex;
             int startIndex = 0;
@@ -1064,14 +1061,7 @@ namespace SystemTrayMenu.UserInterface
                     }
                 }
             }
-#else
-            double offsetY = 0D;
-#endif
 
-            // All childs are using same width and height, so we simply fill in values from parent instead of individual child
-#if AVALONIA
-            return new(0D, offsetY, dgv.ActualWidth, (double?)Resources["RowHeight"] ?? 20D);
-#else
             return new(0D, offsetY, dgv.ActualWidth, (double)Resources["RowHeight"]);
 #endif
         }
@@ -1367,7 +1357,11 @@ namespace SystemTrayMenu.UserInterface
         {
             if (IsLoaded)
             {
+#if AVALONIA
+                SubMenu?.AdjustMenusSizeAndLocation();
+#else
                 MenuScrolled?.Invoke();
+#endif
             }
         }
 

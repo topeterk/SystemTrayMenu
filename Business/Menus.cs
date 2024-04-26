@@ -10,32 +10,30 @@ namespace SystemTrayMenu.Business
     using System.Data;
     using System.IO;
     using System.Linq;
-    using System.Runtime.Versioning;
 #if WINDOWS
     using System.Windows;
 #endif
 #if !AVALONIA
+    using System.Runtime.Versioning;
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Threading;
     using Microsoft.Win32;
+    using SystemTrayMenu.DllImports;
+    using StartLocation = SystemTrayMenu.UserInterface.Menu.StartLocation;
 #else
     using Avalonia.Input;
     using Avalonia.Threading;
     using Application = Avalonia.Application;
     using ModifierKeys = Avalonia.Input.KeyModifiers;
-    using Point = Avalonia.Point;
-    using Rect = System.Drawing.Rectangle;
     using Visibility = SystemTrayMenu.Utilities.Visibility;
 #endif
     using SystemTrayMenu.DataClasses;
-    using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface;
     using SystemTrayMenu.Utilities;
     using Menu = SystemTrayMenu.UserInterface.Menu;
-    using StartLocation = SystemTrayMenu.UserInterface.Menu.StartLocation;
 
     internal class Menus : IDisposable
     {
@@ -511,9 +509,7 @@ namespace SystemTrayMenu.Business
             // However, when the main menu loads, we know it is valid and we can enter desired state directly.
             menu.AddItemsToMenu(rowDatas, menu.Level == 0 ? MenuDataDirectoryState.Valid : null);
 
-#if AVALONIA
-            menu.MenuScrolled += () => menu.SubMenu?.AdjustMenusSizeAndLocation();
-#else
+#if !AVALONIA
             menu.MenuScrolled += () => AdjustMenusSizeAndLocation(menu.Level + 1); // TODO: Only update vertical location while scrolling?
 #endif
             menu.MouseLeave += (_, _) =>

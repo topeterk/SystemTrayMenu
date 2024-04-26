@@ -122,7 +122,7 @@
                          Background="{x:Null}" Foreground="{x:Static stm:MenuDefines.ColorForeground}" CaretBrush="{x:Static stm:MenuDefines.ColorForeground}" />
             </DockPanel>
 
-            <ScrollViewer>
+            <ScrollViewer ScrollViewer.ScrollChanged="HandleScrollChanged">
                 <!-- TODO: MaxHeight should be set for the whole window instead to calculate positions and sizes properly -->
                 <ScrollViewer.MaxHeight>
                     <!-- TODO: Setting must be cut off on screen boundaries, maybe do this in Measure overload? MaxHeight = Math.Min(screenHeightMax, heightMaxByOptions) -->
@@ -149,6 +149,7 @@
                     </MultiBinding>
                 </ScrollViewer.MaxHeight>
                 <u:ListView x:Name="dgv" x:FieldModifier="internal" Margin="6,2,6,1" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <!-- TODO: SelectionChanged="ListView_SelectionChanged" -->
                     <u:ListView.MaxWidth>
                         <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,*,*,*,/,+,+">
                             <Binding Source="{x:Static u:Scaling.Factor}" />
@@ -172,8 +173,6 @@
                             <Binding Path="#windowFrame.Margin.Right" />
                         </MultiBinding>
                     </u:ListView.MaxWidth>
-                    <!--  Background="{x:Null}" -->
-                    <!-- TODO: SelectionChanged="ListView_SelectionChanged" ScrollViewer.ScrollChanged="HandleScrollChanged" -->
                     <ItemsRepeater.Layout>
                       <StackLayout Spacing="0" Orientation="Vertical"/>
                     </ItemsRepeater.Layout>

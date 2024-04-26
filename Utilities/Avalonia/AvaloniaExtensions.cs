@@ -32,6 +32,7 @@ namespace SystemTrayMenu.Utilities
     using System;
     using System.Reflection;
     using Avalonia;
+    using Avalonia.Controls;
     using Avalonia.Controls.ApplicationLifetimes;
     using Avalonia.Input;
     using Avalonia.Interactivity;
@@ -49,6 +50,20 @@ namespace SystemTrayMenu.Utilities
         internal static object GetData(this IDataObject obj, string dataFormat) => obj.Get(dataFormat) ?? new (); // TODO
 
         internal static void Offset(this Point point, double x, double y) => point += new Vector(x, y);
+
+        // TODO: Optimize out searching for childrn by datacontext
+        internal static Control? FindControlByDataContext(this Panel parent, object? context)
+        {
+            foreach (Control item in parent.Children)
+            {
+                if (item.DataContext == context)
+                {
+                    return item;
+                }
+            }
+
+            return null;
+        }
     }
 
     /// <summary>

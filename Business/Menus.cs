@@ -781,17 +781,15 @@ namespace SystemTrayMenu.Business
         }
 #endif
 
+#if !AVALONIA
         private void AdjustLocationOnWatcherUpdate(Menu menu)
         {
             // Force refresh of view, let layout settle and then update position based on new size
             menu.RefreshDataGridView();
             menu.UpdateLayout();
-#if AVALONIA
-            menu.AdjustMenusSizeAndLocation();
-#else
             AdjustMenusSizeAndLocation(menu.Level);
-#endif
         }
+#endif
 
         private void ExecuteWatcherHistory()
         {
@@ -885,7 +883,9 @@ namespace SystemTrayMenu.Business
                 rowDatas = DirectoryHelpers.SortItems(rowDatas);
                 menu.AddItemsToMenu(rowDatas, null);
 
+#if !AVALONIA
                 AdjustLocationOnWatcherUpdate(menu);
+#endif
                 menu.OnWatcherUpdate();
             }
             catch (Exception ex)
@@ -919,9 +919,21 @@ namespace SystemTrayMenu.Business
                 }
 
                 // Apply list changes
-                ((List<RowData>)dgv.ItemsSource).RemoveAll(rowsToRemove.Contains);
+#if AVALONIA
+                List<RowData> items = (List<RowData>)dgv.ItemsSource;
 
+                // Workaround: Avalonia - Unfortunately it does not work to simply remove the entries.
+                // We have to clear and reassign the whole list as otherwise list will not be updated.
+                items.RemoveAll(rowsToRemove.Contains);
+                dgv.ItemsSource = null;
+                dgv.ItemsSource = items;
+#else
+                ((List<RowData>)dgv.ItemsSource).RemoveAll(rowsToRemove.Contains);
+#endif
+
+#if !AVALONIA
                 AdjustLocationOnWatcherUpdate(menu);
+#endif
                 menu.OnWatcherUpdate();
             }
             catch (Exception ex)
@@ -963,7 +975,9 @@ namespace SystemTrayMenu.Business
                 rowDatas = DirectoryHelpers.SortItems(rowDatas);
                 menu.AddItemsToMenu(rowDatas, null);
 
+#if !AVALONIA
                 AdjustLocationOnWatcherUpdate(menu);
+#endif
                 menu.OnWatcherUpdate();
             }
             catch (Exception ex)

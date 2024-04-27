@@ -491,14 +491,14 @@ namespace SystemTrayMenu.UserInterface
 
         internal ListView GetDataGridView() => dgv; // TODO WPF Replace Forms wrapper
 
+#if !AVALONIA
         // Not used as refreshing should be done automatically due to databinding
         // TODO: As long as WPF transition from Forms is incomplete, keep it for testing.
         internal void RefreshDataGridView()
         {
-#if TODO_AVALONIA // maybe not required any more?
             ((CollectionView)CollectionViewSource.GetDefaultView(dgv.ItemsSource)).Refresh();
-#endif
         }
+#endif
 
         // TODO: Check if it is implicitly already running due to SelectionChanged event
         //       In case it is needed, run it within HideWithFade/ShowWithFade?

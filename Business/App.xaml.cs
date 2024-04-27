@@ -33,6 +33,10 @@ namespace SystemTrayMenu
     /// </summary>
     public partial class App : Application, IDisposable
     {
+#if AVALONIA
+        private static IClassicDesktopStyleApplicationLifetime? desktopLifetime;
+#endif
+
         private Menus? menus;
         private JoystickHelper? joystickHelper;
 #if AVALONIA
@@ -51,11 +55,9 @@ namespace SystemTrayMenu
 #endif
 
             AppRestart.BeforeRestarting += Dispose;
-#if TODO_AVALONIA
+#if !AVALONIA
             Activated += (_, _) => IsActiveApp = true;
             Deactivated += (_, _) => IsActiveApp = false;
-#endif
-#if !AVALONIA
             Startup += AppStartupHandler;
 #endif
         }
@@ -78,7 +80,28 @@ namespace SystemTrayMenu
         }
 #endif
 
+#if AVALONIA
+        internal static bool IsActiveApp
+        {
+            get
+            {
+                if (desktopLifetime is not null)
+                {
+                    foreach (var window in desktopLifetime.Windows)
+                    {
+                        if (window.IsActive && window is not TaskbarLogo)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+        }
+#else
         internal static bool IsActiveApp { get; private set; }
+#endif
 
         public void Dispose()
         {
@@ -104,6 +127,8 @@ namespace SystemTrayMenu
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                desktopLifetime = desktop;
+
                 desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 desktop.Exit += AppExitHandler;
 
@@ -214,9 +239,7 @@ namespace SystemTrayMenu
 #if AVALONIA
         private void AppExitHandler(object? sender, ControlledApplicationLifetimeExitEventArgs e)
         {
-            // if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            // {
-            // }
+            desktopLifetime = null;
             Dispose();
         }
 #endif

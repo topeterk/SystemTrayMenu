@@ -75,7 +75,9 @@ namespace SystemTrayMenu.Utilities
 
             try
             {
-                FileAttributes attributes = File.GetAttributes(path);
+                // Workaround: Linux - Make sure there is no trailing path separator when reading attributes
+                // see: https://github.com/dotnet/runtime/issues/21166
+                FileAttributes attributes = File.GetAttributes(path.TrimEnd(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }));
                 hasHiddenFlag = attributes.HasFlag(FileAttributes.Hidden);
                 if (Properties.Settings.Default.SystemSettingsShowHiddenFiles)
                 {

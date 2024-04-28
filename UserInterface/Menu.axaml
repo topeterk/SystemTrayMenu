@@ -210,6 +210,9 @@
                                 </Animation>
                             </Style.Animations>
                         </Style>
+                        <Style Selector=":is(u|SolidBorder)[HasHiddenFlag=true] Image">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Style>
                     </u:ListView.Styles>
                     <u:ListView.ItemTemplate>
                         <DataTemplate>
@@ -217,7 +220,8 @@
                                     Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1"
                                     Tapped="ListViewItem_SingleTapped" DoubleTapped="ListViewItem_DoubleTapped"
                                     PointerPressed="ListViewItem_PointerPressed" PointerReleased="ListViewItem_PointerReleased"
-                                    PointerEntered="ListViewItem_MouseEnter" PointerExited="ListViewItem_MouseLeave">
+                                    PointerEntered="ListViewItem_MouseEnter" PointerExited="ListViewItem_MouseLeave"
+                                    HasHiddenFlag="{Binding HiddenEntry}">
                                 <u:SolidBorder BorderThickness="1" CornerRadius="0" Margin="0" Padding="0">
                                     <u:SolidBorder.Background>
                                         <LinearGradientBrush>

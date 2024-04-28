@@ -17,8 +17,17 @@ namespace SystemTrayMenu.Utilities
     [PseudoClasses(":OpenAnimationStoryboard")]
     internal class SolidBorder : Avalonia.Controls.Border, ICustomHitTest
     {
+        internal static readonly StyledProperty<bool> HasHiddenFlagProperty =
+            AvaloniaProperty.Register<SolidBorder, bool>(nameof(HasHiddenFlag), defaultValue: false);
+
         private IDisposable? animationTimer;
         private bool isAnimationRunning;
+
+        internal bool HasHiddenFlag
+        {
+            get => GetValue(HasHiddenFlagProperty);
+            set => SetValue(HasHiddenFlagProperty, value);
+        }
 
         // Border will only return true on hit where child elements exists,
         // this makes sure to return true even when background is not actually "filled"

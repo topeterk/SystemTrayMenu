@@ -391,13 +391,13 @@ namespace SystemTrayMenu.DataClasses
 
         private void UpdateFinalIcon(BitmapSource icon)
         {
+#if !AVALONIA
             if (HiddenEntry)
             {
                 icon = ImagingHelper.ApplyOpactiy(icon, 0.5d);
-#if !AVALONIA
                 icon.Freeze(); // Make it accessible for any thread
-#endif
             }
+#endif
 
             IconLoading = false;
             ColumnIcon = icon;

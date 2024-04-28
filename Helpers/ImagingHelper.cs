@@ -163,6 +163,7 @@ namespace SystemTrayMenu.Helpers
             return targetBitmap;
         }
 
+#if !AVALONIA
         /// <summary>
         /// Sets a flat the alpha channel value for an image.
         /// </summary>
@@ -171,29 +172,17 @@ namespace SystemTrayMenu.Helpers
         /// <returns>Rendered image.</returns>
         internal static RenderTargetBitmap ApplyOpactiy(BitmapSource originalBitmap, double opacity)
         {
-#if TODO_AVALONIA // The "Visual dVisual" must be created by UI thread?? (InvalidThreadException)
-#if !AVALONIA
             DrawingVisual dVisual = new ();
             using (DrawingContext dc = dVisual.RenderOpen())
-#else
-            // TODO: ???? https://stackoverflow.com/questions/66124655/drawing-a-geometry-onto-a-bitmap-avalonia
-            Visual dVisual = new();
-            RenderTargetBitmap targetBitmap = new(originalBitmap.PixelSize, originalBitmap.Dpi);
-            using (DrawingContext dc = targetBitmap.CreateDrawingContext())
-#endif
             {
                 dc.PushOpacity(opacity);
                 dc.DrawImage(originalBitmap, new(0, 0, originalBitmap.PixelWidth, originalBitmap.PixelHeight));
             }
 
-#if !AVALONIA
             RenderTargetBitmap targetBitmap = new(originalBitmap.PixelWidth, originalBitmap.PixelHeight, originalBitmap.DpiX, originalBitmap.DpiY, PixelFormats.Default);
-#endif
             targetBitmap.Render(dVisual);
             return targetBitmap;
-#else
-            return new(originalBitmap.PixelSize, originalBitmap.Dpi); // TODO: Rendering of image not working yet
-#endif
         }
+#endif
     }
 }

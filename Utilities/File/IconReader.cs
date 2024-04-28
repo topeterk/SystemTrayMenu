@@ -14,6 +14,7 @@ namespace SystemTrayMenu.Utilities
     using System.Drawing;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
+    using SystemTrayMenu.Helpers;
 #endif
 #if !AVALONIA
     using System.Windows;
@@ -23,7 +24,6 @@ namespace SystemTrayMenu.Utilities
     using Application = Avalonia.Application;
 #endif
     using SystemTrayMenu.DllImports;
-    using SystemTrayMenu.Helpers;
 
     /// <summary>
     /// Provides static methods to read system icons for folders and files.
@@ -332,17 +332,30 @@ namespace SystemTrayMenu.Utilities
                 //       /usr/share/icons/Yaru/32x32/mimetypes/text-x-generic.png
                 //                                             application-x-executable.png
                 //       /usr/share/icons/Yaru/32x32/places/folder.png
-                string? iconPath = FreeDesktop.FindThemeIcon("status", "image-loading");
-                if (iconPath is not null)
+                if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+                {
+                    bitmapSource ??= FindThemeIcon("places", "folder");
+                }
+                else
                 {
                     try
                     {
-                        bitmapSource ??= new(iconPath);
+                        NativeMethods.UnixFileMode permissions = NativeMethods.GetUnixFileMode(path);
+                        if (permissions.HasFlag(NativeMethods.UnixFileMode.UserExecute) ||
+                            permissions.HasFlag(NativeMethods.UnixFileMode.GroupExecute) ||
+                            permissions.HasFlag(NativeMethods.UnixFileMode.OtherExecute) )
+                        {
+                            bitmapSource ??= FindThemeIcon("mimetypes", "application-x-executable");
+                        }
                     }
                     catch
                     {
                     }
+
+                    bitmapSource ??= FindThemeIcon("mimetypes", "text-x-generic");
                 }
+
+                bitmapSource ??= FindThemeIcon("status", "image-loading");
             }
 #endif
 
@@ -352,6 +365,25 @@ namespace SystemTrayMenu.Utilities
 #endif
             return bitmapSource;
         }
+
+#if !WINDOWS
+        private static BitmapSource? FindThemeIcon(string context, string iconName)
+        {
+            string? iconPath = FreeDesktop.FindThemeIcon(context, iconName);
+            if (iconPath is not null)
+            {
+                try
+                {
+                    return new(iconPath);
+                }
+                catch
+                {
+                }
+            }
+
+            return null;
+        }
+#endif
 
         private static ConcurrentDictionary<string, BitmapSource> DictIconCache(bool checkPersistentFirst)
             => checkPersistentFirst ? IconDictPersistent : IconDictCache;

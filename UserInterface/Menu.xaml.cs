@@ -773,9 +773,8 @@ namespace SystemTrayMenu.UserInterface
             }
 #endif
 
-#if !TODO_AVALONIA
-            // Better use Bounds instead of DesiredSize?
-#endif
+            // TODO: "Loading" sub menu is placed at wrong position
+            // TODO: "Empty" sub menu is placed at wrong position on Linux
             void AdjustWindowPositionInternal(in Point originLocation)
             {
                 double scaling = Math.Round(Scaling.Factor, 0, MidpointRounding.AwayFromZero);
@@ -810,7 +809,7 @@ namespace SystemTrayMenu.UserInterface
 
                     predecessorFrameWidth = menuPredecessor.windowFrame.ActualWidth;
 #else
-                    predecessorFrameWidth = menuPredecessor.windowFrame.DesiredSize.Width;
+                    predecessorFrameWidth = menuPredecessor.windowFrame.Bounds.Width;
 #endif
 
                     directionToRight = menuPredecessor.directionToRight; // try keeping same direction from predecessor
@@ -957,7 +956,7 @@ namespace SystemTrayMenu.UserInterface
                                 ListView dgv = menuPredecessor.GetDataGridView();
                                 double offsetList = menuPredecessor.GetRelativeChildPositionTo(dgv).Y;
 #if AVALONIA
-                                offsetList += DesiredSize.Height;
+                                offsetList += Bounds.Height;
 #else
                                 offsetList += dgv.ActualHeight;
 #endif
@@ -971,14 +970,17 @@ namespace SystemTrayMenu.UserInterface
                             y += offset;
                         }
 
+#if AVALONIA
+                        if (!menuPredecessor.searchPanel.IsVisible)
+                        {
+                            y += menuPredecessor.searchPanel.Bounds.Height;
+                        }
+#else
                         if (searchPanel.GetVisibility() == Visibility.Collapsed)
                         {
-#if !AVALONIA
                             y += menuPredecessor.searchPanel.ActualHeight;
-#else
-                            y += menuPredecessor.searchPanel.Height;
-#endif
                         }
+#endif
 
                         break;
                     case StartLocation.TopRight:

@@ -78,6 +78,7 @@ namespace SystemTrayMenu.UserInterface
         {
             InitializeComponent();
 
+#if !AVALONIA
             if (!Config.ShowDirectoryTitleAtTop)
             {
                 txtTitle.SetVisibility(Visibility.Collapsed);
@@ -99,6 +100,7 @@ namespace SystemTrayMenu.UserInterface
             {
                 buttonRestart.SetVisibility(Visibility.Collapsed);
             }
+#endif
 
             folderPath = path;
             RowDataParent = rowDataParent;
@@ -114,10 +116,27 @@ namespace SystemTrayMenu.UserInterface
                 // Moving the window is only supported for the main menu
                 MouseDown += MainMenu_MoveStart;
 
+#if AVALONIA
+                if (Config.ShowFunctionKeyRestart)
+                {
+                    buttonRestart.IsVisible = true;
+                }
+
+                if (Config.ShowFunctionKeySettings)
+                {
+                    buttonSettings.IsVisible = true;
+                }
+
+                if (Config.ShowFunctionKeyPinMenu)
+                {
+                    buttonMenuAlwaysOpen.IsVisible = true;
+                }
+#else
                 if (!Config.ShowFunctionKeyPinMenu)
                 {
                     buttonMenuAlwaysOpen.SetVisibility(Visibility.Collapsed);
                 }
+#endif
             }
             else
             {
@@ -132,9 +151,11 @@ namespace SystemTrayMenu.UserInterface
                 MainMenu = ParentMenu.MainMenu;
                 RowDataParent.SubMenu = this;
 
+#if !AVALONIA
                 buttonMenuAlwaysOpen.SetVisibility(Visibility.Collapsed);
                 buttonSettings.SetVisibility(Visibility.Collapsed);
                 buttonRestart.SetVisibility(Visibility.Collapsed);
+#endif
             }
 
             string title;
@@ -161,6 +182,7 @@ namespace SystemTrayMenu.UserInterface
             txtTitle.Text = Title = title;
 #endif
 
+#if !AVALONIA
             foreach (FrameworkElement control in
                 new List<FrameworkElement>()
                 {
@@ -179,6 +201,7 @@ namespace SystemTrayMenu.UserInterface
                 control.Width = Scaling.Scale(control.Width);
                 control.Height = Scaling.Scale(control.Height);
             }
+#endif
 
             labelTitle.FontSize = Scaling.ScaleFontByPoints(8.25F);
             textBoxSearch.FontSize = Scaling.ScaleFontByPoints(8.25F);
@@ -951,31 +974,26 @@ namespace SystemTrayMenu.UserInterface
                                 // Do not allow to show window higher than previous window
                                 offset = 0;
                             }
+#if !AVALONIA
                             else
                             {
                                 ListView dgv = menuPredecessor.GetDataGridView();
                                 double offsetList = menuPredecessor.GetRelativeChildPositionTo(dgv).Y;
-#if AVALONIA
-                                offsetList += Bounds.Height;
-#else
                                 offsetList += dgv.ActualHeight;
-#endif
                                 if (offsetList < offset)
                                 {
                                     // Do not allow to show window below last entry position of list
                                     offset = offsetList;
                                 }
                             }
+#else
+                            offset -= dgv.TranslatePoint(default, this)?.Y ?? 0D;
+#endif
 
                             y += offset;
                         }
 
-#if AVALONIA
-                        if (!menuPredecessor.searchPanel.IsVisible)
-                        {
-                            y += menuPredecessor.searchPanel.Bounds.Height;
-                        }
-#else
+#if !AVALONIA
                         if (searchPanel.GetVisibility() == Visibility.Collapsed)
                         {
                             y += menuPredecessor.searchPanel.ActualHeight;
@@ -1025,16 +1043,16 @@ namespace SystemTrayMenu.UserInterface
 
 #if AVALONIA
         /// <summary>
-        /// Gets the rectangle of the list visual item.
+        /// Gets the rectangle of the list's visual item.
         /// </summary>
         /// <param name="rowData">Data of the element to be looked for.</param>
         /// <returns>Return the Rect in client coordinates of the menu.</returns>
 #else
         /// <summary>
-        /// Gets the rectangle of the list visual item.
+        /// Gets the rectangle of the list's visual item.
         /// </summary>
         /// <param name="rowData">Data of the element to be looked for.</param>
-        /// <returns>Return the Rect in client coordinates of the list visual.</returns>
+        /// <returns>Return the Rect in client coordinates of the list.</returns>
 #endif
         internal Rect GetDataGridViewChildRect(RowData rowData)
         {
@@ -1086,6 +1104,12 @@ namespace SystemTrayMenu.UserInterface
 
             return new(0D, offsetY, dgv.ActualWidth, (double)Resources["RowHeight"]);
 #endif
+        }
+
+        internal void ListView_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            int count = dgv.Items.Count;
+            labelStatus.Content = count.ToString() + " " + Translator.GetText(count == 1 ? "element" : "elements");
         }
 
 #if AVALONIA
@@ -1238,6 +1262,12 @@ namespace SystemTrayMenu.UserInterface
             switch (state)
             {
                 case MenuDataDirectoryState.Valid:
+#if AVALONIA
+                    if (Config.ShowSearchBar)
+                    {
+                        searchPanel.IsVisible = true;
+                    }
+#endif
                     if (Config.ShowCountOfElementsBelow)
                     {
                         ((INotifyCollectionChanged)dgv.Items).CollectionChanged += ListView_CollectionChanged;
@@ -1250,11 +1280,15 @@ namespace SystemTrayMenu.UserInterface
 
                     break;
                 case MenuDataDirectoryState.Empty:
+#if !AVALONIA
                     searchPanel.SetVisibility(Visibility.Collapsed);
+#endif
                     labelStatus.Content = Translator.GetText("Directory empty");
                     break;
                 case MenuDataDirectoryState.NoAccess:
+#if !AVALONIA
                     searchPanel.SetVisibility(Visibility.Collapsed);
+#endif
                     labelStatus.Content = Translator.GetText("Directory inaccessible");
                     break;
                 default:
@@ -1266,9 +1300,9 @@ namespace SystemTrayMenu.UserInterface
 
         private void HandlePreviewKeyDown(object sender, KeyEventArgs e)
         {
+#if !AVALONIA
             searchPanel.SetVisibility(Visibility.Visible);
 
-#if !AVALONIA
             ModifierKeys modifiers = Keyboard.Modifiers;
 #else
             ModifierKeys modifiers = e.KeyModifiers; // TODO: Check if ok?
@@ -1547,12 +1581,6 @@ namespace SystemTrayMenu.UserInterface
                     itemData.IsSelected = lv.SelectedItem == itemData;
                 }
             }
-        }
-
-        private void ListView_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            int count = dgv.Items.Count;
-            labelStatus.Content = count.ToString() + " " + Translator.GetText(count == 1 ? "element" : "elements");
         }
 
 #if !AVALONIA

@@ -7,6 +7,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:stm="clr-namespace:SystemTrayMenu"
         xmlns:u="clr-namespace:SystemTrayMenu.Utilities"
+        xmlns:cfg="clr-namespace:SystemTrayMenu.Properties"
         xmlns:local="clr-namespace:SystemTrayMenu.UserInterface"
         x:Class="SystemTrayMenu.UserInterface.Menu"
         mc:Ignorable="d" Background="Transparent" d:MaxHeight="200"
@@ -112,10 +113,11 @@
         <!-- TODO: https://docs.avaloniaui.net/docs/next/reference/controls/detailed-reference/border -->
         <StackPanel x:Name="tableLayoutPanelMenu">
             <Label x:Name="labelTitle" DockPanel.Dock="Top" Padding="0" Margin="20,0" MinHeight="12"
-                   HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold">
+                   HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"
+                   IsVisible="{Binding Source={x:Static cfg:Settings.Default}, Path=ShowDirectoryTitleAtTop}">
                 <TextBlock x:Name="txtTitle" TextTrimming="CharacterEllipsis"><Run Text="title"/></TextBlock>
             </Label>
-            <DockPanel x:Name="searchPanel" DockPanel.Dock="Top" Margin="6,0" Background="{x:Static stm:MenuDefines.ColorSearchField}">
+            <DockPanel x:Name="searchPanel" DockPanel.Dock="Top" Margin="6,0" Background="{x:Static stm:MenuDefines.ColorSearchField}" IsVisible="False">
                 <Separator x:Name="panelLine" Height="1" Margin="0" DockPanel.Dock="Bottom" Background="{x:Static stm:MenuDefines.ColorIcons}"/>
                 <Image x:Name="pictureBoxSearch" Width="19" Height="19" Margin="2,2,2,1" DockPanel.Dock="Left" Source="{StaticResource ic_fluent_search_48_regularDrawingImage}"/>
                 <TextBox x:Name="textBoxSearch" Margin="0" BorderThickness="0" VerticalContentAlignment="Center"
@@ -289,16 +291,16 @@
 
                 <Image x:Name="pictureBoxLoading" DockPanel.Dock="Right" HorizontalAlignment="Right" MinWidth="18" MaxWidth="18" MaxHeight="18"
                    Source="{StaticResource LoadingIconImage}" Classes="LoadingRotation" RenderTransformOrigin="9,9"/>
-                <Button x:Name="buttonRestart" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxRestart_MouseClick" >
+                <Button x:Name="buttonRestart" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxRestart_MouseClick" IsVisible="False">
                     <Image x:Name="pictureBoxRestart" Source="{StaticResource ic_fluent_arrow_sync_24_regularDrawingImage}"/>
                 </Button>
-                <Button x:Name="buttonSettings" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxSettings_MouseClick" >
+                <Button x:Name="buttonSettings" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxSettings_MouseClick" IsVisible="False" >
                     <Image x:Name="pictureBoxSettings" Source="{StaticResource ic_fluent_settings_28_regularDrawingImage}"/>
                 </Button>
-                <Button x:Name="buttonMenuAlwaysOpen" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxMenuAlwaysOpen_Click" >
+                <Button x:Name="buttonMenuAlwaysOpen" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxMenuAlwaysOpen_Click" IsVisible="False">
                     <Image x:Name="pictureBoxMenuAlwaysOpen" Source="{StaticResource ic_fluent_pin_48_regularDrawingImage}"/>
                 </Button>
-                <Button x:Name="buttonOpenFolder" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxOpenFolder_Click" >
+                <Button x:Name="buttonOpenFolder" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="{x:Null}" Background="{x:Null}" Click="PictureBoxOpenFolder_Click" IsVisible="False" >
                     <Image x:Name="pictureBoxOpenFolder" Source="{StaticResource ic_fluent_folder_arrow_right_48_regularDrawingImage}"/>
                 </Button>
             </DockPanel>

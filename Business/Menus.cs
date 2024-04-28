@@ -22,6 +22,7 @@ namespace SystemTrayMenu.Business
     using SystemTrayMenu.DllImports;
     using StartLocation = SystemTrayMenu.UserInterface.Menu.StartLocation;
 #else
+    using System.Collections.Specialized;
     using Avalonia.Input;
     using Avalonia.Threading;
     using Application = Avalonia.Application;
@@ -927,6 +928,7 @@ namespace SystemTrayMenu.Business
                 items.RemoveAll(rowsToRemove.Contains);
                 dgv.ItemsSource = null;
                 dgv.ItemsSource = items;
+                menu.ListView_CollectionChanged(this, new(NotifyCollectionChangedAction.Reset));
 #else
                 ((List<RowData>)dgv.ItemsSource).RemoveAll(rowsToRemove.Contains);
 #endif
@@ -974,6 +976,9 @@ namespace SystemTrayMenu.Business
                 // Apply list changes
                 rowDatas = DirectoryHelpers.SortItems(rowDatas);
                 menu.AddItemsToMenu(rowDatas, null);
+#if AVALONIA
+                menu.ListView_CollectionChanged(this, new(NotifyCollectionChangedAction.Reset));
+#endif
 
 #if !AVALONIA
                 AdjustLocationOnWatcherUpdate(menu);

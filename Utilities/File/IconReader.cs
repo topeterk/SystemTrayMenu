@@ -8,11 +8,13 @@ namespace SystemTrayMenu.Utilities
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Drawing;
     using System.IO;
+    using System.Threading;
+#if WINDOWS
+    using System.Drawing;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
-    using System.Threading;
+#endif
 #if !AVALONIA
     using System.Windows;
     using System.Windows.Interop;
@@ -311,6 +313,36 @@ namespace SystemTrayMenu.Utilities
             if (OperatingSystem.IsWindows())
             {
                 bitmapSource = TryGetIconAsBitmapSourceSTA(path, resolvedPath, linkOverlay, isFolder);
+            }
+#else
+            if (!OperatingSystem.IsWindows())
+            {
+                // TODO: Find mimetype from file and load associated icon
+                //       See: https://unix.stackexchange.com/questions/123018/gtk-icons-for-special-files/200666#200666
+                //            peter@ubuntu2204:/usr/share/icons$ gio info -a standard::icon ~/test.py
+                //            uri: file:///home/peter/test.py
+                //            local path: /home/peter/test.py
+                //            unix mount: /dev/sda3 / ext4 rw,relatime,errors=remount-ro
+                //            attributes:
+                //            standard::icon: text-x-python, text-x-generic, text-x-python-symbolic, text-x-generic-symbolic
+                //       Alternatively by looking up the type via /usr/share/mime/packages/*.xml
+
+                // TODO: As intermediate solution, at least differentiate between folder/file/application
+                //       /usr/share/icons/Yaru/32x32/status/image-loading.png
+                //       /usr/share/icons/Yaru/32x32/mimetypes/text-x-generic.png
+                //                                             application-x-executable.png
+                //       /usr/share/icons/Yaru/32x32/places/folder.png
+                string? iconPath = FreeDesktop.FindThemeIcon("status", "image-loading");
+                if (iconPath is not null)
+                {
+                    try
+                    {
+                        bitmapSource ??= new(iconPath);
+                    }
+                    catch
+                    {
+                    }
+                }
             }
 #endif
 

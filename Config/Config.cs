@@ -16,6 +16,9 @@ namespace SystemTrayMenu
     using System.Windows;
     using Icon = System.Drawing.Icon;
 #endif
+#if !WINDOWS
+    using static SystemTrayMenu.Utilities.FreeDesktop;
+#endif
     using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
@@ -213,6 +216,20 @@ namespace SystemTrayMenu
                     NativeMethods.SetPreferredAppMode(isDarkMode ? NativeMethods.PreferredAppMode.ForceDark : NativeMethods.PreferredAppMode.ForceLight);
                     NativeMethods.FlushMenuThemes();
                 }
+#if !WINDOWS
+                else
+                {
+                    // TODO: Allow user to set DarkMode app specific or system specific
+                    if (!isDarkMode)
+                    {
+                        DarkModePreference preference = FreeDesktop.GetDarkModePreference();
+                        if (preference == DarkModePreference.PreferDark)
+                        {
+                            isDarkMode = true;
+                        }
+                    }
+                }
+#endif
 
                 readDarkModeDone = true;
             }

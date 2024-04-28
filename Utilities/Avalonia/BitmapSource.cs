@@ -29,6 +29,11 @@ namespace SystemTrayMenu.Utilities
             : base(format, alphaFormat, data, size, dpi, stride)
         {
         }
+#else
+        public BitmapSource(string path)
+            : base(path)
+        {
+        }
 #endif
 
         public static implicit operator BitmapSource(RenderTargetBitmap source)

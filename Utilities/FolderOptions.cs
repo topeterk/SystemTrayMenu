@@ -62,33 +62,34 @@ namespace SystemTrayMenu.Utilities
 #endif
         }
 
-        internal static void ReadHiddenAttributes(string path, out bool hasHiddenFlag, out bool isDirectoryToHide)
+        /// <summary>
+        /// Read the flags if given path points to a file or directory that is marked as hidden.
+        /// </summary>
+        /// <param name="path">Path to file or directory.</param>
+        /// <param name="hasHiddenFlag">Returns if the entry is marked as hidden.</param>
+        /// <param name="hasOmittedFlag">Returns if the entry shall be ommitted.</param>
+        internal static void ReadHiddenAttributes(string path, out bool hasHiddenFlag, out bool hasOmittedFlag)
         {
-            isDirectoryToHide = false;
+            hasOmittedFlag = false;
             hasHiddenFlag = false;
-            if (path.Length >= 260)
-            {
-                Log.Info($"path too long (>=260):'{path}'");
-                return;
-            }
 
             try
             {
                 FileAttributes attributes = File.GetAttributes(path);
                 hasHiddenFlag = attributes.HasFlag(FileAttributes.Hidden);
-                bool hasSystemFlag = attributes.HasFlag(
-                    FileAttributes.Hidden | FileAttributes.System);
                 if (Properties.Settings.Default.SystemSettingsShowHiddenFiles)
                 {
+                    bool hasSystemFlag = attributes.HasFlag(FileAttributes.Hidden | FileAttributes.System);
+
                     if ((hideHiddenEntries && hasHiddenFlag) ||
                         (hideSystemEntries && hasSystemFlag))
                     {
-                        isDirectoryToHide = true;
+                        hasOmittedFlag = true;
                     }
                 }
                 else if (hasHiddenFlag && Properties.Settings.Default.NeverShowHiddenFiles)
                 {
-                    isDirectoryToHide = true;
+                    hasOmittedFlag = true;
                 }
             }
             catch (Exception ex)

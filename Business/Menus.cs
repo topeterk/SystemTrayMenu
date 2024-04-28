@@ -855,8 +855,8 @@ namespace SystemTrayMenu.Business
                         }
 
                         RowData rowDataRenamed = new(rowData.IsFolder, rowData.IsAdditionalItem, 0, path);
-                        FolderOptions.ReadHiddenAttributes(rowDataRenamed.Path, out bool hasHiddenFlag, out bool isDirectoryToHide);
-                        if (isDirectoryToHide)
+                        FolderOptions.ReadHiddenAttributes(rowDataRenamed.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
+                        if (hasOmittedFlag)
                         {
                             continue;
                         }
@@ -950,8 +950,8 @@ namespace SystemTrayMenu.Business
                 bool isFolder = (attr & FileAttributes.Directory) == FileAttributes.Directory;
                 bool isAddionalItem = Path.GetDirectoryName(e.FullPath) != Config.Path;
                 RowData rowData = new(isFolder, isAddionalItem, 0, e.FullPath);
-                FolderOptions.ReadHiddenAttributes(rowData.Path, out bool hasHiddenFlag, out bool isDirectoryToHide);
-                if (isDirectoryToHide)
+                FolderOptions.ReadHiddenAttributes(rowData.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
+                if (hasOmittedFlag)
                 {
                     return;
                 }

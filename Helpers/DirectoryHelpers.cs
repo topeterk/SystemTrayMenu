@@ -25,11 +25,9 @@ namespace SystemTrayMenu.Helpers
                 return;
             }
 
-            bool isNetworkRoot = false;
             try
             {
-                isNetworkRoot = FileLnk.IsNetworkRoot(path);
-                if (isNetworkRoot)
+                if (FileLnk.IsNetworkRoot(path))
                 {
                     DiscoverNetworkRootDirectories(path, ref menuData);
                 }
@@ -61,7 +59,7 @@ namespace SystemTrayMenu.Helpers
                 }
             }
 
-            RemoveHiddenOrReadIcons(worker, isNetworkRoot, ref menuData);
+            LoadIcons(worker, ref menuData);
 
             if (menuData.RowDatas.Count == 0)
             {
@@ -123,9 +121,9 @@ namespace SystemTrayMenu.Helpers
             return rowDatas;
         }
 
-        private static void RemoveHiddenOrReadIcons(BackgroundWorker? worker, bool isNetworkRoot, ref MenuData menuData)
+        private static void LoadIcons(BackgroundWorker? worker, ref MenuData menuData)
         {
-            List<RowData> rowDatasToRemove = new();
+            bool isMainMenu = menuData.Level == 0;
             foreach (RowData rowData in menuData.RowDatas)
             {
                 if (worker?.CancellationPending == true)
@@ -133,22 +131,8 @@ namespace SystemTrayMenu.Helpers
                     return;
                 }
 
-                if (!isNetworkRoot)
-                {
-                    FolderOptions.ReadHiddenAttributes(rowData.Path, out bool hasHiddenFlag, out bool isDirectoryToHide);
-                    if (isDirectoryToHide)
-                    {
-                        rowDatasToRemove.Add(rowData);
-                        continue;
-                    }
-
-                    rowData.HiddenEntry = hasHiddenFlag;
-                }
-
-                rowData.LoadIcon(menuData.Level == 0);
+                rowData.LoadIcon(isMainMenu);
             }
-
-            menuData.RowDatas = menuData.RowDatas.Except(rowDatasToRemove).ToList();
         }
 
         [SupportedOSPlatform("Windows")]
@@ -209,7 +193,14 @@ namespace SystemTrayMenu.Helpers
                     return;
                 }
 
-                menuData.RowDatas.Add(new RowData(true, false, menuData.Level, directory));
+                RowData rowData = new(true, false, menuData.Level, directory);
+
+                FolderOptions.ReadHiddenAttributes(rowData.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
+                if (!hasOmittedFlag)
+                {
+                    rowData.HiddenEntry = hasHiddenFlag;
+                    menuData.RowDatas.Add(rowData);
+                }
             }
 
             foreach (string file in GetFilesBySearchPattern(path, Config.SearchPattern))
@@ -219,7 +210,13 @@ namespace SystemTrayMenu.Helpers
                     return;
                 }
 
-                menuData.RowDatas.Add(new RowData(false, false, menuData.Level, file));
+                RowData rowData = new(false, false, menuData.Level, file);
+                FolderOptions.ReadHiddenAttributes(rowData.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
+                if (!hasOmittedFlag)
+                {
+                    rowData.HiddenEntry = hasHiddenFlag;
+                    menuData.RowDatas.Add(rowData);
+                }
             }
         }
 
@@ -233,14 +230,28 @@ namespace SystemTrayMenu.Helpers
             {
                 foreach (string file in GetFilesBySearchPattern(path, Config.SearchPattern))
                 {
-                    menuData.RowDatas.Add(new RowData(false, true, menuData.Level, file));
+                    RowData rowData = new(false, true, menuData.Level, file);
+                    FolderOptions.ReadHiddenAttributes(rowData.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
+                    if (!hasOmittedFlag)
+                    {
+                        rowData.HiddenEntry = hasHiddenFlag;
+                        menuData.RowDatas.Add(rowData);
+                    }
                 }
 
                 foreach (string directory in Directory.GetDirectories(path))
                 {
                     if (!onlyFiles)
                     {
-                        menuData.RowDatas.Add(new RowData(true, true, menuData.Level, directory));
+                        RowData rowData = new(true, true, menuData.Level, directory);
+                        FolderOptions.ReadHiddenAttributes(rowData.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
+                        if (hasOmittedFlag)
+                        {
+                            continue;
+                        }
+
+                        rowData.HiddenEntry = hasHiddenFlag;
+                        menuData.RowDatas.Add(rowData);
                     }
 
                     if (recursiv)

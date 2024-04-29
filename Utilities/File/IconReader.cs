@@ -367,9 +367,9 @@ namespace SystemTrayMenu.Utilities
         }
 
 #if !WINDOWS
-        private static BitmapSource? FindThemeIcon(string context, string iconName)
+        private static BitmapSource? FindThemeIcon(string context, string iconName, int desiredSize = 48)
         {
-            string? iconPath = FreeDesktop.FindThemeIcon(context, iconName);
+            string? iconPath = FreeDesktop.FindThemeIcon(context, iconName, desiredSize);
             if (iconPath is not null)
             {
                 try

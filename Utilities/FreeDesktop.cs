@@ -80,7 +80,11 @@ namespace SystemTrayMenu.Utilities
             {
                 foreach (string searchDir in searchDirs)
                 {
-                    ThemeBaseDirs.Add(Path.Combine(searchDir, themeName));
+                    string baseDir = Path.Combine(searchDir, themeName);
+                    if (Directory.Exists(baseDir))
+                    {
+                        ThemeBaseDirs.Add(baseDir);
+                    }
                 }
             }
         }
@@ -93,48 +97,99 @@ namespace SystemTrayMenu.Utilities
             PreferLight,
         }
 
-        internal static string FindThemeIcon(string context, string iconName)
+        internal static string? FindThemeIcon(string context, string iconName, int desiredSize)
         {
+            bool isMimeType = context.Equals("mimetypes");
+            do
+            {
+                string? iconPath = FindThemeIconExactName(context, iconName, desiredSize);
+
+                // return found image or exit early as levels of specificity are not allowed for MimeTypes
+                if (!string.IsNullOrEmpty(iconPath) || isMimeType)
+                {
+                    return iconPath;
+                }
+
+                int dashPos = iconName.LastIndexOf('-');
+                if (dashPos < 0)
+                {
+                    // No matching file found
+                    return null;
+                }
+
+                // try again being less specific in the lookup name
+                iconName = iconName.Substring(0, dashPos);
+            }
+            while (true);
+        }
+
+        internal static string? FindThemeIconExactName(string context, string iconName, int desiredSize)
+        {
+            string desiredSizeDir = $"{desiredSize}x{desiredSize}";
+
             // TODO: Lookup for specific sizes
             //       as of now we try to get 32x32 and 48x48 as fallback
             //       48x48 should be provided as minimum by specification
             //       See: https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#install_icons
             // See: https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
-            List<string> iconSizes = new() { "32x32", "48x48" };
-
-            bool isMimeType = context.Equals("mimetypes");
-
             foreach (string baseDir in ThemeBaseDirs)
             {
-                foreach (string iconSize in iconSizes)
+                // Try exact match right away
+                string iconPath = Path.Combine(baseDir, desiredSizeDir, context, iconName + ".png");
+                if (File.Exists(iconPath))
                 {
-                    string lookupDir = Path.Combine(baseDir, iconSize, context);
-                    string baseName = iconName;
-                    do
+                    return iconPath;
+                }
+
+                string[] sizePaths = Directory.GetDirectories(baseDir);
+
+                int closestSmallerDiff = int.MinValue;
+                int closestBiggerDiff = int.MaxValue;
+                string? closestPathSmaller = null;
+                string? closestPathBigger = null;
+
+                foreach (string sizePath in sizePaths)
+                {
+                    if (sizePath.Equals(desiredSizeDir))
                     {
-                        string iconPath = Path.Combine(lookupDir, baseName + ".png");
-                        if (File.Exists(iconPath))
-                        {
-                            return iconPath;
-                        }
-
-                        // levels of specificity are not allowed for MimeTypes
-                        if (isMimeType)
-                        {
-                            break;
-                        }
-
-                        int dashPos = baseName.LastIndexOf('-');
-                        if (dashPos < 0)
-                        {
-                            // No matching file found
-                            break;
-                        }
-
-                        // try again being less specific in the lookup name
-                        baseName = baseName.Substring(0, dashPos);
+                        // Exact match already checked at the beginning
+                        continue;
                     }
-                    while (true);
+
+                    string[] sizeValueStr = Path.GetFileName(sizePath).Split(new char[] { 'x', '@' });
+
+                    // We do not want scaled variations and we only look for equilateral dimensions
+                    if ((sizeValueStr.Length == 2) && sizeValueStr[0].Equals(sizeValueStr[1]))
+                    {
+                        if (int.TryParse(sizeValueStr[0], out int sizeValue))
+                        {
+                            iconPath = Path.Combine(sizePath, context, iconName + ".png");
+                            if (File.Exists(iconPath))
+                            {
+                                int diff = sizeValue - desiredSize;
+                                if ((diff < 0) && (closestSmallerDiff < diff))
+                                {
+                                    closestPathSmaller = iconPath;
+                                    closestSmallerDiff = diff;
+                                }
+                                else if (diff < closestBiggerDiff)
+                                {
+                                    closestPathBigger = iconPath;
+                                    closestBiggerDiff = diff;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Prefer higher resolution image before falling back to lower resolution
+                if (!string.IsNullOrEmpty(closestPathBigger))
+                {
+                    return closestPathBigger;
+                }
+                else if (!string.IsNullOrEmpty(closestPathSmaller))
+                {
+                    return closestPathSmaller;
                 }
             }
 

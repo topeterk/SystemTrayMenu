@@ -15,6 +15,8 @@ namespace SystemTrayMenu.Utilities
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
     using SystemTrayMenu.Helpers;
+#else
+    using System.Runtime.Versioning;
 #endif
 #if !AVALONIA
     using System.Windows;
@@ -317,48 +319,48 @@ namespace SystemTrayMenu.Utilities
 #else
             if (!OperatingSystem.IsWindows())
             {
-                // TODO: Find mimetype from file and load associated icon
-                //       See: https://unix.stackexchange.com/questions/123018/gtk-icons-for-special-files/200666#200666
-                //            peter@ubuntu2204:/usr/share/icons$ gio info -a standard::icon ~/test.py
-                //            uri: file:///home/peter/test.py
-                //            local path: /home/peter/test.py
-                //            unix mount: /dev/sda3 / ext4 rw,relatime,errors=remount-ro
-                //            attributes:
-                //            standard::icon: text-x-python, text-x-generic, text-x-python-symbolic, text-x-generic-symbolic
-                //       Alternatively by looking up the type via /usr/share/mime/packages/*.xml
-
-                // TODO: As intermediate solution, at least differentiate between folder/file/application
-                //       /usr/share/icons/Yaru/32x32/status/image-loading.png
-                //       /usr/share/icons/Yaru/32x32/mimetypes/text-x-generic.png
-                //                                             application-x-executable.png
-                //       /usr/share/icons/Yaru/32x32/places/folder.png
                 if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
                 {
-                    bitmapSource ??= FindThemeIcon("places", "folder");
+                    // Try loading regular folder icon
+                    bitmapSource = FindThemeIcon("places", "folder");
                 }
                 else
                 {
-                    try
+                    string mimeTypeName;
+                    if (FreeDesktop.FindMimeTypeIcon(path, out mimeTypeName))
                     {
-                        NativeMethods.UnixFileMode permissions = NativeMethods.GetUnixFileMode(path);
-                        if (permissions.HasFlag(NativeMethods.UnixFileMode.UserExecute) ||
-                            permissions.HasFlag(NativeMethods.UnixFileMode.GroupExecute) ||
-                            permissions.HasFlag(NativeMethods.UnixFileMode.OtherExecute) )
-                        {
-                            bitmapSource ??= FindThemeIcon("mimetypes", "application-x-executable");
-                        }
-                    }
-                    catch
-                    {
+                        // Try loading regular mimetype icon
+                        bitmapSource = FindThemeIcon("mimetypes", mimeTypeName);
                     }
 
-                    bitmapSource ??= FindThemeIcon("mimetypes", "text-x-generic");
+                    // Try loading file fallback icon (when icon not set yet)
+                    if (bitmapSource is null)
+                    {
+                        try
+                        {
+                            NativeMethods.UnixFileMode permissions = NativeMethods.GetUnixFileMode(path);
+                            if (permissions.HasFlag(NativeMethods.UnixFileMode.UserExecute) ||
+                                permissions.HasFlag(NativeMethods.UnixFileMode.GroupExecute) ||
+                                permissions.HasFlag(NativeMethods.UnixFileMode.OtherExecute))
+                            {
+                                mimeTypeName = "application-x-executable";
+                            }
+                        }
+                        catch
+                        {
+                            mimeTypeName = "text-x-generic";
+                        }
+
+                        bitmapSource = FindThemeIcon("mimetypes", mimeTypeName);
+                    }
                 }
 
+                // Try loading regular fallback icon (when icon not set yet)
                 bitmapSource ??= FindThemeIcon("status", "image-loading");
             }
 #endif
 
+            // Load fallback icon (when icon not set yet)
             bitmapSource ??= NotFoundImage;
 #if !AVALONIA
             bitmapSource.Freeze(); // Make it accessible for any thread
@@ -367,6 +369,7 @@ namespace SystemTrayMenu.Utilities
         }
 
 #if !WINDOWS
+        [UnsupportedOSPlatform("windows")]
         private static BitmapSource? FindThemeIcon(string context, string iconName, int desiredSize = 48)
         {
             string? iconPath = FreeDesktop.FindThemeIcon(context, iconName, desiredSize);

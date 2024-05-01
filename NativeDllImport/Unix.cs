@@ -35,6 +35,8 @@ namespace SystemTrayMenu.DllImports
 
     internal static partial class NativeMethods
     {
+        internal const int FNM_NOMATCH = 1; /* Value returned by fnmatch if STRING does not match PATTERN. */
+
         private const int R_OK = 4; /* Test for read permission. */
         private const int W_OK = 2; /* Test for write permission. */
         private const int X_OK = 1; /* Test for execute permission. */
@@ -126,6 +128,42 @@ namespace SystemTrayMenu.DllImports
             /// </summary>
             SetUser = 2048,
         }
+
+        // Origin: https://github.com/sebastinas/yafc/blob/2a4bbd7f3ed445a18de2006a0b780234448ec713/lib/fnmatch_.h#L36-L43
+        [Flags]
+        internal enum FileNameMatchFlags : int
+        {
+            /// <summary>
+            /// No wildcard can ever match `/'.
+            /// </summary>
+            FNM_PATHNAME = 1,
+
+            /// <summary>
+            /// Backslashes don't quote special chars.
+            /// </summary>
+            FNM_NOESCAPE = 2,
+
+            /// <summary>
+            /// Leading `.' is matched only explicitly.
+            /// </summary>
+            FNM_PERIOD = 4,
+
+            /// <summary>
+            /// Ignore `/...' after a match.
+            /// </summary>
+            FNM_LEADING_DIR = 8,
+
+            /// <summary>
+            /// Compare without regard to case.
+            /// </summary>
+            FNM_CASEFOLD = 16,
+
+            /// <summary>
+            /// Use ksh-like extended matching.
+            /// </summary>
+            FNM_EXTMATCH = 32,
+        }
+
 #if TODO_REMOVE
         [Flags]
         private enum FileStatusFlags
@@ -165,11 +203,22 @@ namespace SystemTrayMenu.DllImports
         }
 
         /// <summary>
+        /// https://man7.org/linux/man-pages/man3/fnmatch.3.html .
+        /// </summary>
+        /// <param name="pattern">Shell wildcard pattern (see glob(7)).</param>
+        /// <param name="str">The string to be checked for matches of pattern.</param>
+        /// <param name="flags">Behavior modifiers.</param>
+        /// <returns>Zero if string matches pattern, FNM_NOMATCH if there is no match or another nonzero value if there is an error.</returns>
+        [UnsupportedOSPlatform("windows")]
+        [DllImport("libc", EntryPoint = "fnmatch", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = false)]
+        internal static extern int fnmatch(string pattern, string str, FileNameMatchFlags flags);
+
+        /// <summary>
         /// https://man7.org/linux/man-pages/man2/access.2.html .
         /// </summary>
         /// <param name="pathname">Path to the file or directory.</param>
         /// <param name="mode">Mode to test access with.</param>
-        /// <returns> On success zero is returned. On error -1 is returned.</returns>
+        /// <returns>On success zero is returned. On error -1 is returned.</returns>
         [UnsupportedOSPlatform("windows")]
         [DllImport("libc", EntryPoint = "access", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int access(string pathname, int mode);

@@ -42,6 +42,14 @@ namespace SystemTrayMenu.Utilities
         private static readonly SortedDictionary<int /*weight*/, List<MimeGlobEntry>> MimeGlobs = new(
             Comparer<int>.Create((x, y) => -x.CompareTo(y))); // inverts default order to descending values
 
+        // TODO: Keep multiple matching globs?
+        //       If the patterns are different, keep only globs with the longest pattern.
+        //       ..all the matching globs result in the same mimetype, use that mimetype as the result.
+        //       If the glob matching fails or results in multiple conflicting mimetypes..
+        //       ..use the result of the glob match that has the highest weight.
+        //       See: https://specifications.freedesktop.org/shared-mime-info-spec/latest/ar01s02.html#idm46055993514752
+        // TODO: Add subclass support: https://specifications.freedesktop.org/shared-mime-info-spec/latest/ar01s02.html#subclassing
+        // TODO: Try to look for icons with similar name "text/plain" -> "text-plain" as it doesn't seem to always have a mapping in icons file
         private static readonly Dictionary<string /*MimeTypeName*/, string /*IconName*/> MimeIcons = new ();
 
         static FreeDesktop()

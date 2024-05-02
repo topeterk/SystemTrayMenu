@@ -326,16 +326,23 @@ namespace SystemTrayMenu.Utilities
                 }
                 else
                 {
-                    string mimeTypeName;
-                    if (FreeDesktop.FindMimeTypeIcon(path, out mimeTypeName))
+                    if (FreeDesktop.FindMimeTypeIcons(path, out var mimeTypeIconNames))
                     {
-                        // Try loading regular mimetype icon
-                        bitmapSource = FindThemeIcon("mimetypes", mimeTypeName);
+                        // Try loading any regular mimetype icon
+                        foreach (string mimeTypeIconName in mimeTypeIconNames)
+                        {
+                            bitmapSource = FindThemeIcon("mimetypes", mimeTypeIconName);
+                            if (bitmapSource is not null)
+                            {
+                                break;
+                            }
+                        }
                     }
 
                     // Try loading file fallback icon (when icon not set yet)
                     if (bitmapSource is null)
                     {
+                        string mimeTypeIconName = "text-x-generic";
                         try
                         {
                             NativeMethods.UnixFileMode permissions = NativeMethods.GetUnixFileMode(path);
@@ -343,15 +350,14 @@ namespace SystemTrayMenu.Utilities
                                 permissions.HasFlag(NativeMethods.UnixFileMode.GroupExecute) ||
                                 permissions.HasFlag(NativeMethods.UnixFileMode.OtherExecute))
                             {
-                                mimeTypeName = "application-x-executable";
+                                mimeTypeIconName = "application-x-executable";
                             }
                         }
                         catch
                         {
-                            mimeTypeName = "text-x-generic";
                         }
 
-                        bitmapSource = FindThemeIcon("mimetypes", mimeTypeName);
+                        bitmapSource = FindThemeIcon("mimetypes", mimeTypeIconName);
                     }
                 }
 

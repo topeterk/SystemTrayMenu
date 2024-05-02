@@ -39,26 +39,16 @@ namespace SystemTrayMenu.Utilities
     {
         private static readonly List<string> ThemeBaseDirs = new();
 
+        private static readonly Dictionary<string /*subclass*/, string /*base*/> MimeSubtypes = new();
+        private static readonly Dictionary<string /*MimeTypeName*/, string /*IconName*/> MimeIcons = new();
         private static readonly SortedDictionary<int /*weight*/, List<MimeGlobEntry>> MimeGlobs = new(
             Comparer<int>.Create((x, y) => -x.CompareTo(y))); // inverts default order to descending values
-
-        // TODO: Keep multiple matching globs?
-        //       If the patterns are different, keep only globs with the longest pattern.
-        //       ..all the matching globs result in the same mimetype, use that mimetype as the result.
-        //       If the glob matching fails or results in multiple conflicting mimetypes..
-        //       ..use the result of the glob match that has the highest weight.
-        //       See: https://specifications.freedesktop.org/shared-mime-info-spec/latest/ar01s02.html#idm46055993514752
-        // TODO: Add subclass support: https://specifications.freedesktop.org/shared-mime-info-spec/latest/ar01s02.html#subclassing
-        // TODO: Try to look for icons with similar name "text/plain" -> "text-plain" as it doesn't seem to always have a mapping in icons file
-        private static readonly Dictionary<string /*MimeTypeName*/, string /*IconName*/> MimeIcons = new ();
 
         static FreeDesktop()
         {
             // Pre-build lookup folders
             // Mime base directories:
             // See: https://specifications.freedesktop.org/shared-mime-info-spec/latest/ar01s02.html#s2_layout
-            //      Unclear what why these paths are mentioned when they are not mentioned to build the base: /usr, /usr/local and the user's home
-            //      Further unclear why these examples arementioned, too: /usr/share/mime/text/html.xml, /usr/local/share/mime/text/html.xml, and ~/.local/share/mime/text/html.xml
             // Theme base directories:
             // See: https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#directory_layout
             // See: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html#variables
@@ -72,6 +62,17 @@ namespace SystemTrayMenu.Utilities
                 if (Directory.Exists(envPath))
                 {
                     searchDirsTheme.Add(envPath);
+                }
+
+                // Even when specification does not mention this path it seems to be some default path
+                // as "mimetype -a -D  test.cpp" shows the home path even when not present in environment variables
+                //    Data dirs are: /home/peter/.local/share, /usr/share/ubuntu, /usr/local/share, /usr/share, /var/lib/snapd/desktop
+                //    XDG_DATA_HOME is ""
+                //    XDG_DATA_DIRS is "/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop"
+                envPath = Path.Combine(envVar.Trim(), ".local", "share");
+                if (Directory.Exists(envPath))
+                {
+                    searchDirsMime.Add(envPath);
                 }
             }
 
@@ -223,11 +224,45 @@ namespace SystemTrayMenu.Utilities
 
                         string mimeTypeName = fields[0];
                         string iconName = fields[1];
-                        if (!MimeIcons.TryAdd(mimeTypeName, iconName))
-                        {
-                            MimeIcons[mimeTypeName] = iconName;
-                        }
+
+                        // Add definition when not already existing
+                        MimeIcons.TryAdd(mimeTypeName, iconName);
                     }
+                }
+            }
+
+            // Load mime type database (mapping of subclasses to mimetypes)
+            foreach (string searchDir in searchDirsMime)
+            {
+                string fileNameSubclasses = Path.Combine(searchDir, "subclasses");
+                if (!File.Exists(fileNameSubclasses))
+                {
+                    continue;
+                }
+
+                IEnumerable<string> lines;
+                try
+                {
+                    lines = File.ReadLines(fileNameSubclasses);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                foreach (string line in lines)
+                {
+                    string[] fields = line.Split(' ');
+                    if (fields.Length != 2)
+                    {
+                        continue;
+                    }
+
+                    string subclassName = fields[0];
+                    string mimeTypeName = fields[1];
+
+                    // Add definition when not already existing
+                    MimeSubtypes.TryAdd(subclassName, mimeTypeName);
                 }
             }
 
@@ -257,28 +292,36 @@ namespace SystemTrayMenu.Utilities
             PreferLight,
         }
 
-        // TODO: Find mimetype from file and load associated icon (return a list of matching icons instead of first best)
-        //       Then caller can try to load alternative files when icon of better matches cannot be loaded
-        //       See: https://unix.stackexchange.com/questions/123018/gtk-icons-for-special-files/200666#200666
-        //            peter@ubuntu2204:/usr/share/icons$ gio info -a standard::icon ~/test.py
-        //            uri: file:///home/peter/test.py
-        //            local path: /home/peter/test.py
-        //            unix mount: /dev/sda3 / ext4 rw,relatime,errors=remount-ro
-        //            attributes:
-        //            standard::icon: text-x-python, text-x-generic, text-x-python-symbolic, text-x-generic-symbolic
-        //       Alternatively by looking up the type via /usr/share/mime/packages/*.xml
-        internal static bool FindMimeTypeIcon(string path, out string mimeTypeIconName)
+        // In best case, similar to:  gio info -a standard::icon ~/test.py
+        internal static bool FindMimeTypeIcons(string path, out List<string> mimeTypeIconNames)
         {
-            if (GetMimeTypeName(path, out string mimeTypeName))
+            mimeTypeIconNames = new();
+            if (GetMimeTypeNames(path, out List<string> mimeTypeNames))
             {
-                if (MimeIcons.TryGetValue(mimeTypeName, out mimeTypeIconName))
+                foreach (string mimeTypeName in mimeTypeNames)
                 {
-                    return true;
+                    if (MimeIcons.TryGetValue(mimeTypeName, out string mimeTypeIconName))
+                    {
+                        if (!mimeTypeIconNames.Contains(mimeTypeIconName))
+                        {
+                            mimeTypeIconNames.Add(mimeTypeIconName);
+                        }
+                    }
                 }
             }
 
-            mimeTypeIconName = string.Empty;
-            return false;
+            if (mimeTypeIconNames.Count == 0)
+            {
+                // When no icon has been found, try to guess icon names based on mime type name
+                // This is not by specification but should help with inproper/incomplete/out-of-spec installations
+                // It should also help agains forbidden levels of specificity during lookup for mimetype icons
+                foreach (string mimeTypeName in mimeTypeNames)
+                {
+                    mimeTypeIconNames.Add(mimeTypeName.Replace('/', '-')); // e.g. "image/png" -> "image-png"
+                }
+            }
+
+            return mimeTypeIconNames.Count > 0;
         }
 
         internal static string? FindThemeIcon(string context, string iconName, int desiredSize)
@@ -396,31 +439,72 @@ namespace SystemTrayMenu.Utilities
             return DarkModePreference.Unkown;
         }
 
-        private static bool GetMimeTypeName(string path, out string mimeTypeName)
+        private static bool GetMimeTypeNames(string path, out List<string> mimeTypeNames)
         {
+            mimeTypeNames = new();
+
+            int longesPattern = 0;
             string? fileName = Path.GetFileName(path);
             if (!string.IsNullOrEmpty(fileName))
             {
+                // Lookup globs
+                // See [1]: https://specifications.freedesktop.org/shared-mime-info-spec/latest/ar01s02.html
                 foreach (var globEntries in MimeGlobs.Values)
                 {
                     foreach (var mimeGlobEntry in globEntries)
                     {
+                        // [1] start by doing a glob match of the filename.
                         FileNameMatchFlags flags = FileNameMatchFlags.FNM_PERIOD;
                         if (!mimeGlobEntry.IsCaseSensitive)
                         {
                             flags |= FileNameMatchFlags.FNM_CASEFOLD;
                         }
 
+                        // [1] The format of the glob pattern is as for fnmatch(3)
                         if (NativeMethods.fnmatch(mimeGlobEntry.Pattern, fileName, flags) == 0)
                         {
-                            mimeTypeName = mimeGlobEntry.MimeTypeName;
-                            return true;
+                            // [1] If the patterns are different, keep only globs with the longest pattern
+                            if (longesPattern < mimeGlobEntry.Pattern.Length)
+                            {
+                                longesPattern = mimeGlobEntry.Pattern.Length;
+                                mimeTypeNames.Clear();
+                            }
+
+                            // Add it when not already existing
+                            if (!mimeTypeNames.Contains(mimeGlobEntry.MimeTypeName))
+                            {
+                                mimeTypeNames.Add(mimeGlobEntry.MimeTypeName);
+                            }
                         }
+                    }
+
+                    // list is sorted by weight, so if we found matches, we can stop here
+                    // [1] Keep only globs with the biggest weight.
+                    if (mimeTypeNames.Count > 0)
+                    {
+                        // [1] there is one or more matching glob, and all the matching globs result in the same mimetype, use that mimetype as the result.
+                        //     If the glob matching fails or results in multiple conflicting mimetypes, read the contents of the file and do magic sniffing on it
+                        // As we do want to do magic sniffing on files, we just return our best guess or return no mimetype instead.
+
+                        // However, fill in fallbacks by adding base types of subclasses as well
+                        // The inherited types will be added to the end and then next subclass is evaluated first.
+                        // This ensures that when looking up the types the top level base classe(s) come(s) last rather in between.
+                        for (int index = 0; index < mimeTypeNames.Count; index++)
+                        {
+                            if (MimeSubtypes.TryGetValue(mimeTypeNames[index], out string baseTypeName))
+                            {
+                                if (!mimeTypeNames.Contains(baseTypeName))
+                                {
+                                    mimeTypeNames.Add(baseTypeName);
+                                }
+                            }
+                        }
+
+                        return true;
                     }
                 }
             }
 
-            mimeTypeName = string.Empty;
             return false;
         }
 

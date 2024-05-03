@@ -11,11 +11,10 @@ namespace SystemTrayMenu.Utilities
     using Avalonia;
     using Avalonia.Controls;
     using Avalonia.Controls.Metadata;
-    using Avalonia.Rendering;
     using Avalonia.Threading;
 
     [PseudoClasses(":OpenAnimationStoryboard")]
-    internal class SolidBorder : Avalonia.Controls.Border, ICustomHitTest
+    internal class SolidBorder : Avalonia.Controls.Border
     {
         internal static readonly StyledProperty<bool> HasHiddenFlagProperty =
             AvaloniaProperty.Register<SolidBorder, bool>(nameof(HasHiddenFlag), defaultValue: false);
@@ -28,12 +27,6 @@ namespace SystemTrayMenu.Utilities
             get => GetValue(HasHiddenFlagProperty);
             set => SetValue(HasHiddenFlagProperty, value);
         }
-
-        // Border will only return true on hit where child elements exists,
-        // this makes sure to return true even when background is not actually "filled"
-        // HitTest gets Pointer location relative to current instance's top left corner,
-        // so we have to check agains our current bounds but without any offsets to parent control.
-        public bool HitTest(Point point) => new Rect(new Size(Bounds.Width, Bounds.Height)).Contains(point);
 
         internal void StartOpenAnimation()
         {

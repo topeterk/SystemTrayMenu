@@ -7,8 +7,10 @@
 #if AVALONIA
 namespace SystemTrayMenu.Utilities
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
+    using Avalonia;
     using Avalonia.Controls;
 
     public class ListView : Avalonia.Controls.ItemsRepeater
@@ -54,6 +56,28 @@ namespace SystemTrayMenu.Utilities
             var element = GetOrCreateElement(index);
             ((TopLevel?)VisualRoot)?.UpdateLayout();
             element.BringIntoView();
+        }
+
+        // The regular method tries to take up as much space as possible,
+        // but actually want to take less possible space as possible.
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            Size size = base.MeasureOverride(availableSize);
+
+            // Find larges child
+            double maxChildWidth = 0;
+            foreach (var element in Children)
+            {
+                maxChildWidth = Math.Max(maxChildWidth, element.DesiredSize.Width);
+            }
+
+            // Shrink until largest child fits
+            if (maxChildWidth < size.Width)
+            {
+                size = size.WithWidth(maxChildWidth);
+            }
+
+            return size;
         }
     }
 }

@@ -14,13 +14,6 @@
         CanResize="False" SystemDecorations="None" Topmost="True" SizeToContent="WidthAndHeight" ShowInTaskbar="False"
         KeyDown="HandlePreviewKeyDown">
 
-    <!-- TODO: Replace AllowsTransparency="True" and borderless window WindowStyle="None" with.. -->
-    <!-- TODO: https://stackoverflow.com/questions/65748375/avaloniaui-how-to-change-the-style-of-the-window-borderless-toolbox-etc -->
-    <!-- TODO:  -->
-    <!-- TODO: ExtendClientAreaToDecorationsHint="True" -->
-    <!-- TODO: ExtendClientAreaChromeHints="NoChrome"   -->
-    <!-- TODO: ExtendClientAreaTitleBarHeightHint="-1"  -->
-
     <!-- TODO: <Window.Triggers> -->
         <!-- TODO: See? https://github.com/AvaloniaUI/Avalonia/issues/2605                -->
         <!-- TODO: <EventTrigger RoutedEvent="local:Menu.FadeToTransparent">              -->
@@ -98,9 +91,6 @@
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
-        <sys:Double x:Key="RowHeight">20</sys:Double>
-        <sys:Double x:Key="ColumnIconWidth">20</sys:Double>
-        <sys:Double x:Key="ColumnTextMaxWidth">80</sys:Double>
     </Window.Resources>
 
     <!-- Remember to adjust the windows's shadow effect accordingly to the size of the margin -->
@@ -150,7 +140,8 @@
                     <Binding Path="#windowFrame.Margin.Bottom" />
                     </MultiBinding>
                 </ScrollViewer.MaxHeight>
-                <u:ListView x:Name="dgv" x:FieldModifier="internal" Margin="6,2,6,1" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <u:ListView x:Name="dgv" x:FieldModifier="internal" Margin="6,2,6,1"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto" Grid.IsSharedSizeScope="True">
                     <!-- TODO: SelectionChanged="ListView_SelectionChanged" -->
                     <u:ListView.MaxWidth>
                         <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,*,*,*,/,+,+">
@@ -218,13 +209,13 @@
                     </u:ListView.Styles>
                     <u:ListView.ItemTemplate>
                         <DataTemplate>
-                            <u:SolidBorder Margin="0" Padding="0" HorizontalAlignment="Stretch"
+                            <u:SolidBorder Margin="0" Padding="0" HorizontalAlignment="Left"
                                     Background="{Binding BackgroundBrush}" BorderBrush="{Binding BorderBrush}" BorderThickness="1"
                                     Tapped="ListViewItem_SingleTapped" DoubleTapped="ListViewItem_DoubleTapped"
                                     PointerPressed="ListViewItem_PointerPressed" PointerReleased="ListViewItem_PointerReleased"
                                     PointerEntered="ListViewItem_MouseEnter" PointerExited="ListViewItem_MouseLeave"
                                     HasHiddenFlag="{Binding HiddenEntry}" ToolTip.Tip="{Binding ColumnText}" ToolTip.ShowDelay="600">
-                                <u:SolidBorder BorderThickness="1" CornerRadius="0" Margin="0" Padding="0">
+                                <u:SolidBorder BorderThickness="1" CornerRadius="0" Margin="0" Padding="0" HorizontalAlignment="Left">
                                     <u:SolidBorder.Background>
                                         <LinearGradientBrush>
                                             <!-- Avalonia Workaround: Make sure Background is of type LinearGradientBrush -->
@@ -239,7 +230,8 @@
                                             <ColumnDefinition SharedSizeGroup="GridGroupIcon" >
                                                 <ColumnDefinition.MaxWidth>
                                                     <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,+">
-                                                        <DynamicResource ResourceKey="ColumnIconWidth" />
+                                                        <!-- image width -->
+                                                        <DynamicResource ResourceKey="RowHeight" />
                                                         <Binding>
                                                             <Binding.Source>
                                                                 <!-- Add horizontal margin of image -->
@@ -249,7 +241,27 @@
                                                     </MultiBinding>
                                                 </ColumnDefinition.MaxWidth>
                                             </ColumnDefinition>
-                                            <ColumnDefinition SharedSizeGroup="GridGroupText" />
+                                            <ColumnDefinition SharedSizeGroup="GridGroupText">
+                                                <ColumnDefinition.MaxWidth>
+                                                    <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,-,-,-">
+                                                        <Binding Path="#dgv.MaxWidth" />
+                                                        <Binding>
+                                                            <Binding.Source>
+                                                                <!-- Add horizontal size of both borders -->
+                                                                <sys:Double>4</sys:Double>
+                                                            </Binding.Source>
+                                                        </Binding>
+                                                        <!-- image width -->
+                                                        <DynamicResource ResourceKey="RowHeight" />
+                                                        <Binding>
+                                                            <Binding.Source>
+                                                                <!-- Add horizontal margin of image -->
+                                                                <sys:Double>4</sys:Double>
+                                                            </Binding.Source>
+                                                        </Binding>
+                                                    </MultiBinding>
+                                                </ColumnDefinition.MaxWidth>
+                                            </ColumnDefinition>
                                         </Grid.ColumnDefinitions>
                                         <Image Grid.Column="0" Margin="2,0,2,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Source="{Binding ColumnIcon}" />
                                         <TextBlock Grid.Column="1" Margin="3,0,2,0" Padding="0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"

@@ -37,7 +37,8 @@
 
 			<SolidColorBrush x:Key="ButtonHoverColor" Color="Gray" Opacity="0.5"/>
 
-			<sys:Double x:Key="RowHeight">20</sys:Double>
+			<sys:Double x:Key="RowHeight">21</sys:Double>
+			<sys:Double x:Key="ColumnIconWidth">16</sys:Double>
 			<sys:Double x:Key="ColumnTextMaxWidth">80</sys:Double>
 		</ResourceDictionary>
 	</Application.Resources>

@@ -118,7 +118,7 @@
                 <!-- TODO: MaxHeight should be set for the whole window instead to calculate positions and sizes properly -->
                 <ScrollViewer.MaxHeight>
                     <!-- TODO: Setting must be cut off on screen boundaries, maybe do this in Measure overload? MaxHeight = Math.Min(screenHeightMax, heightMaxByOptions) -->
-                    <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,*,*,*,/,+,+">
+                    <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,*,*,*,/,+,+,floor-to-lcm">
                     <Binding Source="{x:Static u:Scaling.Factor}" />
                     <Binding Source="{x:Static u:Scaling.FactorByDpi}" />
                     <Binding>
@@ -138,6 +138,8 @@
                     <!-- Margin of the windowFrame is allowed to exceed the boundaries, so we just add them afterwards -->
                     <Binding Path="#windowFrame.Margin.Top" />
                     <Binding Path="#windowFrame.Margin.Bottom" />
+                    <!-- floor to a list item boundary that initial window will not cut off half list items -->
+                    <DynamicResource ResourceKey="RowHeight" />
                     </MultiBinding>
                 </ScrollViewer.MaxHeight>
                 <u:ListView x:Name="dgv" x:FieldModifier="internal" Margin="6,2,6,1"
@@ -230,8 +232,7 @@
                                             <ColumnDefinition SharedSizeGroup="GridGroupIcon" >
                                                 <ColumnDefinition.MaxWidth>
                                                     <MultiBinding Converter="{StaticResource ArithmeticConverter}" ConverterParameter="+,+">
-                                                        <!-- image width -->
-                                                        <DynamicResource ResourceKey="RowHeight" />
+                                                        <DynamicResource ResourceKey="ColumnIconWidth" />
                                                         <Binding>
                                                             <Binding.Source>
                                                                 <!-- Add horizontal margin of image -->
@@ -251,8 +252,7 @@
                                                                 <sys:Double>4</sys:Double>
                                                             </Binding.Source>
                                                         </Binding>
-                                                        <!-- image width -->
-                                                        <DynamicResource ResourceKey="RowHeight" />
+                                                        <DynamicResource ResourceKey="ColumnIconWidth" />
                                                         <Binding>
                                                             <Binding.Source>
                                                                 <!-- Add horizontal margin of image -->

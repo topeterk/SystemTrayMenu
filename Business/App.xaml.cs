@@ -23,6 +23,7 @@ namespace SystemTrayMenu
     using SystemTrayMenu.UserInterface;
 #endif
     using SystemTrayMenu.Business;
+    using SystemTrayMenu.DllImports;
     using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Helpers.Updater;
     using SystemTrayMenu.Properties;
@@ -209,6 +210,26 @@ namespace SystemTrayMenu
 
         private void AppStartupHandler(object sender, object e)
         {
+#if AVALONIA
+            // IcoWidth 100% = 21px, 175% is 33
+            double icoWidth = 16 * Scaling.FactorByDpi;
+            double factorIconSizeInPercent = Settings.Default.IconSizeInPercent / 100D;
+            Resources["ColumnIconWidth"] = Math.Ceiling(icoWidth * factorIconSizeInPercent * Scaling.Factor);
+
+            double factor;
+            if (NativeMethods.IsTouchEnabled())
+            {
+                factor = Settings.Default.RowHeighteInPercentageTouch / 100f;
+            }
+            else
+            {
+                factor = Settings.Default.RowHeighteInPercentage / 100D;
+            }
+
+            double rowHeightDefault = 21.24d * Scaling.FactorByDpi;
+            Resources["RowHeight"] = Math.Round(rowHeightDefault * factor * Scaling.Factor);
+#endif
+
             IconReader.Startup();
 
             menus = new();

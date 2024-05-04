@@ -742,7 +742,7 @@ namespace SystemTrayMenu.UserInterface
         {
             Point originLocation = new(0D, 0D);
 
-#if TODO_AVALONIA
+#if !AVALONIA
             // Update the height and width
             AdjustDataGridViewHeight(menuPredecessor, bounds.Height);
             AdjustDataGridViewWidth();
@@ -782,9 +782,7 @@ namespace SystemTrayMenu.UserInterface
                 originLocation = NativeMethods.Screen.CursorPosition;
             }
 
-#if AVALONIA
-            AdjustWindowPositionInternal(originLocation);
-#else
+#if !AVALONIA
             if (IsLoaded)
             {
                 AdjustWindowPositionInternal(originLocation);
@@ -794,11 +792,11 @@ namespace SystemTrayMenu.UserInterface
                 // Layout cannot be calculated during loading, postpone this event
                 Loaded += (_, _) => AdjustWindowPositionInternal(originLocation);
             }
-#endif
 
             // TODO: "Loading" sub menu is placed at wrong position
             // TODO: "Empty" sub menu is placed at wrong position on Linux
             void AdjustWindowPositionInternal(in Point originLocation)
+#endif
             {
                 double scaling = Math.Round(Scaling.Factor, 0, MidpointRounding.AwayFromZero);
                 double overlappingOffset = 0D;
@@ -1353,6 +1351,7 @@ namespace SystemTrayMenu.UserInterface
             e.Handled = true;
         }
 
+#if !AVALONIA
         private void AdjustDataGridViewHeight(Menu? menuPredecessor, double screenHeightMax)
         {
             double factor = Settings.Default.RowHeighteInPercentage / 100f;
@@ -1408,6 +1407,7 @@ namespace SystemTrayMenu.UserInterface
                 ((double)Scaling.Factor * Scaling.FactorByDpi * 400D * (Settings.Default.WidthMaxInPercent / 100D))
                 + windowFrame.Margin.Left + windowFrame.Margin.Right);
         }
+#endif
 
         private void HandleScrollChanged(object sender, ScrollChangedEventArgs e)
         {

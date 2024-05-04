@@ -21,6 +21,8 @@ namespace SystemTrayMenu.Utilities
                 { "-", (x, y) => x - y },
                 { "*", (x, y) => x * y },
                 { "/", (x, y) => x / y },
+                { "%", (x, y) => x % y },
+                { "floor-to-lcm", (x, y) => x - (x % y) }, // floor to the next multiple with the least common multiple
             };
 
         public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
@@ -53,19 +55,21 @@ namespace SystemTrayMenu.Utilities
         private static bool TryGetOperations(object? parameter, int operationIndex, out Func<double, double, double>? operation)
         {
             operation = null;
-            var operations = parameter?.ToString().Split(',');
+            string[]? operations = parameter?.ToString().Split(',');
 
-            if (operations == null || operations.Length == 0)
+            if (operations is null || operations.Length == 0)
             {
                 return false;
             }
 
             if (operations.Length <= operationIndex)
             {
+                // When no further operations are give, re-run the last operation again
                 operationIndex = operations.Length - 1;
             }
 
-            return Operations.TryGetValue(operations[operationIndex].ToString(), out operation);
+            string operationName = operations[operationIndex];
+            return Operations.TryGetValue(operationName, out operation);
         }
     }
 }

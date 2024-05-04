@@ -22,6 +22,11 @@ namespace SystemTrayMenu.Utilities
         private IDisposable? animationTimer;
         private bool isAnimationRunning;
 
+        ~SolidBorder()
+        {
+            animationTimer?.Dispose();
+        }
+
         internal bool HasHiddenFlag
         {
             get => GetValue(HasHiddenFlagProperty);

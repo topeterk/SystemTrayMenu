@@ -240,7 +240,7 @@ namespace SystemTrayMenu.DataClasses
             if (!IconReader.GetIconAsync(IsPointingToFolder, Path, ResolvedPath, ShowOverlay, isMainMenu, UpdateFinalIcon, isMainMenu))
             {
                 IconLoading = true;
-                ColumnIcon = IconReader.LoadingImage; // TODO: Maybe add rotation animation like for the loading Menu icon? (See: pictureBoxLoading, LoadingRotation)
+                ColumnIcon = IconReader.LoadingImage;
             }
         }
 

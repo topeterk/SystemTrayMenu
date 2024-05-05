@@ -53,7 +53,14 @@ namespace SystemTrayMenu.DllImports
             {
                 get
                 {
-                    // TODO: Is there a better way as creating a new Window just to get updated the Screens?
+                    // Workaround: Avalonia - Is there a better way as creating a new Window just to get updated the Screens?
+                    //   It seems that Screens can only be instantiated by IWindowImpl but this is [Unstable].
+                    //   Next less bloated class would be WindowBase but requires an IWindowImpl but this is [Unstable] as well.
+                    //   Therefore there is no easier way to getting Screens.
+                    //
+                    //   Moreover we also cannot re-use an existing Screens as it doesn't seem to (always) update its values.
+                    //   Therefore we create a new instance making sure no cached data is returned.
+                    //   Something like InvalidateScreensCache is no public API (to call it manually) and it only seems to work on Windows.
                     return new Window().Screens;
                 }
             }

@@ -22,7 +22,6 @@ namespace SystemTrayMenu.UserInterface
     using Avalonia.Interactivity;
     using Avalonia.Media;
     using ReactiveUI;
-    using FrameworkElement = Avalonia.Controls.Control;
     using ModifierKeys = Avalonia.Input.KeyModifiers;
     using MouseEventArgs = Avalonia.Input.PointerEventArgs;
     using Point = Avalonia.Point;
@@ -40,7 +39,9 @@ namespace SystemTrayMenu.UserInterface
     /// </summary>
     public partial class Menu : Window
     {
+#if !AVALONIA
         private const int CornerRadiusConstant = 10;
+#endif
 #if TODO_AVALONIA // Fade Events
         private static readonly RoutedEvent FadeToTransparentEvent = EventManager.RegisterRoutedEvent(
             nameof(FadeToTransparent), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(Menu));
@@ -696,7 +697,19 @@ namespace SystemTrayMenu.UserInterface
         {
             if (Level == 0)
             {
-                GetScreenBounds(out Rect boundsMainMenu, out bool useCustomLocation, out StartLocation startLocation);
+                GetScreenBounds(out Rect boundsMainMenu, out bool useCustomLocation, out StartLocation startLocation, out Point originLocation);
+
+                // When opened at a very specific location, we do not want to move the window around.
+                if (startLocation == StartLocation.Point)
+                {
+                    if (!RelocateOnNextShow)
+                    {
+                        return;
+                    }
+
+                    RelocateOnNextShow = false;
+                }
+
                 Rect boundsSubMenu = boundsMainMenu;
 
                 // Exclude the main menu space from sub menus that they cannot ever overlap it
@@ -712,21 +725,18 @@ namespace SystemTrayMenu.UserInterface
 
                 // Remember the bounds for telling sub menus the available space
                 MenuBounds = boundsSubMenu;
-
-                AdjustSizeAndLocation(boundsMainMenu, ParentMenu, startLocation, useCustomLocation);
+                AdjustSizeAndLocation(boundsMainMenu, null, startLocation, originLocation);
             }
-            else
+            else if (ParentMenu is not null)
             {
-                if (ParentMenu is not null)
-                {
-                    // Calculate based on the available space given by the parent menu
-                    MenuBounds = ParentMenu.MenuBounds;
-                    AdjustSizeAndLocation(MenuBounds, ParentMenu, StartLocation.Predecessor, false /* TODO unused */);
-                }
+                // Calculate based on the available space given by the parent menu
+                MenuBounds = ParentMenu.MenuBounds;
+                AdjustSizeAndLocation(MenuBounds, ParentMenu, StartLocation.Predecessor, ParentMenu.Location);
             }
         }
 #endif
 
+#if !AVALONIA
         /// <summary>
         /// Update the position and size of the menu.
         /// </summary>
@@ -742,11 +752,10 @@ namespace SystemTrayMenu.UserInterface
         {
             Point originLocation = new(0D, 0D);
 
-#if !AVALONIA
             // Update the height and width
             AdjustDataGridViewHeight(menuPredecessor, bounds.Height);
             AdjustDataGridViewWidth();
-#endif
+
             if (Level > 0)
             {
                 if (menuPredecessor == null)
@@ -782,7 +791,6 @@ namespace SystemTrayMenu.UserInterface
                 originLocation = NativeMethods.Screen.CursorPosition;
             }
 
-#if !AVALONIA
             if (IsLoaded)
             {
                 AdjustWindowPositionInternal(originLocation);
@@ -796,6 +804,20 @@ namespace SystemTrayMenu.UserInterface
             // TODO: "Loading" sub menu is placed at wrong position
             // TODO: "Empty" sub menu is placed at wrong position on Linux
             void AdjustWindowPositionInternal(in Point originLocation)
+#else
+        /// <summary>
+        /// Update the position and size of the menu.
+        /// </summary>
+        /// <param name="bounds">Screen coordinates where the menu is allowed to be drawn in.</param>
+        /// <param name="menuPredecessor">Predecessor menu (when available).</param>
+        /// <param name="startLocation">Defines where the first menu is drawn (when no predecessor is set).</param>
+        /// <param name="originLocation">Location when Point startLocation is selected.</param>
+        internal void AdjustSizeAndLocation(
+            Rect bounds,
+            Menu? menuPredecessor,
+            StartLocation startLocation,
+            Point originLocation)
+        {
 #endif
             {
                 double scaling = Math.Round(Scaling.Factor, 0, MidpointRounding.AwayFromZero);
@@ -1026,14 +1048,12 @@ namespace SystemTrayMenu.UserInterface
 #else
                 Left = x;
                 Top = y;
-#endif
 
                 if (Settings.Default.RoundCorners)
                 {
                     windowFrame.CornerRadius = new CornerRadius(CornerRadiusConstant);
                 }
 
-#if !AVALONIA
                 UpdateLayout();
 #endif
             }
@@ -1169,7 +1189,7 @@ namespace SystemTrayMenu.UserInterface
 #endif
 
 #if AVALONIA
-        private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation)
+        private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation, out Point originLocation)
         {
 #if TODO_AVALONIA
             // Find out, how cursor position can be found without any open windows
@@ -1178,21 +1198,29 @@ namespace SystemTrayMenu.UserInterface
             {
                 screenBounds = NativeMethods.Screen.FromPoint(NativeMethods.Screen.CursorPosition);
                 useCustomLocation = false;
+                startLocation = StartLocation.Point;
+                originLocation = NativeMethods.Screen.CursorPosition;
+                return;
             }
             else if (Settings.Default.UseCustomLocation)
             {
-                screenBounds = NativeMethods.Screen.FromPoint(new(
-                    Settings.Default.CustomLocationX,
-                    Settings.Default.CustomLocationY));
-
-                useCustomLocation = screenBounds.Contains(
-                    new Point(Settings.Default.CustomLocationX, Settings.Default.CustomLocationY));
+                Point customLocation = new(Settings.Default.CustomLocationX, Settings.Default.CustomLocationY);
+                screenBounds = NativeMethods.Screen.FromPoint(customLocation);
+                useCustomLocation = screenBounds.Contains(customLocation);
+                if (useCustomLocation)
+                {
+                    startLocation = StartLocation.Point;
+                    originLocation = customLocation;
+                    return;
+                }
             }
             else
             {
                 screenBounds = NativeMethods.Screen.PrimaryScreen;
                 useCustomLocation = false;
             }
+
+            originLocation = default;
 
             // Shrink the usable space depending on taskbar location
             WindowsTaskbar taskbar = new();
@@ -1303,7 +1331,7 @@ namespace SystemTrayMenu.UserInterface
 
             ModifierKeys modifiers = Keyboard.Modifiers;
 #else
-            ModifierKeys modifiers = e.KeyModifiers; // TODO: Check if ok?
+            ModifierKeys modifiers = e.KeyModifiers;
 #endif
             switch (e.Key)
             {

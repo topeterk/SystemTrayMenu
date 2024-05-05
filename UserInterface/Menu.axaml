@@ -99,6 +99,14 @@
             Background="{x:Static stm:MenuDefines.ColorBackground}"
             BorderBrush="{x:Static stm:MenuDefines.ColorBackgroundBorder}"
             BoxShadow="2 2 4 2 Black">
+        <Interaction.Behaviors>
+            <DataTriggerBehavior Binding="{Binding Source={x:Static cfg:Settings.Default}, Path=RoundCorners}" ComparisonCondition="Equal" Value="True">
+                <ChangePropertyAction TargetObject="{Binding $parent}" PropertyName="CornerRadius" Value="10" />
+            </DataTriggerBehavior>
+            <DataTriggerBehavior Binding="{Binding Source={x:Static cfg:Settings.Default}, Path=RoundCorners}" ComparisonCondition="Equal" Value="False">
+                <ChangePropertyAction TargetObject="{Binding $parent}" PropertyName="CornerRadius" Value="0" />
+            </DataTriggerBehavior>
+        </Interaction.Behaviors>
         <!-- TODO: Update: BoxShadow color with {Binding Source={x:Static stm:MenuDefines.ColorBackgroundBorder},Path=Color} and set fitting values -->
         <!-- TODO: https://docs.avaloniaui.net/docs/next/reference/controls/detailed-reference/border -->
         <StackPanel x:Name="tableLayoutPanelMenu">

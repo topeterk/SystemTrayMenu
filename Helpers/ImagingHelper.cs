@@ -16,7 +16,7 @@ namespace SystemTrayMenu.Helpers
     using Avalonia.Media;
     using Avalonia.Media.Imaging;
     using SystemTrayMenu.Utilities;
-#if TODO_LINUX
+#if WINDOWS
     using Bitmap = System.Drawing.Bitmap;
 #endif
     using Size = System.Drawing.Size;
@@ -148,9 +148,8 @@ namespace SystemTrayMenu.Helpers
             }
 
             RenderTargetBitmap targetBitmap = new (originalBitmap.PixelWidth, originalBitmap.PixelHeight, originalBitmap.DpiX, originalBitmap.DpiY, PixelFormats.Default);
+            targetBitmap.Render(dVisual);
 #else
-            // TODO: ???? https://stackoverflow.com/questions/66124655/drawing-a-geometry-onto-a-bitmap-avalonia
-            Visual dVisual = new();
             RenderTargetBitmap targetBitmap = new(originalBitmap.PixelSize, originalBitmap.Dpi);
             using (DrawingContext dc = targetBitmap.CreateDrawingContext())
             {
@@ -159,7 +158,6 @@ namespace SystemTrayMenu.Helpers
                 dc.DrawImage(overlayBitmap, rect);
             }
 #endif
-            targetBitmap.Render(dVisual);
             return targetBitmap;
         }
 

@@ -9,10 +9,6 @@
 
 	<Application.Resources>
 		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-				<!-- TODO: ResourceInclude Source="/Resources/ScrollBarStyles.axaml" /-->
-			</ResourceDictionary.MergedDictionaries>
-
 			<u:ArithmeticConverter x:Key="ArithmeticConverter" />
 
 			<WindowIcon x:Key="ApplicationTrayIcon">/Resources/SystemTrayMenu.ico</WindowIcon>
@@ -51,7 +47,6 @@
 		<Style Selector="Window">
 			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
 			<Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" />
-			<!-- TODO: <Setter Property="TextOptions.TextFormattingMode" Value="Display" /-->
 			<Setter Property="UseLayoutRounding" Value="True" />
 		</Style>
 		<Style Selector="TabItem">
@@ -72,17 +67,10 @@
 		</Style>
 
 		<Style Selector="TextBox">
-			<!-- Please update HotkeySelector as well -->
 			<Setter Property="Height" Value="21" />
 			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
 			<Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" />
-			<!-- TODO: Setter Property="SelectionTextBrush" Value="White" /-->
 			<Setter Property="SelectionBrush" Value="#0078d7" />
-		</Style>
-		<Style Selector="TextBox">
-			<!-- TODO: Make selector work for final GroupBox type -->
-			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
-			<Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" />
 		</Style>
 		<Style Selector="CheckBox">
 			<Setter Property="Margin" Value="3" />
@@ -90,13 +78,11 @@
 			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
 		</Style>
 		<Style Selector="ComboBox">
-			<!-- not working for selected TabIdem yet, so we keep default colors -->
-			<!--Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" /-->
-			<!--Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" /-->
+			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
+			<Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" />
 		</Style>
-		<Style Selector="ItemsRepeater">
-			<!-- TODO: Make selector work for final ListView type -->
-			<!-- TODO: Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" /-->
+		<Style Selector="NumericUpDown">
+			<Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" />
 			<Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" />
 		</Style>
 		<Style Selector="RadioButton">

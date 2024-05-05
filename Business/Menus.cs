@@ -840,7 +840,7 @@ namespace SystemTrayMenu.Business
                 foreach (RowData rowData in menu.GetDataGridView().Items)
 #endif
                 {
-                    // TODO: Check if this check is correct as it looks like wronge entries might be modified as well?
+                    // TODO: Check if this check is correct as it looks like wrong entries might be modified as well?
                     if (rowData.Path.StartsWith($"{e.OldFullPath}"))
                     {
                         string path = rowData.Path.Replace(e.OldFullPath, e.FullPath);

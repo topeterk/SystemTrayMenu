@@ -975,19 +975,19 @@ namespace SystemTrayMenu.UserInterface
             }
         }
 
+#if !AVALONIA
         // <summary>
         // sort the assembly list by column
         // </summary>
         private void AssemblyInfoListView_ColumnClick(object sender, RoutedEventArgs e)
         {
-#if TODO_AVALONIA
             AssemblyInfoListView.Items.SortDescriptions.Clear();
             AssemblyInfoListView.Items.SortDescriptions.Add(new SortDescription(
                 ((GridViewColumnHeader)e.OriginalSource).Column.Header.ToString(),
                 ListSortDirection.Ascending));
             AssemblyInfoListView.Items.Refresh();
-#endif
         }
+#endif
 
 #if TODO_AVALONIA
         // <summary>

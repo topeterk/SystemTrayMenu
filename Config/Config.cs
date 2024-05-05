@@ -86,7 +86,7 @@ namespace SystemTrayMenu
         {
 #if AVALONIA
 #if WINDOWS
-            if (Settings.Default.UseIconFromRootFolder && OperatingSystem.IsWindows())
+            if (Settings.Default.UseIconFromRootFolder && OperatingSystem.IsWindowsVersionAtLeast(6, 1))
             {
                 if (iconRootFolder is null)
                 {

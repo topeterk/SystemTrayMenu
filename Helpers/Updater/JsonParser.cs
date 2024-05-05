@@ -7,7 +7,7 @@ namespace SystemTrayMenu.Helpers.Updater
     // The MIT License (MIT)
 
     // Copyright (c) 2018 Alex Parker
-    // Copyright (c) 2018-2023 Peter Kirmeier
+    // Copyright (c) 2018-2024 Peter Kirmeier
 
     // Permission is hereby granted, free of charge, to any person obtaining a copy of
     // this software and associated documentation files (the "Software"), to deal in
@@ -448,9 +448,13 @@ namespace SystemTrayMenu.Helpers.Updater
             return nameToMember;
         }
 
-        private static object ParseObject(Type type, string json)
+        private static object? ParseObject(Type type, string json)
         {
-            object instance = FormatterServices.GetUninitializedObject(type);
+            object? instance = Activator.CreateInstance(type);
+            if (instance is null)
+            {
+                return null;
+            }
 
             // The list is split into key/value pairs only, this means the split must be divisible by 2 to be valid JSON
             List<string> elems = Split(json);

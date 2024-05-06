@@ -345,10 +345,10 @@ namespace SystemTrayMenu.Utilities
                         string mimeTypeIconName = "text-x-generic";
                         try
                         {
-                            NativeMethods.UnixFileMode permissions = NativeMethods.GetUnixFileMode(path);
-                            if (permissions.HasFlag(NativeMethods.UnixFileMode.UserExecute) ||
-                                permissions.HasFlag(NativeMethods.UnixFileMode.GroupExecute) ||
-                                permissions.HasFlag(NativeMethods.UnixFileMode.OtherExecute))
+                            UnixFileMode permissions = File.GetUnixFileMode(path);
+                            if (permissions.HasFlag(UnixFileMode.UserExecute) ||
+                                permissions.HasFlag(UnixFileMode.GroupExecute) ||
+                                permissions.HasFlag(UnixFileMode.OtherExecute))
                             {
                                 mimeTypeIconName = "application-x-executable";
                             }

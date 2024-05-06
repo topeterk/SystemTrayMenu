@@ -370,8 +370,6 @@ namespace SystemTrayMenu.UserInterface
             TopRight,
         }
 
-        internal Point Location => new (Left, Top); // TODO WPF Replace Forms wrapper
-
 #if AVALONIA
         internal Rect MenuBounds { get; private set; } = default;
 #endif
@@ -497,7 +495,11 @@ namespace SystemTrayMenu.UserInterface
                 if (OperatingSystem.IsWindows())
                 {
                     Point mousePos = NativeMethods.Screen.CursorPosition;
+#if AVALONIA
+                    Rect bounds = new(Position.X, Position.Y, Width, Height);
+#else
                     Rect bounds = new(Left, Top, Width, Height);
+#endif
                     return bounds.Contains(mousePos);
                 }
 #if !TODO_AVALONIA
@@ -697,7 +699,7 @@ namespace SystemTrayMenu.UserInterface
         {
             if (Level == 0)
             {
-                GetScreenBounds(out Rect boundsMainMenu, out bool useCustomLocation, out StartLocation startLocation, out Point originLocation);
+                GetScreenBounds(out Rect boundsMainMenu, out bool useCustomLocation, out StartLocation startLocation, out PixelPoint originLocation);
 
                 // When opened at a very specific location, we do not want to move the window around.
                 if (startLocation == StartLocation.Point)
@@ -731,7 +733,7 @@ namespace SystemTrayMenu.UserInterface
             {
                 // Calculate based on the available space given by the parent menu
                 MenuBounds = ParentMenu.MenuBounds;
-                AdjustSizeAndLocation(MenuBounds, ParentMenu, StartLocation.Predecessor, ParentMenu.Location);
+                AdjustSizeAndLocation(MenuBounds, ParentMenu, StartLocation.Predecessor, ParentMenu.Position);
             }
         }
 #endif
@@ -766,7 +768,7 @@ namespace SystemTrayMenu.UserInterface
 
                 // Sub Menu location depends on the location of its predecessor
                 startLocation = StartLocation.Predecessor;
-                originLocation = menuPredecessor.Location;
+                originLocation = new (menuPredecessor.Left, menuPredecessor.Top);
             }
             else if (useCustomLocation)
             {
@@ -816,7 +818,7 @@ namespace SystemTrayMenu.UserInterface
             Rect bounds,
             Menu? menuPredecessor,
             StartLocation startLocation,
-            Point originLocation)
+            PixelPoint originLocation)
         {
 #endif
             {
@@ -1189,7 +1191,7 @@ namespace SystemTrayMenu.UserInterface
 #endif
 
 #if AVALONIA
-        private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation, out Point originLocation)
+        private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation, out PixelPoint originLocation)
         {
 #if TODO_AVALONIA
             // Find out, how cursor position can be found without any open windows
@@ -1199,7 +1201,7 @@ namespace SystemTrayMenu.UserInterface
                 screenBounds = NativeMethods.Screen.FromPoint(NativeMethods.Screen.CursorPosition);
                 useCustomLocation = false;
                 startLocation = StartLocation.Point;
-                originLocation = NativeMethods.Screen.CursorPosition;
+                originLocation = NativeMethods.Screen.CursorPosition.ToPixelPoint();
                 return;
             }
             else if (Settings.Default.UseCustomLocation)
@@ -1210,7 +1212,7 @@ namespace SystemTrayMenu.UserInterface
                 if (useCustomLocation)
                 {
                     startLocation = StartLocation.Point;
-                    originLocation = customLocation;
+                    originLocation = customLocation.ToPixelPoint();
                     return;
                 }
             }
@@ -1544,6 +1546,9 @@ namespace SystemTrayMenu.UserInterface
             }
 
             lastLocation = mousePos;
+
+            Settings.Default.CustomLocationX = Position.X;
+            Settings.Default.CustomLocationY = Position.Y;
 #else
             if (OperatingSystem.IsWindows())
             {
@@ -1552,10 +1557,10 @@ namespace SystemTrayMenu.UserInterface
                 Top = Top + mousePos.Y - lastLocation.Y;
                 lastLocation = mousePos;
             }
-#endif
 
             Settings.Default.CustomLocationX = (int)Left;
             Settings.Default.CustomLocationY = (int)Top;
+#endif
         }
 
         private void MainMenu_MoveEnd(object? sender, EventArgs? e)

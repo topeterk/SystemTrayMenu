@@ -44,7 +44,7 @@ namespace SystemTrayMenu.UserInterface
 
             // Move the window out of screen, just for safety
 #if AVALONIA
-            Top += NativeMethods.Screen.VirtualScreenHeight * 2;
+            Position = new(Position.X, (int)(Position.Y + (NativeMethods.Screen.VirtualScreenHeight * 2)));
 #else
             Top += SystemParameters.VirtualScreenHeight * 2;
 

@@ -57,6 +57,11 @@ namespace SystemTrayMenu.Utilities
 
             return null;
         }
+
+        internal static PixelPoint ToPixelPoint(this Point point)
+        {
+            return new((int)point.X, (int)point.Y);
+        }
     }
 }
 #endif

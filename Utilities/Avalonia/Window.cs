@@ -63,10 +63,6 @@ namespace SystemTrayMenu.Utilities
 
         internal Dispatcher Dispatcher => Dispatcher.UIThread;
 
-        internal double Left { get => Position.X; set => Position = new((int)value, Position.Y); }
-
-        internal double Top { get => Position.Y; set => Position = new(Position.X, (int)value); }
-
         internal bool? ShowDialog()
         {
             Task<bool?> dialog = ShowDialog<bool?>(this);

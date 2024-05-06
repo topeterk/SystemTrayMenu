@@ -310,7 +310,7 @@ namespace SystemTrayMenu.DataClasses
                         // Snap context menu left aligned with a small padding, but keep it vertically centered
                         Rect rectChild = Owner.GetDataGridViewChildRect(this);
 #if AVALONIA
-                        position = new (Owner.Left + rectChild.Left + 10D, Owner.Top + rectChild.Top + (rectChild.Height / 2D));
+                        position = new (Owner.Position.X + rectChild.Left + 10D, Owner.Position.Y + rectChild.Top + (rectChild.Height / 2D));
 #else
                         position = Owner.GetRelativeChildPositionTo(Owner.GetDataGridView());
                         position.Offset(Owner.Left + rectChild.Left + 10D, Owner.Top + rectChild.Top + (rectChild.Height / 2D));

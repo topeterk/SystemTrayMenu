@@ -235,8 +235,13 @@ namespace SystemTrayMenu.Business
                 case Key.Right:
                     Menu? next = menuBefore.SubMenu;
                     Menu? prev = menuBefore.ParentMenu;
-                    bool nextLeft = next != null && next.Location.X < menuBefore.Location.X;
-                    bool prevLeft = prev != null && prev.Location.X < menuBefore.Location.X;
+#if AVALONIA
+                    bool nextLeft = next != null && next.Position.X < menuBefore.Position.X;
+                    bool prevLeft = prev != null && prev.Position.X < menuBefore.Position.X;
+#else
+                    bool nextLeft = next != null && next.Left < menuBefore.Left;
+                    bool prevLeft = prev != null && prev.Left < menuBefore.Left;
+#endif
 
                     // P = Parent, N = Next ..
                     // Menues come from right in examples

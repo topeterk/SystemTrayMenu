@@ -384,6 +384,11 @@ namespace SystemTrayMenu.UserInterface
 
         public static bool IsOpen() => singletonWindow != null;
 
+        private static T? GetSettingsDefaultValue<T>(string name)
+        {
+            return (T?)Convert.ChangeType(Settings.Default.Properties[name].DefaultValue, typeof(T));
+        }
+
         [SupportedOSPlatform("Windows")]
         private static void AddSetFolderByWindowsContextMenu()
         {
@@ -888,11 +893,6 @@ namespace SystemTrayMenu.UserInterface
             }
 
             buttonAddSampleStartMenuFolder.IsEnabled = !doesStartMenuFolderExist;
-        }
-
-        private T? GetSettingsDefaultValue<T>(string name)
-        {
-            return (T?)Convert.ChangeType(Settings.Default.Properties[name].DefaultValue, typeof(T));
         }
 
         private void ButtonSizeAndLocationDefault_Click(object sender, RoutedEventArgs e)

@@ -40,8 +40,6 @@ namespace SystemTrayMenu.UserInterface
     /// </summary>
     public partial class AboutBox : Window
     {
-        private static readonly Regex RegexUrl = new(@"(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?");
-
         private static AboutBox? singletonWindow;
 
         private string? entryAssemblyName;
@@ -184,7 +182,7 @@ namespace SystemTrayMenu.UserInterface
                     // Parse string to detect hyperlinks and add handlers to them
                     // See: https://mycsharp.de/forum/threads/97560/erledigt-dynamische-hyperlinks-in-wpf-flowdocument?page=1
                     int lastPos = 0;
-                    foreach (Match match in RegexUrl.Matches(value).Cast<Match>())
+                    foreach (Match match in RegexUrl().Matches(value).Cast<Match>())
                     {
                         if (match.Index != lastPos)
                         {
@@ -238,6 +236,12 @@ namespace SystemTrayMenu.UserInterface
                 singletonWindow.Show();
             }
         }
+
+        [GeneratedRegex(@"(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?")]
+        private static partial Regex RegexUrl();
+
+        [GeneratedRegex("(\\.Assembly|\\.)(?<ColumnText>[^.]*)Attribute$", RegexOptions.IgnoreCase)]
+        private static partial Regex RegexAssemblyAttrib();
 
         private static AboutBox CreateAbout()
         {
@@ -449,7 +453,7 @@ namespace SystemTrayMenu.UserInterface
             string name;
             string value;
             NameValueCollection nvc = new();
-            Regex r = new(@"(\.Assembly|\.)(?<ColumnText>[^.]*)Attribute$", RegexOptions.IgnoreCase);
+            Regex r = RegexAssemblyAttrib();
 
             foreach (object attrib in a.GetCustomAttributes(false))
             {
@@ -732,7 +736,7 @@ namespace SystemTrayMenu.UserInterface
         private void PopulateAssemblies()
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            List<AssemblyInfoListViewItem> items = new List<AssemblyInfoListViewItem>(assemblies.Length);
+            List<AssemblyInfoListViewItem> items = new (assemblies.Length);
 
             foreach (Assembly a in assemblies)
             {
@@ -832,9 +836,12 @@ namespace SystemTrayMenu.UserInterface
         // <summary>
         // perform assemblyinfo to string replacements on labels
         // </summary>
-        private string ReplaceTokens(string s)
-        {
-            return s.Replace("%title%", EntryAssemblyAttrib("title"), StringComparison.InvariantCulture)
+#if AVALONIA
+        private string? ReplaceTokens(string? s) => s?
+#else
+        private string ReplaceTokens(string s) => s
+#endif
+                .Replace("%title%", EntryAssemblyAttrib("title"), StringComparison.InvariantCulture)
                 .Replace("%copyright%", EntryAssemblyAttrib("copyright"), StringComparison.InvariantCulture)
                 .Replace("%description%", EntryAssemblyAttrib("description"), StringComparison.InvariantCulture)
                 .Replace("%company%", EntryAssemblyAttrib("company"), StringComparison.InvariantCulture)
@@ -843,7 +850,6 @@ namespace SystemTrayMenu.UserInterface
                 .Replace("%year%", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCulture)
                 .Replace("%version%", EntryAssemblyAttrib("version"), StringComparison.InvariantCulture)
                 .Replace("%builddate%", EntryAssemblyAttrib("builddate"), StringComparison.InvariantCulture);
-        }
 
         // <summary>
         // things to do when form is loaded

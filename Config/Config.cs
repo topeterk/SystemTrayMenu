@@ -213,7 +213,7 @@ namespace SystemTrayMenu
                     }
 
                     // Required for native UI rendering like the ShellContextMenu
-                    NativeMethods.SetPreferredAppMode(isDarkMode ? NativeMethods.PreferredAppMode.ForceDark : NativeMethods.PreferredAppMode.ForceLight);
+                    _ = NativeMethods.SetPreferredAppMode(isDarkMode ? NativeMethods.PreferredAppMode.ForceDark : NativeMethods.PreferredAppMode.ForceLight);
                     NativeMethods.FlushMenuThemes();
                 }
 #if !WINDOWS

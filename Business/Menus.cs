@@ -411,13 +411,13 @@ namespace SystemTrayMenu.Business
                         if (!await Config.SetFolderByUser(mainMenu))
                         {
                             // Most likely the user canceled
-                            Application.Current.Shutdown();
+                            Application.Current?.Shutdown();
                         }
                         else if (string.IsNullOrEmpty(Config.Path))
                         {
                             // Still not a valid path set.
                             // Stop here otherwise this most likely loop again to this point.
-                            Application.Current.Shutdown();
+                            Application.Current?.Shutdown();
                         }
                         else
                         {
@@ -432,13 +432,13 @@ namespace SystemTrayMenu.Business
                         if (!await Config.SetFolderByUser(mainMenu))
                         {
                             // Most likely the user canceled
-                            Application.Current.Shutdown();
+                            Application.Current?.Shutdown();
                         }
                         else if (string.IsNullOrEmpty(Config.Path))
                         {
                             // Still not a valid path set.
                             // Stop here otherwise this most likely loop again to this point.
-                            Application.Current.Shutdown();
+                            Application.Current?.Shutdown();
                         }
                         else
                         {

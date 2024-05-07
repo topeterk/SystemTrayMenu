@@ -139,8 +139,7 @@ namespace SystemTrayMenu.DllImports
                 {
                     if (OperatingSystem.IsWindows())
                     {
-                        NativeMethods.POINT lpPoint;
-                        if (NativeMethods.GetCursorPos(out lpPoint))
+                        if (NativeMethods.GetCursorPos(out NativeMethods.POINT lpPoint))
                         {
                             LastCursorPosition = new(lpPoint.X, lpPoint.Y);
                         }
@@ -179,7 +178,7 @@ namespace SystemTrayMenu.DllImports
             }
 
 #if AVALONIA
-            private static Rect ScreenToRect(Avalonia.Platform.Screen screen) => new(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height);
+            private static Rect ScreenToRect(Avalonia.Platform.Screen? screen) => screen is not null ? new(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height) : new(0, 0, 800, 600);
 #else
             [SupportedOSPlatform("windows")]
             internal static void FetchScreens()
@@ -223,6 +222,7 @@ namespace SystemTrayMenu.DllImports
                 [SupportedOSPlatform("Windows")]
                 [DllImport("user32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
                 [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
+                [return: MarshalAs(UnmanagedType.Bool)]
                 public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
 
                 /// <summary>
@@ -231,6 +231,7 @@ namespace SystemTrayMenu.DllImports
                 [SupportedOSPlatform("Windows")]
                 [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
                 [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
+                [return: MarshalAs(UnmanagedType.Bool)]
                 public static extern bool GetCursorPos(out POINT lpPoint);
 
                 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]

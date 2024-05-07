@@ -34,8 +34,8 @@ namespace SystemTrayMenu.DllImports
 
         [SupportedOSPlatform("Windows")]
         [DllImport("user32.dll", EntryPoint = "UnregisterHotKey", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
-        [return: MarshalAs(UnmanagedType.Bool)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.UserDirectories)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool User32UnregisterHotKey(IntPtr hWnd, int id);
 
         [SupportedOSPlatform("Windows")]

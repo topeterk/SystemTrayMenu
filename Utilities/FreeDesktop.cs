@@ -38,10 +38,10 @@ namespace SystemTrayMenu.Utilities
     [UnsupportedOSPlatform("windows")]
     internal static class FreeDesktop
     {
-        private static readonly List<string> ThemeBaseDirs = new();
+        private static readonly List<string> ThemeBaseDirs = [];
 
-        private static readonly Dictionary<string /*subclass*/, string /*base*/> MimeSubtypes = new();
-        private static readonly Dictionary<string /*MimeTypeName*/, string /*IconName*/> MimeIcons = new();
+        private static readonly Dictionary<string /*subclass*/, string /*base*/> MimeSubtypes = [];
+        private static readonly Dictionary<string /*MimeTypeName*/, string /*IconName*/> MimeIcons = [];
         private static readonly SortedDictionary<int /*weight*/, List<MimeGlobEntry>> MimeGlobs = new(
             Comparer<int>.Create((x, y) => -x.CompareTo(y))); // inverts default order to descending values
 
@@ -54,8 +54,8 @@ namespace SystemTrayMenu.Utilities
             // See: https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html#directory_layout
             // See: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html#variables
             string envPath;
-            List<string> searchDirsMime = new();
-            List<string> searchDirsTheme = new();
+            List<string> searchDirsMime = [];
+            List<string> searchDirsTheme = [];
             string? envVar = Environment.GetEnvironmentVariable("HOME");
             if (!string.IsNullOrEmpty(envVar))
             {
@@ -189,7 +189,7 @@ namespace SystemTrayMenu.Utilities
                         }
                         else
                         {
-                            MimeGlobs.Add(weight, new () { mimeGlobEntry });
+                            MimeGlobs.Add(weight, [mimeGlobEntry]);
                         }
                     }
                 }
@@ -301,7 +301,7 @@ namespace SystemTrayMenu.Utilities
         //              gio info -a standard::symbolic-icon ~/test.cpp
         internal static bool FindMimeTypeIcons(string path, out List<string> mimeTypeIconNames)
         {
-            mimeTypeIconNames = new();
+            mimeTypeIconNames = [];
             if (GetMimeTypeNames(path, out List<string> mimeTypeNames))
             {
                 foreach (string mimeTypeName in mimeTypeNames)
@@ -392,7 +392,7 @@ namespace SystemTrayMenu.Utilities
                         continue;
                     }
 
-                    string[] sizeValueStr = Path.GetFileName(sizePath).Split(new char[] { 'x', '@' });
+                    string[] sizeValueStr = Path.GetFileName(sizePath).Split(['x', '@']);
 
                     // We do not want scaled variations and we only look for equilateral dimensions
                     if ((sizeValueStr.Length == 2) && sizeValueStr[0].Equals(sizeValueStr[1]))
@@ -456,7 +456,7 @@ namespace SystemTrayMenu.Utilities
         /// <returns>true: One or more mime types found, false: No mime type found.</returns>
         private static bool GetMimeTypeNames(string path, out List<string> mimeTypeNames)
         {
-            mimeTypeNames = new();
+            mimeTypeNames = [];
 
             int longesPattern = 0;
             string? fileName = Path.GetFileName(path);
@@ -525,8 +525,8 @@ namespace SystemTrayMenu.Utilities
 
         private static List<string> FindThemes()
         {
-            List<Tuple<string, ThemeDetectionMethod>> detectionMethodsPattern = new()
-            {
+            List<Tuple<string, ThemeDetectionMethod>> detectionMethodsPattern =
+            [
                 new ("Cinnamon", ThemeDetectionMethod.GSETTINGS),
                 new ("GNOME", ThemeDetectionMethod.GSETTINGS ),
                 new ("LXDE", ThemeDetectionMethod.GSETTINGS ),
@@ -534,8 +534,8 @@ namespace SystemTrayMenu.Utilities
                 new ("XFCE", ThemeDetectionMethod.GSETTINGS ),
                 new ("KDE", ThemeDetectionMethod.KDE_CONFIG ),
                 new ("LXQt", ThemeDetectionMethod.GTK_CONFIG ),
-            };
-            List<ThemeDetectionMethod> detectionMethods = new();
+            ];
+            List<ThemeDetectionMethod> detectionMethods = [];
 
             // Detect preferred environment and add detection methods
             // Based on table from archlinux' xdg-utils documentation
@@ -570,7 +570,7 @@ namespace SystemTrayMenu.Utilities
 
             // Try each method to find a selected theme
             string? themeName;
-            List<string> themeNames = new();
+            List<string> themeNames = [];
             foreach (ThemeDetectionMethod detectionMethod in detectionMethods)
             {
                 // See: https://unix.stackexchange.com/questions/419895/if-i-have-a-mime-type-how-do-i-get-its-associated-icon-from-the-current-appearan
@@ -658,7 +658,7 @@ namespace SystemTrayMenu.Utilities
 
                             // Look for configurations in all search paths
                             // See: https://docs.gtk.org/gtk3/class.Settings.html
-                            List<string> settingFiles = new();
+                            List<string> settingFiles = [];
 
                             // This path is not mentioned in documentation but whole world is talking about it, so we assume it exists as local override and add it first
                             envPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "gtk-3.0", "settings.ini");
@@ -839,7 +839,7 @@ namespace SystemTrayMenu.Utilities
         {
             try
             {
-                ProcessStartInfo processStartInfo = new ProcessStartInfo
+                ProcessStartInfo processStartInfo = new ()
                 {
                     FileName = filename,
                     Arguments = arguments,
@@ -859,26 +859,27 @@ namespace SystemTrayMenu.Utilities
         // TODO: Check and improve parsing as syntax is not 100 percent know yet
         private static string? ReadValueFromIniFile(IEnumerable<string> lines, string section, string key)
         {
+            string lineTrimmed;
             string sectionLine = $"[{section}]";
             bool inIconsSection = false;
             foreach (string line in lines)
             {
-                line.Trim();
+                lineTrimmed = line.Trim();
 
                 // not sure, if there are comments, so ignore anything after
-                if (line.StartsWith(sectionLine))
+                if (lineTrimmed.StartsWith(sectionLine))
                 {
                     inIconsSection = true;
                 }
 
                 // ok it is nasty but good enough
-                else if (line.StartsWith('[') && line.Contains(']'))
+                else if (lineTrimmed.StartsWith('[') && lineTrimmed.Contains(']'))
                 {
                     inIconsSection = false;
                 }
                 else if (inIconsSection)
                 {
-                    string[] fields = line.Split('=');
+                    string[] fields = lineTrimmed.Split('=');
                     if (fields.Length == 2)
                     {
                         if (fields[0].Trim().Equals(key))
@@ -922,7 +923,7 @@ namespace SystemTrayMenu.Utilities
             internal string Pattern;
             internal bool IsCaseSensitive;
 
-            public override string ToString() => MimeTypeName + ":" + Pattern + (IsCaseSensitive ? ":cs" : string.Empty);
+            public override readonly string ToString() => MimeTypeName + ":" + Pattern + (IsCaseSensitive ? ":cs" : string.Empty);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace SystemTrayMenu.Utilities
         {
             get
             {
-                var lv = new ItemsControl();
+                ItemsControl lv = new ();
                 lv.ItemsSource = ItemsSource;
                 return lv.Items;
             }

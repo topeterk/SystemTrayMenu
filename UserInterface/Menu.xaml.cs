@@ -418,10 +418,7 @@ namespace SystemTrayMenu.UserInterface
 #if AVALONIA
             Control? control = dgv.FindControlByDataContext(rowData);
             SolidBorder openAnimationBorder = control?.FindVisualChildOfType<SolidBorder>();
-            if (openAnimationBorder is not null)
-            {
-                openAnimationBorder.StartOpenAnimation();
-            }
+            openAnimationBorder?.StartOpenAnimation();
 #else
             ListViewItem? lvi;
             int i = 0;
@@ -693,13 +690,13 @@ namespace SystemTrayMenu.UserInterface
 
 #if AVALONIA
         /// <summary>
-        /// Performs AdjustSizeAndLocation on this menu and all of its submenus
+        /// Performs AdjustSizeAndLocation on this menu and all of its submenus.
         /// </summary>
         internal void AdjustMenusSizeAndLocation()
         {
             if (Level == 0)
             {
-                GetScreenBounds(out Rect boundsMainMenu, out bool useCustomLocation, out StartLocation startLocation, out PixelPoint originLocation);
+                GetScreenBounds(out Rect boundsMainMenu, out StartLocation startLocation, out PixelPoint originLocation);
 
                 // When opened at a very specific location, we do not want to move the window around.
                 if (startLocation == StartLocation.Point)
@@ -1079,7 +1076,7 @@ namespace SystemTrayMenu.UserInterface
 #if AVALONIA
             Control? control = dgv.FindControlByDataContext(rowData);
             Point position = control?.TranslatePoint(default, this) ?? default;
-            return new Rect(position, control?.Bounds.Size ?? default(Size));
+            return new (position, control?.Bounds.Size ?? default);
 #else
             // When scrolled, we have to reduce the index number as we calculate based on visual tree
             int rowIndex = rowData.RowIndex;
@@ -1191,7 +1188,7 @@ namespace SystemTrayMenu.UserInterface
 #endif
 
 #if AVALONIA
-        private void GetScreenBounds(out Rect screenBounds, out bool useCustomLocation, out StartLocation startLocation, out PixelPoint originLocation)
+        private static void GetScreenBounds(out Rect screenBounds, out StartLocation startLocation, out PixelPoint originLocation)
         {
 #if TODO_AVALONIA
             // Find out, how cursor position can be found without any open windows
@@ -1199,7 +1196,6 @@ namespace SystemTrayMenu.UserInterface
             if (Settings.Default.AppearAtMouseLocation && OperatingSystem.IsWindows())
             {
                 screenBounds = NativeMethods.Screen.FromPoint(NativeMethods.Screen.CursorPosition);
-                useCustomLocation = false;
                 startLocation = StartLocation.Point;
                 originLocation = NativeMethods.Screen.CursorPosition.ToPixelPoint();
                 return;
@@ -1208,8 +1204,7 @@ namespace SystemTrayMenu.UserInterface
             {
                 Point customLocation = new(Settings.Default.CustomLocationX, Settings.Default.CustomLocationY);
                 screenBounds = NativeMethods.Screen.FromPoint(customLocation);
-                useCustomLocation = screenBounds.Contains(customLocation);
-                if (useCustomLocation)
+                if (screenBounds.Contains(customLocation))
                 {
                     startLocation = StartLocation.Point;
                     originLocation = customLocation.ToPixelPoint();
@@ -1219,7 +1214,6 @@ namespace SystemTrayMenu.UserInterface
             else
             {
                 screenBounds = NativeMethods.Screen.PrimaryScreen;
-                useCustomLocation = false;
             }
 
             originLocation = default;
@@ -1236,6 +1230,7 @@ namespace SystemTrayMenu.UserInterface
                     break;
                 case TaskbarPosition.Right:
                 case TaskbarPosition.Bottom:
+                case TaskbarPosition.Unknown:
                 default:
                     startLocation = StartLocation.BottomRight;
                     break;

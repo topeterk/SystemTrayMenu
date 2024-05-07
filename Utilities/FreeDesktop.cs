@@ -609,6 +609,9 @@ namespace SystemTrayMenu.Utilities
 
                     case ThemeDetectionMethod.KDE_CONFIG:
                         {
+                            // TODO: Maybe try something like this before doing it manually?
+                            //       kreadconfig5--file kdeglobals --group General--key Name
+
                             // Get search path and load configuration file
                             // TODO: Make sure kf5-config returns a single path in proper format
                             // See: https://www.giovanniceribella.eu/fuere/?p=1641

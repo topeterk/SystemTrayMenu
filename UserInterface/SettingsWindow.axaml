@@ -202,43 +202,39 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <HeaderedContentControl Classes="GroupBox" Header="{u:Translate 'Add content of directory to root directory'}">
-                            <StackPanel>
+                            <StackPanel Grid.IsSharedSizeScope="True">
                                 <CheckBox x:Name="checkBoxShowOnlyAsSearchResult" Content="{u:Translate 'Show only as search result'}"/>
                                 <DockPanel LastChildFill="False">
                                     <Button DockPanel.Dock="Left" Content="{u:Translate 'Add directory'}" Click="ButtonAddFolderToRootFolder_Click"/>
                                     <Button DockPanel.Dock="Right" x:Name="buttonRemoveFolder" Content="{u:Translate 'Remove directory'}" Click="ButtonRemoveFolder_Click" IsEnabled="False"/>
                                 </DockPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="GridGroupFolder" />
+                                        <ColumnDefinition SharedSizeGroup="GridGroupRecursive" />
+                                        <ColumnDefinition SharedSizeGroup="GridGroupOnlyFiles" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="2" Background="{x:Null}" TextWrapping="NoWrap" Text="{u:Translate 'Directory paths'}"/>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2" Background="{x:Null}" TextWrapping="NoWrap" Text="{u:Translate 'Recursive'}"/>
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="2" Background="{x:Null}" TextWrapping="NoWrap" Text="{u:Translate 'Only Files'}"/>
+                                </Grid>
+                                <!-- TODO: Replace with Datagrid and fix code behind as list collection is not fully working yet -->
                                 <u:ListView x:Name="dataGridViewFolders" x:FieldModifier="private" MinHeight="90" Margin="5" ScrollViewer.VerticalScrollBarVisibility="Auto" Background="{x:Null}">
                                     <!-- TODO: SelectionChanged="DataGridViewFolders_SelectionChanged" -->
-                                    <!-- TODO: <u:ListView.View> -->
-                                    <!-- TODO:     <Grid>        -->
-                                            <!-- TODO: <GridViewColumn DisplayMemberBinding="{Binding ColumnFolder}">             -->
-                                            <!-- TODO:     <GridViewColumn.Header>                                                -->
-                                            <!-- TODO:         <GridViewColumnHeader Content="{u:Translate 'Directory paths'}" /> -->
-                                            <!-- TODO:     </GridViewColumn.Header>                                               -->
-                                            <!-- TODO: </GridViewColumn>                                                          -->
-                                            <!-- TODO: <GridViewColumn>                                                           -->
-                                            <!-- TODO:     <GridViewColumn.Header>                                                -->
-                                            <!-- TODO:         <GridViewColumnHeader Content="{u:Translate 'Recursive'}" />       -->
-                                            <!-- TODO:     </GridViewColumn.Header>                                               -->
-                                            <!-- TODO:     <GridViewColumn.CellTemplate>                                          -->
-                                            <!-- TODO:         <DataTemplate>                                                     -->
-                                            <!-- TODO:             <CheckBox IsChecked="{Binding ColumnRecursiveLevel}"/>         -->
-                                            <!-- TODO:         </DataTemplate>                                                    -->
-                                            <!-- TODO:     </GridViewColumn.CellTemplate>                                         -->
-                                            <!-- TODO: </GridViewColumn>                                                          -->
-                                            <!-- TODO: <GridViewColumn>                                                           -->
-                                            <!-- TODO:     <GridViewColumn.Header>                                                -->
-                                            <!-- TODO:         <GridViewColumnHeader Content="{u:Translate 'Only Files'}" />      -->
-                                            <!-- TODO:     </GridViewColumn.Header>                                               -->
-                                            <!-- TODO:     <GridViewColumn.CellTemplate>                                          -->
-                                            <!-- TODO:         <DataTemplate>                                                     -->
-                                            <!-- TODO:             <CheckBox IsChecked="{Binding ColumnOnlyFiles}"/>              -->
-                                            <!-- TODO:         </DataTemplate>                                                    -->
-                                            <!-- TODO:     </GridViewColumn.CellTemplate>                                         -->
-                                            <!-- TODO: </GridViewColumn>                                                          -->
-                                    <!-- TODO:     </Grid>        -->
-                                    <!-- TODO: </u:ListView.View> -->
+                                    <u:ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition SharedSizeGroup="GridGroupFolder" />
+                                                    <ColumnDefinition SharedSizeGroup="GridGroupRecursive" />
+                                                    <ColumnDefinition SharedSizeGroup="GridGroupOnlyFiles" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox Grid.Column="0" VerticalAlignment="Center" Margin="2" Background="{x:Null}" TextWrapping="NoWrap" Text="{Binding ColumnFolder}"/>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding ColumnRecursiveLevel}"/>
+                                                <CheckBox Grid.Column="2" IsChecked="{Binding ColumnOnlyFiles}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </u:ListView.ItemTemplate>
                                 </u:ListView>
                                 <Button x:Name="buttonAddSampleStartMenuFolder" Content="???" Click="ButtonAddSampleStartMenuFolder_Click" HorizontalAlignment="Left" IsEnabled="False"/>
                                 <CheckBox x:Name="checkBoxGenerateShortcutsToDrives" Content="{u:Translate 'Generate drive shortcuts on startup'}"/>

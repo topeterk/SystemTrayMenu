@@ -44,8 +44,10 @@ namespace SystemTrayMenu.Utilities
         {
             get
             {
-                ItemsControl lv = new ();
-                lv.ItemsSource = ItemsSource;
+                ItemsControl lv = new()
+                {
+                    ItemsSource = ItemsSource,
+                };
                 return lv.Items;
             }
             set => ItemsSource = value;

@@ -50,7 +50,7 @@
 			<Setter Property="UseLayoutRounding" Value="True" />
 		</Style>
 		<Style Selector="TabItem">
-			<!-- not working for selected TabIdem yet, so we keep default colors -->
+			<!-- TODO: not working for selected TabIdem yet, so we keep default colors -->
 			<!--Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" /-->
 			<!--Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" /-->
 		</Style>
@@ -58,7 +58,7 @@
 			<Setter Property="Background" Value="Transparent" />
 		</Style>
 		<Style Selector="TextBlock">
-			<!--not used yet as several controls are using it but overwriting colors let them look bad -->
+			<!-- TODO: not used yet as several controls are using it but overwriting colors let them look bad -->
 			<!--Setter Property="Foreground" Value="{x:Static stm:MenuDefines.ColorForeground}" /-->
 			<!--Setter Property="Background" Value="{x:Static stm:MenuDefines.ColorBackground}" /-->
 		</Style>

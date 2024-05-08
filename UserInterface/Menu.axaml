@@ -176,9 +176,6 @@
                             <Binding Path="#windowFrame.Margin.Right" />
                         </MultiBinding>
                     </u:ListView.MaxWidth>
-                    <ItemsRepeater.Layout>
-                      <StackLayout Spacing="0" Orientation="Vertical"/>
-                    </ItemsRepeater.Layout>
                     <u:ListView.Resources>
                         <!-- Set min-size according to: learn.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-customize-the-thumb-size-on-a-scrollbar#create-a-scrollbar-with-a-minimum-thumb-size -->
                         <!-- Thumb's minimum height is half of VerticalScrollBarButtonHeightKey -->

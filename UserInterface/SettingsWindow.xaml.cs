@@ -12,6 +12,7 @@ namespace SystemTrayMenu.UserInterface
 #if WINDOWS
     using Windows.ApplicationModel;
     using StartupTaskState = Windows.ApplicationModel.StartupTaskState;
+    using SystemTrayMenu.Helpers;
 #endif
 #if !AVALONIA
     using System.Windows;
@@ -24,7 +25,6 @@ namespace SystemTrayMenu.UserInterface
     using Window = SystemTrayMenu.Utilities.Window;
 #endif
     using Microsoft.Win32;
-    using SystemTrayMenu.Helpers;
     using SystemTrayMenu.Properties;
     using SystemTrayMenu.UserInterface.FolderBrowseDialog;
     using SystemTrayMenu.Utilities;
@@ -848,7 +848,19 @@ namespace SystemTrayMenu.UserInterface
             {
                 if (!string.IsNullOrEmpty(dialog.Folder))
                 {
+#if AVALONIA
+                    List<ListViewItemData> list = [];
+                    foreach (ListViewItemData item in dataGridViewFolders.Items)
+                    {
+                        list.Add(item);
+                    }
+
+                    list.Add(new (dialog.Folder, false, true));
+                    dataGridViewFolders.ItemsSource = null;
+                    dataGridViewFolders.ItemsSource = list;
+#else
                     dataGridViewFolders.Items.Add(new ListViewItemData(dialog.Folder, false, true));
+#endif
                     EnableButtonAddStartMenu();
                 }
             }

@@ -443,27 +443,13 @@ namespace SystemTrayMenu.UserInterface
         internal void ResetSearchText()
         {
             textBoxSearch.Text = string.Empty;
-            if (dgv.Items.Count > 0)
-            {
-#if !AVALONIA
-                dgv.ScrollIntoView(dgv.Items[0]);
-#else
-                dgv.ScrollIntoView(0);
-#endif
-            }
+            ScrollIntoView(0);
         }
 
         internal void OnWatcherUpdate()
         {
             TextBoxSearch_TextChanged(true);
-            if (dgv.Items.Count > 0)
-            {
-#if !AVALONIA
-                dgv.ScrollIntoView(dgv.Items[0]);
-#else
-                dgv.ScrollIntoView(0);
-#endif
-            }
+            ScrollIntoView(0);
         }
 
         internal void FocusTextBox(bool selectAll = false)
@@ -512,8 +498,6 @@ namespace SystemTrayMenu.UserInterface
             return false;
         }
 
-        internal ListView GetDataGridView() => dgv; // TODO WPF Replace Forms wrapper
-
 #if !AVALONIA
         // Not used as refreshing should be done automatically due to databinding
         // TODO: As long as WPF transition from Forms is incomplete, keep it for testing.
@@ -525,7 +509,7 @@ namespace SystemTrayMenu.UserInterface
 
         // TODO: Check if it is implicitly already running due to SelectionChanged event
         //       In case it is needed, run it within HideWithFade/ShowWithFade?
-        internal void RefreshSelection() => ListView_SelectionChanged(GetDataGridView(), null);
+        internal void RefreshSelection() => ListView_SelectionChanged(dgv, null);
 
         internal bool TrySelectAt(int index, int indexAlternative = -1)
         {
@@ -548,9 +532,9 @@ namespace SystemTrayMenu.UserInterface
 
             dgv.SelectedItem = itemData;
 #if !AVALONIA
-            dgv.ScrollIntoView(itemData);
+            ScrollIntoView(itemData);
 #else
-            dgv.ScrollIntoView(index);
+            ScrollIntoView(index);
 #endif
 
             RowSelectionChanged?.Invoke(itemData);
@@ -996,9 +980,8 @@ namespace SystemTrayMenu.UserInterface
 #if !AVALONIA
                             else
                             {
-                                ListView dgv = menuPredecessor.GetDataGridView();
-                                double offsetList = menuPredecessor.GetRelativeChildPositionTo(dgv).Y;
-                                offsetList += dgv.ActualHeight;
+                                double offsetList = menuPredecessor.GetRelativeChildPositionTo(menuPredecessor.dgv).Y;
+                                offsetList += menuPredecessor.dgv.ActualHeight;
                                 if (offsetList < offset)
                                 {
                                     // Do not allow to show window below last entry position of list
@@ -1580,6 +1563,14 @@ namespace SystemTrayMenu.UserInterface
                 }
             }
         }
+
+#if AVALONIA
+        private void ScrollIntoView(int index) => dgv.TryGetElement(index)?.BringIntoView();
+#else
+        private void ScrollIntoView(int index) => dgv.ScrollIntoView(dgv.Items[index]);
+
+        private void ScrollIntoView(object item) => dgv.ScrollIntoView(item);
+#endif
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs? e)
         {

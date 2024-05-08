@@ -312,7 +312,7 @@ namespace SystemTrayMenu.DataClasses
 #if AVALONIA
                         position = new (Owner.Position.X + rectChild.Left + 10D, Owner.Position.Y + rectChild.Top + (rectChild.Height / 2D));
 #else
-                        position = Owner.GetRelativeChildPositionTo(Owner.GetDataGridView());
+                        position = Owner.GetRelativeChildPositionTo(Owner.dgv);
                         position.Offset(Owner.Left + rectChild.Left + 10D, Owner.Top + rectChild.Top + (rectChild.Height / 2D));
 #endif
                     }

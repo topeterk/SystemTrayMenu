@@ -171,7 +171,7 @@ namespace SystemTrayMenu.Business
             IsSelectedByKey = false;
 
             focussedMenu = itemData.Owner!; // function is only called for itemData that have an Owner set
-            focussedMenu.GetDataGridView().SelectedItem = itemData;
+            focussedMenu.dgv.SelectedItem = itemData;
         }
 
         private void SelectByKey(Key key, Menu menuBefore)
@@ -204,14 +204,14 @@ namespace SystemTrayMenu.Business
 
                     break;
                 case Key.Up:
-                    if (menuBefore.TrySelectAt(menuBefore.GetDataGridView().Items.IndexOf(menuBefore.SelectedItem) - 1, menuBefore.GetDataGridView().Items.Count - 1))
+                    if (menuBefore.TrySelectAt(menuBefore.dgv.Items.IndexOf(menuBefore.SelectedItem) - 1, menuBefore.dgv.Items.Count - 1))
                     {
                         IsSelectedByKey = true;
                     }
 
                     break;
                 case Key.Down:
-                    if (menuBefore.TrySelectAt(menuBefore.GetDataGridView().Items.IndexOf(menuBefore.SelectedItem) + 1, 0))
+                    if (menuBefore.TrySelectAt(menuBefore.dgv.Items.IndexOf(menuBefore.SelectedItem) + 1, 0))
                     {
                         IsSelectedByKey = true;
                     }
@@ -225,7 +225,7 @@ namespace SystemTrayMenu.Business
 
                     break;
                 case Key.End:
-                    if (menuBefore.TrySelectAt(menuBefore.GetDataGridView().Items.Count - 1, -1))
+                    if (menuBefore.TrySelectAt(menuBefore.dgv.Items.Count - 1, -1))
                     {
                         IsSelectedByKey = true;
                     }

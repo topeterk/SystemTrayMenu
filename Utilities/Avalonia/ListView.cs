@@ -51,13 +51,6 @@ namespace SystemTrayMenu.Utilities
             set => ItemsSource = value;
         }
 
-        public void ScrollIntoView(int index)
-        {
-            var element = GetOrCreateElement(index);
-            ((TopLevel?)VisualRoot)?.UpdateLayout();
-            element.BringIntoView();
-        }
-
         // The regular method tries to take up as much space as possible,
         // but actually want to take less possible space as possible.
         protected override Size MeasureOverride(Size availableSize)

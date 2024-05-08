@@ -534,7 +534,7 @@ namespace SystemTrayMenu.Business
                 menu.SelectedItem = null;
                 if (!isSearchStringEmpty)
                 {
-                    ListView dgv = menu.GetDataGridView();
+                    ListView dgv = menu.dgv;
                     if (dgv.Items.Count > 0)
                     {
                         keyboardInput.SelectByMouse((RowData)dgv.Items[0]);
@@ -834,10 +834,10 @@ namespace SystemTrayMenu.Business
             {
                 List<RowData> rowDatas = new();
 #if !AVALONIA
-                foreach (RowData rowData in menu.GetDataGridView().Items.SourceCollection)
+                foreach (RowData rowData in menu.dgv.Items.SourceCollection)
 #else
                 // TODO: SourceCollection
-                foreach (RowData rowData in menu.GetDataGridView().Items)
+                foreach (RowData rowData in menu.dgv.Items)
 #endif
                 {
                     // TODO: Check if this check is correct as it looks like wrong entries might be modified as well?
@@ -899,7 +899,7 @@ namespace SystemTrayMenu.Business
         {
             try
             {
-                ListView? dgv = menu.GetDataGridView();
+                ListView dgv = menu.dgv;
                 List<RowData> rowsToRemove = new();
 
                 foreach (RowData rowData in dgv.ItemsSource)
@@ -962,10 +962,10 @@ namespace SystemTrayMenu.Business
                 rowData.LoadIcon(true);
 
 #if !AVALONIA
-                var items = (List<RowData>)menu.GetDataGridView().Items.SourceCollection;
+                var items = (List<RowData>)menu.dgv.Items.SourceCollection;
 #else
                 // TODO: SourceCollection
-                var items = menu.GetDataGridView().Items;
+                var items = menu.dgv.Items;
 #endif
                 List<RowData> rowDatas = new(items.Count + 1) { rowData };
                 foreach (RowData item in items)

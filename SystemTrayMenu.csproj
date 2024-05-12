@@ -54,9 +54,14 @@ EXIT 0</PreBuildEvent>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <NoWarn>1701;1702;WFAC010;MSB3061</NoWarn>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(UseWPF)' ">
+    <NoWarn>$(NoWarn);SYSLIB1054</NoWarn> <!-- Do not use recommended LibraryImport as it requires to enable unsafe code for the whole project which is not required by DllImport -->
+  </PropertyGroup>
   <PropertyGroup Condition=" !'$(UseWPF)' ">
-    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
-    <Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>true</Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>
+    <NoWarn>$(NoWarn);IDE0028</NoWarn> <!-- Using simplified collection initializers will break the code for pre-.Net8 code (Still in used by WPF) -->
+    <NoWarn>$(NoWarn);IDE0066</NoWarn> <!-- Using new switch syntax will break the code for pre-.Net8 code (Still in used by WPF) -->
+    <NoWarn>$(NoWarn);IDE0290</NoWarn> <!-- Using primary constructor will break the code for pre-.Net8 code (Still in used by WPF) -->
+    <NoWarn>$(NoWarn);CS8600;CS8602</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ErrorReport>none</ErrorReport>

@@ -19,8 +19,6 @@ namespace SystemTrayMenu.UserInterface
     using System.Windows;
 #endif
 
-    [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1124:Do not use regions", Justification = "Mark SystemTrayMenu modifications made to original source.")]
-
     /// <summary>
     /// source: https://www.codeproject.com/Articles/22012/Explorer-Shell-Context-Menu
     /// modified to fit SystemTrayMenu.

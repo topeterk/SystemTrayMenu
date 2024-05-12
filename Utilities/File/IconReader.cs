@@ -32,9 +32,11 @@ namespace SystemTrayMenu.Utilities
     /// </summary>
     internal static class IconReader
     {
-        internal static readonly BitmapSource LoadingImage = (BitmapSource)Application.Current.Resources["LoadingIconImage"];
-        internal static readonly BitmapSource NotFoundImage = (BitmapSource)Application.Current.Resources["NotFoundIconImage"];
-        private static readonly BitmapSource OverlayImage = (BitmapSource)Application.Current.Resources["LinkArrowIconImage"];
+        internal static readonly BitmapSource LoadingImage = (BitmapSource)Application.Current.Resources["LoadingIconImage"]!;
+        internal static readonly BitmapSource NotFoundImage = (BitmapSource)Application.Current.Resources["NotFoundIconImage"]!;
+#if WINDOWS
+        private static readonly BitmapSource OverlayImage = (BitmapSource)Application.Current.Resources["LinkArrowIconImage"]!;
+#endif
 
         private static readonly ConcurrentDictionary<string, BitmapSource> IconDictPersistent = new();
         private static readonly ConcurrentDictionary<string, BitmapSource> IconDictCache = new();
@@ -179,36 +181,6 @@ namespace SystemTrayMenu.Utilities
             return TryGetIcon(path, linkOverlay, shFileInfo, imageList);
         }
 #endif
-
-        private static bool CacheGetOrAddIcon(
-            string key,
-            bool persistentEntry,
-            Action<BitmapSource?> onIconLoaded,
-            bool synchronousLoading,
-            Func<string, BitmapSource> factory)
-        {
-            if (!DictIconCache(persistentEntry).TryGetValue(key, out BitmapSource? icon) &&
-                !DictIconCache(!persistentEntry).TryGetValue(key, out icon))
-            {
-                if (synchronousLoading)
-                {
-                    icon = DictIconCache(persistentEntry).GetOrAdd(key, factory);
-                }
-                else
-                {
-                    IconFactoryQueueSTA.Add(() =>
-                    {
-                        BitmapSource icon = DictIconCache(persistentEntry).GetOrAdd(key, factory);
-                        onIconLoaded(icon);
-                    });
-
-                    return false;
-                }
-            }
-
-            onIconLoaded(icon);
-            return true;
-        }
 
 #if !AVALONIA
         [SupportedOSPlatform("Windows")]
@@ -409,6 +381,8 @@ namespace SystemTrayMenu.Utilities
             return isExtensionWithSameIcon;
         }
 
+#if WINDOWS
+        [SupportedOSPlatform("Windows")]
         private static uint GetFlags(bool linkOverlay, bool largeIcon)
         {
             uint flags = NativeMethods.ShgfiIcon | NativeMethods.ShgfiSYSICONINDEX;
@@ -428,6 +402,7 @@ namespace SystemTrayMenu.Utilities
 
             return flags;
         }
+#endif
 
 #if TODO_LINUX
         [SupportedOSPlatform("Windows")]

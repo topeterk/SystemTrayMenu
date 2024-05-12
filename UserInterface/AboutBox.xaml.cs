@@ -16,16 +16,19 @@ namespace SystemTrayMenu.UserInterface
     using System.Runtime.Versioning;
     using System.Text.RegularExpressions;
     using Microsoft.Win32;
+#if WINDOWS
+    using System.Windows;
+#endif
 #if !AVALONIA
     using System.ComponentModel;
-    using System.Linq;
-    using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Documents;
     using System.Windows.Input;
     using System.Windows.Threading;
 #else
     using Avalonia.Controls;
+    using Avalonia.Controls.Documents;
+    using Avalonia.Controls.Templates;
     using Avalonia.Input;
     using Avalonia.Threading;
     using RoutedEventArgs = Avalonia.Interactivity.RoutedEventArgs;
@@ -174,7 +177,32 @@ namespace SystemTrayMenu.UserInterface
                 else
                 {
                     MoreRichTextBox.SetVisibility(Visibility.Visible);
-#if TODO_AVALONIA
+
+#if AVALONIA
+                    string text = ReplaceTokens(value);
+                    AppMoreInfoLabel.Text = null;
+                    AppMoreInfoLabel.Inlines.Clear();
+
+                    // Parse string to detect hyperlinks and add handlers to them
+                    // See: https://mycsharp.de/forum/threads/97560/erledigt-dynamische-hyperlinks-in-wpf-flowdocument?page=1
+                    int lastPos = 0;
+                    foreach (Match match in (IEnumerable<Match>)RegexUrl().Matches(text))
+                    {
+                        if (match.Index != lastPos)
+                        {
+                            AppMoreInfoLabel.Inlines.Add(text[lastPos..match.Index]);
+                        }
+
+                        AppMoreInfoLabel.Inlines.Add(CreateInlineHyperlink(match.Value, match.Value));
+
+                        lastPos = match.Index + match.Length;
+                    }
+
+                    if (lastPos < text.Length)
+                    {
+                        AppMoreInfoLabel.Inlines.Add(text[lastPos..]);
+                    }
+#else
                     MoreRichTextBox.Document.Blocks.Clear();
 
                     Paragraph para = new ();
@@ -182,7 +210,7 @@ namespace SystemTrayMenu.UserInterface
                     // Parse string to detect hyperlinks and add handlers to them
                     // See: https://mycsharp.de/forum/threads/97560/erledigt-dynamische-hyperlinks-in-wpf-flowdocument?page=1
                     int lastPos = 0;
-                    foreach (Match match in RegexUrl().Matches(value).Cast<Match>())
+                    foreach (Match match in (IEnumerable<Match>)RegexUrl().Matches(value))
                     {
                         if (match.Index != lastPos)
                         {
@@ -206,8 +234,6 @@ namespace SystemTrayMenu.UserInterface
                     }
 
                     MoreRichTextBox.Document.Blocks.Add(para);
-#else
-                    AppMoreInfoLabel.Text = value;
 #endif
                 }
             }
@@ -242,6 +268,34 @@ namespace SystemTrayMenu.UserInterface
 
         [GeneratedRegex("(\\.Assembly|\\.)(?<ColumnText>[^.]*)Attribute$", RegexOptions.IgnoreCase)]
         private static partial Regex RegexAssemblyAttrib();
+
+#if AVALONIA
+        private static InlineUIContainer CreateInlineHyperlink(string linkName, string navigateUri)
+        {
+            // Workaround until it might become an Avalonia feature: Custom UI Inline control to implement inline hyperlink
+            //   See: https://github.com/AvaloniaUI/Avalonia/discussions/8818
+            //   See: https://github.com/AvaloniaUI/Avalonia/discussions/6664
+            //   See: https://github.com/AvaloniaUI/Avalonia/blob/9849da209c1c958e65fe4f9adc1657e0264ca515/tests/Avalonia.Controls.UnitTests/TextBlockTests.cs#L282-L295
+            Button button = new()
+            {
+                Content = linkName,
+                Template = new FuncControlTemplate<Button>((parent, scope) =>
+                    new TextBlock
+                    {
+                        Name = "PART_ContentPresenter",
+
+                        // ! is Avlonia property operator, See: public static IndexerDescriptor operator !(AvaloniaProperty property)
+                        [!TextBlock.TextProperty] = parent[!ContentProperty],
+                        TextDecorations = Avalonia.Media.TextDecorationCollection.Parse("Underline"),
+                        Foreground = AppColors.Hyperlink,
+                    }.RegisterInNameScope(scope)),
+                Command = new ActionCommand((_) => Log.ProcessStart(navigateUri)),
+                Cursor = new (StandardCursorType.Hand),
+            };
+            ToolTip.SetTip(button, navigateUri);
+            return new (button);
+        }
+#endif
 
         private static AboutBox CreateAbout()
         {
@@ -827,10 +881,12 @@ namespace SystemTrayMenu.UserInterface
                 AppDateLabel.Content = ReplaceTokens((string)AppDateLabel.Content);
             }
 
+#if !AVALONIA
             if (MoreRichTextBox.GetVisibility() == Visibility.Visible)
             {
                 AppMoreInfo = ReplaceTokens(AppMoreInfo);
             }
+#endif
         }
 
         // <summary>
@@ -995,7 +1051,7 @@ namespace SystemTrayMenu.UserInterface
         }
 #endif
 
-#if TODO_AVALONIA
+#if !AVALONIA
         // <summary>
         // launch any http:// or mailto: links clicked in the body of the rich text box
         // </summary>

@@ -10,9 +10,9 @@ namespace SystemTrayMenu.UserInterface
     using System.Reflection;
     using System.Runtime.Versioning;
 #if WINDOWS
+    using SystemTrayMenu.Helpers;
     using Windows.ApplicationModel;
     using StartupTaskState = Windows.ApplicationModel.StartupTaskState;
-    using SystemTrayMenu.Helpers;
 #endif
 #if !AVALONIA
     using System.Windows;
@@ -983,11 +983,6 @@ namespace SystemTrayMenu.UserInterface
             numericUpDownTimeUntilClosesAfterEnterPressed.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.TimeUntilClosesAfterEnterPressed));
             numericUpDownClearCacheIfMoreThanThisNumberOfItems.Value = GetSettingsDefaultValue<decimal>(nameof(Settings.Default.ClearCacheIfMoreThanThisNumberOfItems));
             textBoxSearchPattern.Text = string.Empty;
-        }
-
-        private void TextBoxColorsChanged(ColorSelector sender)
-        {
-            SaveColorsTemporarily();
         }
 
         private void SaveColorsTemporarily()

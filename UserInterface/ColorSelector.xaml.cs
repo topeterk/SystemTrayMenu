@@ -73,7 +73,7 @@ namespace SystemTrayMenu.UserInterface
 #endif
         }
 
-        public event Action<ColorSelector>? ColorChanged;
+        public event Action? ColorChanged;
 
         public string Text
         {
@@ -141,7 +141,7 @@ namespace SystemTrayMenu.UserInterface
             }
 #endif
 
-            ColorChanged?.Invoke(this);
+            ColorChanged?.Invoke();
         }
 
 #if AVALONIA
@@ -156,7 +156,7 @@ namespace SystemTrayMenu.UserInterface
             Text = ColorToHexConverter.ToHexString(e.NewColor, AlphaComponentPosition.Leading, false, true);
             isChanging = false;
 
-            ColorChanged?.Invoke(this);
+            ColorChanged?.Invoke();
         }
 #endif
 

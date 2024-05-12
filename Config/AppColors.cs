@@ -19,7 +19,13 @@ namespace SystemTrayMenu
     {
 #if !AVALONIA
         private static readonly ColorConverter ColorConverter = new();
+#else
+        /* -- Non-User controlled -- */
+
+        // prefered CSS color value for links, see: https://html.spec.whatwg.org/multipage/rendering.html#phrasing-content-0
+        public static SolidColorBrush Hyperlink => new(Color.FromRgb(0, 0, 238));
 #endif
+
         /* -- General -- */
 
         public static SolidColorBrush SelectedItem { get; internal set; } = new(Color.FromRgb(204, 232, 255));

@@ -25,9 +25,8 @@
 
         <Separator Height="6" Margin="0" DockPanel.Dock="Top"/>
         <ScrollViewer x:Name="MoreRichTextBox" Height="250" DockPanel.Dock="Top">
-            <TextBlock x:Name="AppMoreInfoLabel" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" TextWrapping="Wrap">
-                <TextBlock.Text>%product% is %copyright%, %trademark%"</TextBlock.Text>
-            </TextBlock>
+            <!-- TODO: Use a textbox instead, e.g. AvaloniaEdit or is there a simpler option? -->
+            <TextBlock x:Name="AppMoreInfoLabel" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
         </ScrollViewer>
 
         <StackPanel VerticalAlignment="Center" Orientation="Horizontal" DockPanel.Dock="Bottom">

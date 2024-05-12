@@ -2,7 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2023-2023 Peter Kirmeier
+// Copyright (c) 2023-2024 Peter Kirmeier
 
 #if !WINDOWS
 namespace SystemTrayMenu.Utilities
@@ -28,23 +28,29 @@ namespace SystemTrayMenu.Utilities
 
     internal enum MessageBoxImage
     {
+#if TODO_REMOVE
         None = 0,
         Error = 16,
         Hand = 16,
         Stop = 16,
         Question = 32,
         Exclamation = 48,
+#endif
         Warning = 48,
+#if TODO_REMOVE
         Asterisk = 64,
         Information = 64,
+#endif
     }
 
     internal class MessageBox
     {
         internal static MessageBoxResult Show(string messageBoxText) => DoLogOnly(messageBoxText);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060", Justification = "Unused parameter kept for API Compatibility")]
         internal static MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button) => DoLogOnly(messageBoxText, caption);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060", Justification = "Unused parameter kept for API Compatibility")]
         internal static MessageBoxResult Show(string messageBoxText, string? caption, MessageBoxButton button, MessageBoxImage icon) => DoLogOnly(messageBoxText, caption);
 
         private static MessageBoxResult DoLogOnly(string text, string? caption = null) // TODO: Messagebox

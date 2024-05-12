@@ -26,6 +26,7 @@ namespace SystemTrayMenu.UserInterface
     using System.Windows.Input;
     using System.Windows.Threading;
 #else
+    using System.Diagnostics.CodeAnalysis;
     using Avalonia.Controls;
     using Avalonia.Controls.Documents;
     using Avalonia.Controls.Templates;
@@ -893,6 +894,7 @@ namespace SystemTrayMenu.UserInterface
         // perform assemblyinfo to string replacements on labels
         // </summary>
 #if AVALONIA
+        [return: NotNullIfNotNull(nameof(s))]
         private string? ReplaceTokens(string? s) => s?
 #else
         private string ReplaceTokens(string s) => s

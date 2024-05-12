@@ -534,11 +534,19 @@ namespace SystemTrayMenu.Business
                 menu.SelectedItem = null;
                 if (!isSearchStringEmpty)
                 {
+#if AVALONIA
+                    List<RowData> items = (List<RowData>)menu.dgv.ItemsSource;
+                    if (items.Count > 0)
+                    {
+                        keyboardInput.SelectByMouse(items[0]);
+                    }
+#else
                     ListView dgv = menu.dgv;
                     if (dgv.Items.Count > 0)
                     {
                         keyboardInput.SelectByMouse((RowData)dgv.Items[0]);
                     }
+#endif
                 }
 
 #if !AVALONIA
@@ -963,11 +971,11 @@ namespace SystemTrayMenu.Business
 
 #if !AVALONIA
                 var items = (List<RowData>)menu.dgv.Items.SourceCollection;
-#else
-                // TODO: SourceCollection
-                var items = menu.dgv.Items;
-#endif
                 List<RowData> rowDatas = new(items.Count + 1) { rowData };
+#else
+                var items = menu.dgv.ItemsSource;
+                List<RowData> rowDatas = new() { rowData };
+#endif
                 foreach (RowData item in items)
                 {
                     rowDatas.Add(item);

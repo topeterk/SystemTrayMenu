@@ -30,7 +30,7 @@ namespace SystemTrayMenu.UserInterface
             string myname = myassembly.GetName().Name ?? string.Empty;
             Title = myname;
 
-            Closed += (_, _) => Application.Current.Shutdown();
+            Closed += (_, _) => Application.Current?.Shutdown();
 
             // Do final initialization after rendering has been finished for the first time.
             // This ensures all icons and images are properly loaded and renderd (e.g. thumbnail image of alt tab menu).

@@ -66,7 +66,7 @@ namespace SystemTrayMenu.Utilities
                 }
             }
 
-            Application.Current.Shutdown();
+            Application.Current?.Shutdown();
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

@@ -850,7 +850,7 @@ namespace SystemTrayMenu.UserInterface
                 {
 #if AVALONIA
                     List<ListViewItemData> list = [];
-                    foreach (ListViewItemData item in dataGridViewFolders.Items)
+                    foreach (ListViewItemData item in dataGridViewFolders.ItemsSource)
                     {
                         list.Add(item);
                     }

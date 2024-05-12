@@ -55,7 +55,7 @@ EXIT 0</PreBuildEvent>
     <NoWarn>1701;1702;WFAC010;MSB3061</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" !'$(UseWPF)' ">
-    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
     <Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>true</Avalonia_I_Want_To_Use_Private_Apis_In_Nuget_Package_And_Promise_To_Pin_The_Exact_Avalonia_Version_In_Package_Dependency>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

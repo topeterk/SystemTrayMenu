@@ -30,7 +30,7 @@ namespace SystemTrayMenu.UserInterface
             AddItem(menu, "Check for updates", () => GitHubUpdate.ActivateNewVersionFormOrCheckForUpdates(showWhenUpToDate: true));
             AddSeperator(menu);
             AddItem(menu, "Restart", AppRestart.ByAppContextMenu);
-            AddItem(menu, "Exit app", () => Application.Current.Shutdown());
+            AddItem(menu, "Exit app", () => Application.Current?.Shutdown());
 
             return menu;
         }

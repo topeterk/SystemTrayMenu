@@ -514,13 +514,18 @@ namespace SystemTrayMenu.UserInterface
         internal bool TrySelectAt(int index, int indexAlternative = -1)
         {
             RowData itemData;
-            if (index >= 0 && dgv.Items.Count > index)
+#if AVALONIA
+            List<RowData> items = (List<RowData>)dgv.ItemsSource;
+#else
+            ItemCollection items = dgv.Items;
+#endif
+            if (index >= 0 && items.Count > index)
             {
-                itemData = (RowData)dgv.Items[index];
+                itemData = (RowData)items[index];
             }
-            else if (indexAlternative >= 0 && dgv.Items.Count > indexAlternative)
+            else if (indexAlternative >= 0 && items.Count > indexAlternative)
             {
-                itemData = (RowData)dgv.Items[indexAlternative];
+                itemData = (RowData)items[indexAlternative];
 #if AVALONIA
                 index = indexAlternative;
 #endif

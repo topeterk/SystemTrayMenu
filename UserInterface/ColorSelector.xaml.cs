@@ -104,7 +104,7 @@ namespace SystemTrayMenu.UserInterface
 
         public string Description
         {
-            get => (string)label.Content;
+            get => (string)label.Content ?? string.Empty;
             set => label.Content = value ?? string.Empty;
         }
 

@@ -76,8 +76,8 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppTitle
         {
-            get => (string)AppTitleLabel.Content;
-            set => AppTitleLabel.Content = value;
+            get => (string)AppTitleLabel.Content ?? string.Empty;
+            set => AppTitleLabel.Content = value ?? string.Empty;
         }
 
         // <summary>
@@ -89,12 +89,13 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppDescription
         {
-            get => (string)AppDescriptionLabel.Content;
+            get => (string)AppDescriptionLabel.Content ?? string.Empty;
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
                     AppDescriptionLabel.SetVisibility(Visibility.Collapsed);
+                    AppDescriptionLabel.Content = string.Empty;
                 }
                 else
                 {
@@ -113,12 +114,13 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppVersion
         {
-            get => (string)AppVersionLabel.Content;
+            get => (string)AppVersionLabel.Content ?? string.Empty;
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
                     AppVersionLabel.SetVisibility(Visibility.Collapsed);
+                    AppVersionLabel.Content = string.Empty;
                 }
                 else
                 {
@@ -138,12 +140,13 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppCopyright
         {
-            get => (string)AppCopyrightLabel.Content;
+            get => (string)AppCopyrightLabel.Content ?? string.Empty;
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
                     AppCopyrightLabel.SetVisibility(Visibility.Collapsed);
+                    AppCopyrightLabel.Content = string.Empty;
                 }
                 else
                 {

@@ -32,8 +32,8 @@ namespace SystemTrayMenu.Utilities
     /// </summary>
     internal static class IconReader
     {
-        internal static readonly BitmapSource LoadingImage = (BitmapSource)Application.Current.Resources["LoadingIconImage"]!;
-        internal static readonly BitmapSource NotFoundImage = (BitmapSource)Application.Current.Resources["NotFoundIconImage"]!;
+        internal static readonly BitmapSource LoadingImage = (BitmapSource)Application.Current!.Resources["LoadingIconImage"]!;
+        internal static readonly BitmapSource NotFoundImage = (BitmapSource)Application.Current!.Resources["NotFoundIconImage"]!;
 #if WINDOWS
         private static readonly BitmapSource OverlayImage = (BitmapSource)Application.Current.Resources["LinkArrowIconImage"]!;
 #endif

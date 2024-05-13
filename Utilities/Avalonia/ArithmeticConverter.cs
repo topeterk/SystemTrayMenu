@@ -9,13 +9,14 @@ namespace SystemTrayMenu.Utilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using Avalonia;
     using Avalonia.Data.Converters;
 
     internal class ArithmeticConverter : IMultiValueConverter
     {
-        private static readonly IDictionary<string, Func<double, double, double>> Operations = new Dictionary<string, Func<double, double, double>>
+        private static readonly Dictionary<string, Func<double, double, double>> Operations = new()
             {
                 { "+", (x, y) => x + y },
                 { "-", (x, y) => x - y },
@@ -36,7 +37,7 @@ namespace SystemTrayMenu.Utilities
 
             for (int i = 0; i < values.Count; i++)
             {
-                if (!double.TryParse(values[i].ToString(), out var parsedNumber))
+                if (!double.TryParse(values[i]?.ToString(), out var parsedNumber))
                 {
                     return AvaloniaProperty.UnsetValue;
                 }
@@ -52,10 +53,10 @@ namespace SystemTrayMenu.Utilities
             return result;
         }
 
-        private static bool TryGetOperations(object? parameter, int operationIndex, out Func<double, double, double>? operation)
+        private static bool TryGetOperations(object? parameter, int operationIndex, [NotNullWhen(true)] out Func<double, double, double>? operation)
         {
             operation = null;
-            string[]? operations = parameter?.ToString().Split(',');
+            string[]? operations = parameter?.ToString()?.Split(',');
 
             if (operations is null || operations.Length == 0)
             {

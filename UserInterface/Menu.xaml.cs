@@ -288,13 +288,19 @@ namespace SystemTrayMenu.UserInterface
 
 #if !AVALONIA
                 foreach (RowData item in dgv.Items.SourceCollection)
-#else
-                // TODO: SourceCollection
-                foreach (RowData item in dgv.Items)
-#endif
                 {
                     item.SubMenu?.Close();
                 }
+#else
+                List<RowData>? items = (List<RowData>?)dgv.ItemsSource;
+                if (items is not null)
+                {
+                    foreach (RowData item in items)
+                    {
+                        item.SubMenu?.Close();
+                    }
+                }
+#endif
             };
 
 #if !AVALONIA
@@ -394,16 +400,25 @@ namespace SystemTrayMenu.UserInterface
             {
 #if !AVALONIA
                 foreach (RowData rowData in dgv.Items.SourceCollection)
-#else
-                // TODO: SourceCollection
-                foreach (RowData rowData in dgv.Items)
-#endif
                 {
-                    if (rowData.SubMenu != null)
+                    if (rowData.SubMenu is not null)
                     {
                         return rowData.SubMenu;
                     }
                 }
+#else
+                List<RowData>? items = (List<RowData>?)dgv.ItemsSource;
+                if (items is not null)
+                {
+                    foreach (RowData rowData in items)
+                    {
+                        if (rowData.SubMenu is not null)
+                        {
+                            return rowData.SubMenu;
+                        }
+                    }
+                }
+#endif
 
                 return null;
             }
@@ -515,15 +530,15 @@ namespace SystemTrayMenu.UserInterface
         {
             RowData itemData;
 #if AVALONIA
-            List<RowData> items = (List<RowData>)dgv.ItemsSource;
+            List<RowData>? items = (List<RowData>?)dgv.ItemsSource;
 #else
             ItemCollection items = dgv.Items;
 #endif
-            if (index >= 0 && items.Count > index)
+            if (index >= 0 && items?.Count > index)
             {
                 itemData = (RowData)items[index];
             }
-            else if (indexAlternative >= 0 && items.Count > indexAlternative)
+            else if (indexAlternative >= 0 && items?.Count > indexAlternative)
             {
                 itemData = (RowData)items[indexAlternative];
 #if AVALONIA
@@ -1597,13 +1612,19 @@ namespace SystemTrayMenu.UserInterface
                 ListView lv = (ListView)sender;
 #if !AVALONIA
                 foreach (RowData itemData in lv.Items.SourceCollection)
-#else
-                // TODO: SourceCollection
-                foreach (RowData itemData in lv.Items)
-#endif
                 {
                     itemData.IsSelected = lv.SelectedItem == itemData;
                 }
+#else
+                List<RowData>? items = (List<RowData>?)dgv.ItemsSource;
+                if (items is not null)
+                {
+                    foreach (RowData itemData in items)
+                    {
+                        itemData.IsSelected = lv.SelectedItem == itemData;
+                    }
+                }
+#endif
             }
         }
 

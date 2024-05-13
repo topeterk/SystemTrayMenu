@@ -82,13 +82,13 @@ namespace SystemTrayMenu.UserInterface
                 try
                 {
 #if AVALONIA
-                    Color color = Color.Parse(txtbox.Text.Trim());
+                    Color color = Color.Parse(txtbox.Text?.Trim() ?? string.Empty);
 #else
                     Color color = (Color)ColorConverter.ConvertFromString(txtbox.Text.Trim());
 #endif
 
                     // Convertion passed, return string as it is valid
-                    return txtbox.Text.Trim();
+                    return txtbox.Text?.Trim() ?? string.Empty;
                 }
                 catch
                 {

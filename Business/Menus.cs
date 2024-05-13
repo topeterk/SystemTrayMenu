@@ -535,8 +535,8 @@ namespace SystemTrayMenu.Business
                 if (!isSearchStringEmpty)
                 {
 #if AVALONIA
-                    List<RowData> items = (List<RowData>)menu.dgv.ItemsSource;
-                    if (items.Count > 0)
+                    List<RowData>? items = (List<RowData>?)menu.dgv.ItemsSource;
+                    if (items?.Count > 0)
                     {
                         keyboardInput.SelectByMouse(items[0]);
                     }
@@ -844,43 +844,47 @@ namespace SystemTrayMenu.Business
 #if !AVALONIA
                 foreach (RowData rowData in menu.dgv.Items.SourceCollection)
 #else
-                // TODO: SourceCollection
-                foreach (RowData rowData in menu.dgv.Items)
-#endif
+                List<RowData>? items = (List<RowData>?)menu.dgv.ItemsSource;
+                if (items is not null)
                 {
-                    // TODO: Check if this check is correct as it looks like wrong entries might be modified as well?
-                    if (rowData.Path.StartsWith($"{e.OldFullPath}"))
+                    foreach (RowData rowData in items)
+#endif
                     {
-                        string path = rowData.Path.Replace(e.OldFullPath, e.FullPath);
-                        if (rowData.IsFolder)
+                        // TODO: Check if this check is correct as it looks like wrong entries might be modified as well?
+                        if (rowData.Path.StartsWith($"{e.OldFullPath}"))
                         {
-                            string? dirpath = Path.GetDirectoryName(path);
-                            if (string.IsNullOrEmpty(dirpath))
+                            string path = rowData.Path.Replace(e.OldFullPath, e.FullPath);
+                            if (rowData.IsFolder)
+                            {
+                                string? dirpath = Path.GetDirectoryName(path);
+                                if (string.IsNullOrEmpty(dirpath))
+                                {
+                                    continue;
+                                }
+
+                                path = dirpath;
+                            }
+
+                            RowData rowDataRenamed = new(rowData.IsFolder, rowData.IsAdditionalItem, 0, path);
+                            FolderOptions.ReadHiddenAttributes(rowDataRenamed.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
+                            if (hasOmittedFlag)
                             {
                                 continue;
                             }
 
-                            path = dirpath;
+                            IconReader.RemoveIconFromCache(rowData.Path);
+                            rowDataRenamed.HiddenEntry = hasHiddenFlag;
+                            rowDataRenamed.LoadIcon(true);
+                            rowDatas.Add(rowDataRenamed);
                         }
-
-                        RowData rowDataRenamed = new(rowData.IsFolder, rowData.IsAdditionalItem, 0, path);
-                        FolderOptions.ReadHiddenAttributes(rowDataRenamed.Path, out bool hasHiddenFlag, out bool hasOmittedFlag);
-                        if (hasOmittedFlag)
+                        else
                         {
-                            continue;
+                            rowDatas.Add(rowData);
                         }
-
-                        IconReader.RemoveIconFromCache(rowData.Path);
-                        rowDataRenamed.HiddenEntry = hasHiddenFlag;
-                        rowDataRenamed.LoadIcon(true);
-                        rowDatas.Add(rowDataRenamed);
                     }
-                    else
-                    {
-                        rowDatas.Add(rowData);
-                    }
+#if AVALONIA
                 }
-
+#endif
                 if (menu.SelectedItem != null)
                 {
                     menu.SelectedItem = null;
@@ -909,16 +913,25 @@ namespace SystemTrayMenu.Business
             {
                 ListView dgv = menu.dgv;
                 List<RowData> rowsToRemove = new();
-
+#if !AVALONIA
                 foreach (RowData rowData in dgv.ItemsSource)
+#else
+                List<RowData>? items = (List<RowData>?)dgv.ItemsSource;
+                if (items is not null)
                 {
-                    if (rowData.Path == e.FullPath ||
-                        rowData.Path.StartsWith($"{e.FullPath}{Path.DirectorySeparatorChar}"))
+                    foreach (RowData rowData in items)
+#endif
                     {
-                        IconReader.RemoveIconFromCache(rowData.Path);
-                        rowsToRemove.Add(rowData);
+                        if (rowData.Path == e.FullPath ||
+                            rowData.Path.StartsWith($"{e.FullPath}{Path.DirectorySeparatorChar}"))
+                        {
+                            IconReader.RemoveIconFromCache(rowData.Path);
+                            rowsToRemove.Add(rowData);
+                        }
                     }
+#if AVALONIA
                 }
+#endif
 
                 if (menu.SelectedItem != null && rowsToRemove.Contains(menu.SelectedItem))
                 {
@@ -929,11 +942,11 @@ namespace SystemTrayMenu.Business
 
                 // Apply list changes
 #if AVALONIA
-                List<RowData> items = (List<RowData>)dgv.ItemsSource;
+                items = (List<RowData>?)dgv.ItemsSource;
 
                 // Workaround: Avalonia - Unfortunately it does not work to simply remove the entries.
                 // We have to clear and reassign the whole list as otherwise list will not be updated.
-                items.RemoveAll(rowsToRemove.Contains);
+                items?.RemoveAll(rowsToRemove.Contains);
                 dgv.ItemsSource = null;
                 dgv.ItemsSource = items;
                 menu.ListView_CollectionChanged(this, new(NotifyCollectionChangedAction.Reset));
@@ -972,14 +985,21 @@ namespace SystemTrayMenu.Business
 #if !AVALONIA
                 var items = (List<RowData>)menu.dgv.Items.SourceCollection;
                 List<RowData> rowDatas = new(items.Count + 1) { rowData };
-#else
-                var items = menu.dgv.ItemsSource;
-                List<RowData> rowDatas = new() { rowData };
-#endif
                 foreach (RowData item in items)
                 {
                     rowDatas.Add(item);
                 }
+#else
+                List<RowData> rowDatas = new() { rowData };
+                List<RowData>? items = (List<RowData>?)menu.dgv.ItemsSource;
+                if (items is not null)
+                {
+                    foreach (RowData item in items)
+                    {
+                        rowDatas.Add(item);
+                    }
+                }
+#endif
 
                 // Apply list changes
                 rowDatas = DirectoryHelpers.SortItems(rowDatas);

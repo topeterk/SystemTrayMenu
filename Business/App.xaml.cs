@@ -68,14 +68,17 @@ namespace SystemTrayMenu
         {
             set
             {
-                App app = (App)Current;
-                if (value)
+                App? app = (App?)Current;
+                if (app?.trayIcon is not null)
                 {
-                    app.trayIcon.Icon = (WindowIcon)app.Resources["ApplicationTrayIconLoading"];
-                }
-                else
-                {
-                    app.trayIcon.Icon = Config.GetCustomAppIcon() ?? (WindowIcon)app.Resources["ApplicationTrayIcon"];
+                    if (value)
+                    {
+                        app.trayIcon.Icon = (WindowIcon?)app.Resources["ApplicationTrayIconLoading"];
+                    }
+                    else
+                    {
+                        app.trayIcon.Icon = Config.GetCustomAppIcon() ?? (WindowIcon?)app.Resources["ApplicationTrayIcon"];
+                    }
                 }
             }
         }

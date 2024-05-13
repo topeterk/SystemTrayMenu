@@ -846,9 +846,9 @@ namespace SystemTrayMenu.Utilities
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                 };
-                Process process = Process.Start(processStartInfo);
-                process.WaitForExit();
-                return process.StandardOutput.ReadToEnd();
+                Process? process = Process.Start(processStartInfo);
+                process?.WaitForExit();
+                return process?.StandardOutput.ReadToEnd();
             }
             catch
             {

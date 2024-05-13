@@ -542,7 +542,7 @@ namespace SystemTrayMenu.UserInterface
             }
 #endif
 
-            Settings.Default.CurrentCultureInfoName = comboBoxLanguage.SelectedValue.ToString();
+            Settings.Default.CurrentCultureInfoName = comboBoxLanguage.SelectedValue?.ToString() ?? string.Empty;
             if (numericUpDownSizeInPercent.Value.HasValue)
             {
                 Settings.Default.SizeInPercent = (int)numericUpDownSizeInPercent.Value;
@@ -646,10 +646,21 @@ namespace SystemTrayMenu.UserInterface
             Settings.Default.ShowOnlyAsSearchResult = checkBoxShowOnlyAsSearchResult.IsChecked ?? false;
 
             string pathsAddToMainMenu = string.Empty;
+#if !AVALONIA
             foreach (ListViewItemData itemData in dataGridViewFolders.Items)
             {
                 pathsAddToMainMenu += $"{itemData.ColumnFolder} recursiv:{itemData.ColumnRecursiveLevel} onlyFiles:{itemData.ColumnOnlyFiles}|";
             }
+#else
+            List<ListViewItemData>? list = (List<ListViewItemData>?)dataGridViewFolders.ItemsSource;
+            if (list is not null)
+            {
+                foreach (ListViewItemData itemData in list)
+                {
+                    pathsAddToMainMenu += $"{itemData.ColumnFolder} recursiv:{itemData.ColumnRecursiveLevel} onlyFiles:{itemData.ColumnOnlyFiles}|";
+                }
+            }
+#endif
 
             Settings.Default.PathsAddToMainMenu = pathsAddToMainMenu;
 
@@ -849,15 +860,19 @@ namespace SystemTrayMenu.UserInterface
                 if (!string.IsNullOrEmpty(dialog.Folder))
                 {
 #if AVALONIA
-                    List<ListViewItemData> list = [];
-                    foreach (ListViewItemData item in dataGridViewFolders.ItemsSource)
+                    List<ListViewItemData> newList = [];
+                    List<ListViewItemData>? list = (List<ListViewItemData>?)dataGridViewFolders.ItemsSource;
+                    if (list is not null)
                     {
-                        list.Add(item);
+                        foreach (ListViewItemData itemData in list)
+                        {
+                            newList.Add(itemData);
+                        }
                     }
 
-                    list.Add(new (dialog.Folder, false, true));
+                    newList.Add(new (dialog.Folder, false, true));
                     dataGridViewFolders.ItemsSource = null;
-                    dataGridViewFolders.ItemsSource = list;
+                    dataGridViewFolders.ItemsSource = newList;
 #else
                     dataGridViewFolders.Items.Add(new ListViewItemData(dialog.Folder, false, true));
 #endif
@@ -891,18 +906,33 @@ namespace SystemTrayMenu.UserInterface
 
         private void EnableButtonAddStartMenu()
         {
+            string folderPathCommonStartMenu = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
             bool doesStartMenuFolderExist = false;
+#if AVALONIA
+            List<ListViewItemData>? list = (List<ListViewItemData>?)dataGridViewFolders.ItemsSource;
+            if (list is not null)
+            {
+                foreach (ListViewItemData itemData in list)
+                {
+                    // TODO: Check: Is RecursiveLevel and OnlyFiles really important to be the StartMenu folder entry? (Remove in version 1?)
+                    if (folderPathCommonStartMenu.Equals(itemData.ColumnFolder))
+                    {
+                        doesStartMenuFolderExist = true;
+                        break;
+                    }
+                }
+            }
+#else
             foreach (ListViewItemData itemData in dataGridViewFolders.Items)
             {
-                string folderPathCommonStartMenu = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-
                 // TODO: Check: Is RecursiveLevel and OnlyFiles really important to be the StartMenu folder entry? (Remove in version 1?)
-                if (itemData.ColumnFolder == folderPathCommonStartMenu)
+                if (folderPathCommonStartMenu.Equals(itemData.ColumnFolder))
                 {
                     doesStartMenuFolderExist = true;
                     break;
                 }
             }
+#endif
 
             buttonAddSampleStartMenuFolder.IsEnabled = !doesStartMenuFolderExist;
         }

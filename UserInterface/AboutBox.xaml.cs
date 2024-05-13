@@ -185,7 +185,7 @@ namespace SystemTrayMenu.UserInterface
 #if AVALONIA
                     string text = ReplaceTokens(value);
                     AppMoreInfoLabel.Text = null;
-                    AppMoreInfoLabel.Inlines.Clear();
+                    AppMoreInfoLabel.Inlines = new ();
 
                     // Parse string to detect hyperlinks and add handlers to them
                     // See: https://mycsharp.de/forum/threads/97560/erledigt-dynamische-hyperlinks-in-wpf-flowdocument?page=1

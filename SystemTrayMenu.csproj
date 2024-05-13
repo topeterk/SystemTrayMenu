@@ -61,7 +61,7 @@ EXIT 0</PreBuildEvent>
     <NoWarn>$(NoWarn);IDE0028</NoWarn> <!-- Using simplified collection initializers will break the code for pre-.Net8 code (Still in used by WPF) -->
     <NoWarn>$(NoWarn);IDE0066</NoWarn> <!-- Using new switch syntax will break the code for pre-.Net8 code (Still in used by WPF) -->
     <NoWarn>$(NoWarn);IDE0290</NoWarn> <!-- Using primary constructor will break the code for pre-.Net8 code (Still in used by WPF) -->
-    <NoWarn>$(NoWarn);CS8600;CS8602</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
+    <NoWarn>$(NoWarn);CS8600</NoWarn> <!-- TODO: Enable all the Warnings again!!!! -->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ErrorReport>none</ErrorReport>

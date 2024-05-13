@@ -432,7 +432,7 @@ namespace SystemTrayMenu.UserInterface
         {
 #if AVALONIA
             Control? control = dgv.FindControlByDataContext(rowData);
-            SolidBorder openAnimationBorder = control?.FindVisualChildOfType<SolidBorder>();
+            SolidBorder? openAnimationBorder = control?.FindVisualChildOfType<SolidBorder>();
             openAnimationBorder?.StartOpenAnimation();
 #else
             ListViewItem? lvi;
@@ -1480,11 +1480,11 @@ namespace SystemTrayMenu.UserInterface
         {
             if (Config.AlwaysOpenByPin = !Config.AlwaysOpenByPin)
             {
-                pictureBoxMenuAlwaysOpen.Source = (DrawingImage)Resources["ic_fluent_pin_48_filledDrawingImage"];
+                pictureBoxMenuAlwaysOpen.Source = (DrawingImage?)Resources["ic_fluent_pin_48_filledDrawingImage"];
             }
             else
             {
-                pictureBoxMenuAlwaysOpen.Source = (DrawingImage)Resources["ic_fluent_pin_48_regularDrawingImage"];
+                pictureBoxMenuAlwaysOpen.Source = (DrawingImage?)Resources["ic_fluent_pin_48_regularDrawingImage"];
             }
         }
 

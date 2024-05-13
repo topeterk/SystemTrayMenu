@@ -76,7 +76,7 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppTitle
         {
-            get => (string)AppTitleLabel.Content ?? string.Empty;
+            get => (string?)AppTitleLabel.Content ?? string.Empty;
             set => AppTitleLabel.Content = value ?? string.Empty;
         }
 
@@ -89,7 +89,7 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppDescription
         {
-            get => (string)AppDescriptionLabel.Content ?? string.Empty;
+            get => (string?)AppDescriptionLabel.Content ?? string.Empty;
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -114,7 +114,7 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppVersion
         {
-            get => (string)AppVersionLabel.Content ?? string.Empty;
+            get => (string?)AppVersionLabel.Content ?? string.Empty;
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -140,7 +140,7 @@ namespace SystemTrayMenu.UserInterface
         // </remarks>
         public string AppCopyright
         {
-            get => (string)AppCopyrightLabel.Content ?? string.Empty;
+            get => (string?)AppCopyrightLabel.Content ?? string.Empty;
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -882,7 +882,7 @@ namespace SystemTrayMenu.UserInterface
 
             if (AppDateLabel.GetVisibility() == Visibility.Visible)
             {
-                AppDateLabel.Content = ReplaceTokens((string)AppDateLabel.Content);
+                AppDateLabel.Content = ReplaceTokens((string?)AppDateLabel.Content ?? string.Empty);
             }
 
 #if !AVALONIA

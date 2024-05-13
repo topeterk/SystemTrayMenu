@@ -2,7 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 //
-// Copyright (c) 2022-2023 Peter Kirmeier
+// Copyright (c) 2022-2024 Peter Kirmeier
 
 namespace SystemTrayMenu.UserInterface
 {
@@ -23,7 +23,7 @@ namespace SystemTrayMenu.UserInterface
         {
             InitializeComponent();
 
-            label.Content = ((string)label.Content) + " " + GitHubUpdate.LatestVersionName;
+            label.Content = ((string?)label.Content) + " " + GitHubUpdate.LatestVersionName;
         }
 
         private void ButtonGoToDownloadPage_Click(object sender, RoutedEventArgs e)

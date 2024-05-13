@@ -183,7 +183,7 @@ namespace SystemTrayMenu.Utilities
                             }
                         }
 
-                        if (MimeGlobs.TryGetValue(weight, out List<MimeGlobEntry> mimes))
+                        if (MimeGlobs.TryGetValue(weight, out List<MimeGlobEntry>? mimes))
                         {
                             mimes.Add(mimeGlobEntry);
                         }
@@ -306,7 +306,7 @@ namespace SystemTrayMenu.Utilities
             {
                 foreach (string mimeTypeName in mimeTypeNames)
                 {
-                    if (MimeIcons.TryGetValue(mimeTypeName, out string mimeTypeIconName))
+                    if (MimeIcons.TryGetValue(mimeTypeName, out string? mimeTypeIconName))
                     {
                         if (!mimeTypeIconNames.Contains(mimeTypeIconName))
                         {
@@ -506,7 +506,7 @@ namespace SystemTrayMenu.Utilities
                         // This ensures that when looking up the types the top level base classe(s) come(s) last rather in between.
                         for (int index = 0; index < mimeTypeNames.Count; index++)
                         {
-                            if (MimeSubtypes.TryGetValue(mimeTypeNames[index], out string baseTypeName))
+                            if (MimeSubtypes.TryGetValue(mimeTypeNames[index], out string? baseTypeName))
                             {
                                 if (!mimeTypeNames.Contains(baseTypeName))
                                 {

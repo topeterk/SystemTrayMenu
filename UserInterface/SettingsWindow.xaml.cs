@@ -53,7 +53,7 @@ namespace SystemTrayMenu.UserInterface
             switch (GetAutostartMode())
             {
                 case AutostartMode.StartupTask:
-                    groupBoxAutostart.Content = $"{(string)groupBoxAutostart.Content} ({Translator.GetText("Task Manager")})";
+                    groupBoxAutostart.Content = $"{(string?)groupBoxAutostart.Content ?? string.Empty} ({Translator.GetText("Task Manager")})";
                     checkBoxAutostart.SetVisibility(Visibility.Collapsed);
                     labelStartupStatus.Content = string.Empty;
                     break;

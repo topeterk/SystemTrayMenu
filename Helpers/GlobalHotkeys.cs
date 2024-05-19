@@ -355,7 +355,7 @@ namespace SystemTrayMenu.Helpers
         }
 
         [SupportedOSPlatform("Windows")]
-        private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        private static IntPtr WndProc(IntPtr hwnd, int msg, nint wParam, nint lParam, ref bool handled)
         {
             const int WmHotkey = 0x0312;
 

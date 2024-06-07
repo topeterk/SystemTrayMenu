@@ -108,7 +108,7 @@ stages:
       displayName: 'DotNet Publish'
       inputs:
         command: 'publish'
-        arguments: '--configuration $(buildConfiguration) --runtime $(RuntimeRID) --framework $(TargetFramework) --self-contained $(SelfContained)'
+        arguments: '--configuration $(buildConfiguration) --runtime $(RuntimeRID) --framework $(TargetFramework) --self-contained $(SelfContained) --use-current-runtime'
         publishWebProjects: false
         zipAfterPublish: false
         projects: '$(Build.DefinitionName).csproj'

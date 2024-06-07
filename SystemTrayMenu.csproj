@@ -3,6 +3,8 @@
   <PropertyGroup>
     <!-- https://learn.microsoft.com/en-us/dotnet/standard/frameworks -->
     <TargetFrameworks>net8.0;net8.0-windows10.0.22000.0;net7.0-windows10.0.22000.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">net8.0</TargetFrameworks> <!-- Linux Avalonia -->
+    <TargetFrameworks Condition=" '$(RuntimeIdentifier)' == 'osx-x64'   ">net8.0</TargetFrameworks> <!-- MacOS Avalonia -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
     <UseCurrentRuntimeIdentifier>true</UseCurrentRuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net7.0-windows10.0.22000.0' ">win-x64</RuntimeIdentifier> <!-- Windows WPF -->

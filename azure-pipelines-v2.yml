@@ -41,49 +41,40 @@ stages:
         win-x64:
           PoolVmImg: 'windows-latest'
           RuntimeRID: 'win-x64'
-          PlatformType: 'Desktop'
           SelfContained: 'false'
         linux-x64:
           PoolVmImg: 'ubuntu-latest'
           RuntimeRID: 'linux-x64'
-          PlatformType: 'Desktop'
           SelfContained: 'false'
         osx-x64:
           PoolVmImg: 'macOS-latest'
           RuntimeRID: 'osx-x64'
-          PlatformType: 'Desktop'
           SelfContained: 'false'
 # Windows
 #       win-x86:
 #         PoolVmImg: 'windows-latest'
 #         RuntimeRID: 'win-x86'
-#         PlatformType: 'Desktop'
 #         SelfContained: 'false'
 #       win-arm:
 #         PoolVmImg: 'windows-latest'
 #         RuntimeRID: 'win-arm'
-#         PlatformType: 'Desktop'
 #         SelfContained: 'false'
 #       win-arm64:
 #         PoolVmImg: 'windows-latest'
 #         RuntimeRID: 'win-arm64'
-#         PlatformType: 'Desktop'
 #         SelfContained: 'false'
 # Linux
 #       linux-musl-x64:
 #         PoolVmImg: 'ubuntu-latest'
 #         RuntimeRID: 'linux-musl-x64'
-#         PlatformType: 'Desktop'
 #         SelfContained: 'false'
 #       linux-arm:
 #         PoolVmImg: 'ubuntu-latest'
 #         RuntimeRID: 'linux-arm'
-#         PlatformType: 'Desktop'
 #         SelfContained: 'false'
 #       linux-arm64:
 #         PoolVmImg: 'ubuntu-latest'
 #         RuntimeRID: 'linux-arm64'
-#         PlatformType: 'Desktop'
 #         SelfContained: 'false'
 
     variables:

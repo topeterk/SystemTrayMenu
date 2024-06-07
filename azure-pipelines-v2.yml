@@ -41,45 +41,48 @@ stages:
         win-x64:
           PoolVmImg: 'windows-latest'
           RuntimeRID: 'win-x64'
+          TargetFramework: 'net8.0-windows10.0.22000.0'
           SelfContained: 'false'
         linux-x64:
           PoolVmImg: 'ubuntu-latest'
           RuntimeRID: 'linux-x64'
+          TargetFramework: 'net8.0'
           SelfContained: 'false'
         osx-x64:
           PoolVmImg: 'macOS-latest'
           RuntimeRID: 'osx-x64'
+          TargetFramework: 'net8.0'
           SelfContained: 'false'
 # Windows
-#       win-x86:
-#         PoolVmImg: 'windows-latest'
-#         RuntimeRID: 'win-x86'
-#         SelfContained: 'false'
 #       win-arm:
 #         PoolVmImg: 'windows-latest'
 #         RuntimeRID: 'win-arm'
+#         TargetFramework: 'net8.0-windows10.0.22000.0'
 #         SelfContained: 'false'
 #       win-arm64:
 #         PoolVmImg: 'windows-latest'
 #         RuntimeRID: 'win-arm64'
+#         TargetFramework: 'net8.0-windows10.0.22000.0'
 #         SelfContained: 'false'
 # Linux
 #       linux-musl-x64:
 #         PoolVmImg: 'ubuntu-latest'
 #         RuntimeRID: 'linux-musl-x64'
+#         TargetFramework: 'net8.0'
 #         SelfContained: 'false'
 #       linux-arm:
 #         PoolVmImg: 'ubuntu-latest'
 #         RuntimeRID: 'linux-arm'
+#         TargetFramework: 'net8.0'
 #         SelfContained: 'false'
 #       linux-arm64:
 #         PoolVmImg: 'ubuntu-latest'
 #         RuntimeRID: 'linux-arm64'
+#         TargetFramework: 'net8.0'
 #         SelfContained: 'false'
 
     variables:
       buildConfiguration: 'Release'
-      targetFramework: 'net8.0'
 
     pool:
       vmImage: '$(PoolVmImg)'
@@ -105,7 +108,7 @@ stages:
       displayName: 'DotNet Publish'
       inputs:
         command: 'publish'
-        arguments: '--configuration $(buildConfiguration) --runtime $(RuntimeRID) --framework $(targetFramework) --self-contained $(SelfContained)'
+        arguments: '--configuration $(buildConfiguration) --runtime $(RuntimeRID) --framework $(TargetFramework) --self-contained $(SelfContained)'
         publishWebProjects: false
         zipAfterPublish: false
         projects: '$(Build.DefinitionName).csproj'
@@ -122,7 +125,7 @@ stages:
       condition: startsWith(variables['RuntimeRID'], 'win-')
       displayName: 'Archive ZIP'
       inputs:
-        rootFolderOrFile: '$(Build.SourcesDirectory)/bin/AnyCPU/$(buildConfiguration)/$(targetFramework)/$(RuntimeRID)/publish/'
+        rootFolderOrFile: '$(Build.SourcesDirectory)/bin/AnyCPU/$(buildConfiguration)/$(TargetFramework)/$(RuntimeRID)/publish/'
         includeRootFolder: false
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.DefinitionName).$(System.JobName)-v2-PreRelease.zip'
         archiveType: 'zip'
@@ -133,7 +136,7 @@ stages:
       condition: or(startsWith(variables['RuntimeRID'], 'linux-'), startsWith(variables['RuntimeRID'], 'osx-'))
       displayName: 'Archive TAR.GZ'
       inputs:
-        rootFolderOrFile: '$(Build.SourcesDirectory)/bin/AnyCPU/$(buildConfiguration)/$(targetFramework)/$(RuntimeRID)/publish/'
+        rootFolderOrFile: '$(Build.SourcesDirectory)/bin/AnyCPU/$(buildConfiguration)/$(TargetFramework)/$(RuntimeRID)/publish/'
         includeRootFolder: false
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.DefinitionName).$(System.JobName)-v2-PreRelease.tar.gz'
         archiveType: 'tar'

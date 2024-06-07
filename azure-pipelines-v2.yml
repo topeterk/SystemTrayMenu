@@ -112,9 +112,8 @@ stages:
       # See: https://learn.microsoft.com/de-de/visualstudio/msbuild/resolvecomreference-task?view=vs-2022#msb4803-error
       displayName: 'DotNet MSBuild Publish'
       inputs:
-        command: custom
-        custom: msbuild
-        command: 'msbuild'
+        command: 'custom'
+        custom: 'msbuild'
         arguments: '/t:publish /p:Configuration=$(buildConfiguration);Platform=x64;RuntimeIdentifier=win-x64;TargetFrameworks=$(TargetFramework);SelfContained=$(SelfContained)'
         projects: '$(Build.DefinitionName).csproj'
 

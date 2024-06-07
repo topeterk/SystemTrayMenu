@@ -101,30 +101,22 @@ stages:
       inputs:
         versionSpec: '6.x'
 
-# example:  dotnet publish --configuration Release --runtime win-x64   --framework net8.0 --self-contained false SystemTrayMenu.csproj
-# example:  dotnet publish --configuration Release --runtime linux-x64 --framework net8.0 --self-contained true  SystemTrayMenu.csproj
-
-    - task: DotNetCoreCLI@2
-      condition: startsWith(variables['RuntimeRID'], 'win-')
-      displayName: 'DotNet Restore'
-      inputs:
-        command: 'restore'
-        arguments: '--runtime $(RuntimeRID) --framework $(TargetFramework)'
-        projects: '$(Build.DefinitionName).csproj'
-
-    - task: DotNetCoreCLI@2
+    - task: MSBuild@1
       condition: startsWith(variables['RuntimeRID'], 'win-')
       # This is needed for Windows as we have COM dependencies which dotnet publish is not able to handle:
       #   error MSB4803: The task "ResolveComReference" is not supported on the .NET Core version of MSBuild.
       #   Please use the .NET Framework version of MSBuild. See https://aka.ms/msbuild/MSB4803 for further details.
       # See: https://learn.microsoft.com/de-de/visualstudio/msbuild/resolvecomreference-task?view=vs-2022#msb4803-error
-      displayName: 'DotNet MSBuild Publish'
+      displayName: 'MSBuild Publish'
       inputs:
-        command: 'custom'
-        custom: 'msbuild'
-        arguments: '/t:publish /p:Configuration=$(buildConfiguration);Platform=x64;RuntimeIdentifier=win-x64;TargetFrameworks=$(TargetFramework);SelfContained=$(SelfContained)'
-        projects: '$(Build.DefinitionName).csproj'
+        solution: '$(Build.DefinitionName).csproj'
+        msbuildArchitecture: 'x64'
+        platform: 'AnyCPU'
+        configuration: '$(BuildConfiguration)'
+        msbuildArguments: '/restore /t:publish /p:Configuration=$(buildConfiguration);RuntimeIdentifier=win-x64;TargetFrameworks=$(TargetFramework);SelfContained=$(SelfContained)'
+        maximumCpuCount: true
 
+    # example:  dotnet publish --configuration Release --runtime win-x64 --framework net8.0 --self-contained false SystemTrayMenu.csproj
     - task: DotNetCoreCLI@2
       condition: not(startsWith(variables['RuntimeRID'], 'win-'))
       displayName: 'DotNet Publish'

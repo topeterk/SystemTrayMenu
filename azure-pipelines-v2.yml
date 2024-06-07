@@ -105,6 +105,21 @@ stages:
 # example:  dotnet publish --configuration Release --runtime linux-x64 --framework net8.0 --self-contained true  SystemTrayMenu.csproj
 
     - task: DotNetCoreCLI@2
+      condition: startsWith(variables['RuntimeRID'], 'win-')
+      # This is needed for Windows as we have COM dependencies which dotnet publish is not able to handle:
+      #   error MSB4803: The task "ResolveComReference" is not supported on the .NET Core version of MSBuild.
+      #   Please use the .NET Framework version of MSBuild. See https://aka.ms/msbuild/MSB4803 for further details.
+      # See: https://learn.microsoft.com/de-de/visualstudio/msbuild/resolvecomreference-task?view=vs-2022#msb4803-error
+      displayName: 'DotNet MSBuild Publish'
+      inputs:
+        command: custom
+        custom: msbuild
+        command: 'msbuild'
+        arguments: '/t:publish /p:Configuration=$(buildConfiguration);Platform=x64;RuntimeIdentifier=win-x64;TargetFrameworks=$(TargetFramework);SelfContained=$(SelfContained)'
+        projects: '$(Build.DefinitionName).csproj'
+
+    - task: DotNetCoreCLI@2
+      condition: not(startsWith(variables['RuntimeRID'], 'win-'))
       displayName: 'DotNet Publish'
       inputs:
         command: 'publish'

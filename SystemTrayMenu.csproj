@@ -4,13 +4,15 @@
     <!-- https://learn.microsoft.com/en-us/dotnet/standard/frameworks -->
     <TargetFrameworks>net7.0-windows10.0.22000.0;net8.0-windows10.0.22000.0;net8.0</TargetFrameworks>
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
-    <RuntimeIdentifiers Condition=" '$(TargetFramework)' == 'net7.0-windows10.0.22000.0' ">win-x64</RuntimeIdentifiers> <!-- Windows WPF -->
-    <RuntimeIdentifiers Condition=" '$(TargetFramework)' == 'net8.0-windows10.0.22000.0' ">win-x64</RuntimeIdentifiers> <!-- Windows Avalonia -->
-    <RuntimeIdentifiers Condition=" '$(TargetFramework)' == 'net8.0' ">linux-x64;osx-x64</RuntimeIdentifiers>           <!-- Linux/MacOS Avalonia -->
+    <TargetFramework Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">net8.0</TargetFramework>
+    <TargetFramework Condition=" '$(RuntimeIdentifier)' == 'osx-x64'   ">net8.0</TargetFramework>
+    <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net7.0-windows10.0.22000.0' ">win-x64</RuntimeIdentifier> <!-- Windows WPF -->
+    <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net8.0-windows10.0.22000.0' ">win-x64</RuntimeIdentifier> <!-- Windows Avalonia -->
+    <RuntimeIdentifiers Condition=" '$(TargetFramework)' == 'net8.0' ">linux-x64;osx-x64</RuntimeIdentifiers>         <!-- Linux/MacOS Avalonia -->
     <UseWPF Condition=" '$(TargetFramework)' != 'net7.0-windows10.0.22000.0' ">False</UseWPF>
     <UseWPF Condition=" '$(TargetFramework)' == 'net7.0-windows10.0.22000.0' ">True</UseWPF>
     <!-- TODO_LINUX/TODO_AVALONIA define marks WPF/Windows code that needs to be ported to Avalonia/Linux -->
-    <DefineConstants Condition=" '$(RuntimeIdentifiers)' == 'win-x64' ">$(DefineConstants);TODO_LINUX</DefineConstants>
+    <DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);TODO_LINUX</DefineConstants>
     <DefineConstants Condition="  '$(UseWPF)' ">$(DefineConstants);TODO_AVALONIA</DefineConstants>
     <DefineConstants Condition=" !'$(UseWPF)' ">$(DefineConstants);AVALONIA</DefineConstants>
     <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->

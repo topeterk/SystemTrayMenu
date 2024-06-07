@@ -106,6 +106,14 @@ stages:
 
     - task: DotNetCoreCLI@2
       condition: startsWith(variables['RuntimeRID'], 'win-')
+      displayName: 'DotNet Restore'
+      inputs:
+        command: 'restore'
+        arguments: '--runtime $(RuntimeRID) --framework $(TargetFramework)'
+        projects: '$(Build.DefinitionName).csproj'
+
+    - task: DotNetCoreCLI@2
+      condition: startsWith(variables['RuntimeRID'], 'win-')
       # This is needed for Windows as we have COM dependencies which dotnet publish is not able to handle:
       #   error MSB4803: The task "ResolveComReference" is not supported on the .NET Core version of MSBuild.
       #   Please use the .NET Framework version of MSBuild. See https://aka.ms/msbuild/MSB4803 for further details.

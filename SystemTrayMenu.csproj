@@ -38,8 +38,6 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <PreBuildEvent>taskkill /f /fi "pid gt 0" /im SystemTrayMenu.exe &gt;nul
-EXIT 0</PreBuildEvent>
     <RepositoryUrl>https://github.com/Hofknecht/SystemTrayMenu</RepositoryUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>hofknecht.eu/systemtraymenu/</PackageProjectUrl>
@@ -54,6 +52,10 @@ EXIT 0</PreBuildEvent>
     <ApplicationManifest>Resources\app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\SystemTrayMenu.ico</ApplicationIcon>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">
+    <PreBuildEvent>taskkill /f /fi "pid gt 0" /im SystemTrayMenu.exe &gt;nul
+EXIT 0</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(UseWPF)' ">
     <NoWarn>$(NoWarn);SYSLIB1054</NoWarn> <!-- Do not use recommended LibraryImport as it requires to enable unsafe code for the whole project which is not required by DllImport -->

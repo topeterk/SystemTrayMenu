@@ -80,6 +80,12 @@ stages:
 #         RuntimeRID: 'linux-arm64'
 #         TargetFramework: 'net8.0'
 #         SelfContained: 'false'
+# MacOS
+        osx-arm64:
+          PoolVmImg: 'macOS-latest'
+          RuntimeRID: 'osx-arm64'
+          TargetFramework: 'net8.0'
+          SelfContained: 'false'
 
     variables:
       buildConfiguration: 'Release'
@@ -113,7 +119,7 @@ stages:
         msbuildArchitecture: 'x64'
         platform: 'AnyCPU'
         configuration: '$(BuildConfiguration)'
-        msbuildArguments: '/restore /t:publish /p:Configuration=$(buildConfiguration);RuntimeIdentifier=win-x64;TargetFrameworks=$(TargetFramework);SelfContained=$(SelfContained)'
+        msbuildArguments: '/restore /t:publish /p:RuntimeIdentifier=win-x64;TargetFrameworks=$(TargetFramework);SelfContained=$(SelfContained)'
         maximumCpuCount: true
 
     # example:  dotnet publish --configuration Release --runtime win-x64 --framework net8.0 --self-contained false SystemTrayMenu.csproj

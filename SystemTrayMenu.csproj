@@ -5,6 +5,7 @@
     <TargetFrameworks>net8.0;net8.0-windows10.0.22000.0;net7.0-windows10.0.22000.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">net8.0</TargetFrameworks> <!-- Linux Avalonia -->
     <TargetFrameworks Condition=" '$(RuntimeIdentifier)' == 'osx-x64'   ">net8.0</TargetFrameworks> <!-- MacOS Avalonia -->
+    <TargetFrameworks Condition=" '$(RuntimeIdentifier)' == 'osx-arm64' ">net8.0</TargetFrameworks> <!-- MacOS Avalonia -->
     <!-- https://docs.microsoft.com/en-us/dotnet/core/rid-catalog -->
     <UseCurrentRuntimeIdentifier>true</UseCurrentRuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(TargetFramework)' == 'net7.0-windows10.0.22000.0' ">win-x64</RuntimeIdentifier> <!-- Windows WPF -->
@@ -51,7 +52,6 @@
     <StartupObject>SystemTrayMenu.Program</StartupObject>
     <ApplicationManifest>Resources\app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\SystemTrayMenu.ico</ApplicationIcon>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">
     <PreBuildEvent>taskkill /f /fi "pid gt 0" /im SystemTrayMenu.exe &gt;nul
@@ -167,7 +167,7 @@ EXIT 0</PreBuildEvent>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <Target Name="TestMessage" BeforeTargets="Build" >
-    <Message Text="Building $(RuntimeIdentifier) using $(TargetFramework)" Importance="high"/>
+  <Target Name="TargetInfo" BeforeTargets="Build" >
+    <Message Text="Build for $(RuntimeIdentifier) using $(TargetFramework)" Importance="high"/>
   </Target>
 </Project>

@@ -21,7 +21,6 @@ namespace SystemTrayMenu.UserInterface
     using Avalonia.Input;
     using Avalonia.Interactivity;
     using Avalonia.Media;
-    using ReactiveUI;
     using ModifierKeys = Avalonia.Input.KeyModifiers;
     using MouseEventArgs = Avalonia.Input.PointerEventArgs;
     using Point = Avalonia.Point;
@@ -227,13 +226,13 @@ namespace SystemTrayMenu.UserInterface
 #if !AVALONIA
                 Command = new ActionCommand((_) => Clipboard.SetData(DataFormats.Text, textBoxSearch.SelectedText)),
 #else
-                Command = ReactiveCommand.CreateFromTask(async () =>
+                Command = new ActionCommand(async (_) =>
+                {
+                    if (GetTopLevel(this)?.Clipboard is { } clipboard)
                     {
-                        if (GetTopLevel(this)?.Clipboard is { } clipboard)
-                        {
-                            await clipboard.SetTextAsync(textBoxSearch.SelectedText);
-                        }
-                    }),
+                        await clipboard.SetTextAsync(textBoxSearch.SelectedText);
+                    }
+                }),
 #endif
             });
             textBoxSearch.ContextMenu.Items.Add(new MenuItem()

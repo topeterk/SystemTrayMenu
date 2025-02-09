@@ -101,10 +101,10 @@
             BoxShadow="2 2 4 2 Black">
         <Interaction.Behaviors>
             <DataTriggerBehavior Binding="{Binding Source={x:Static cfg:Settings.Default}, Path=RoundCorners}" ComparisonCondition="Equal" Value="True">
-                <ChangePropertyAction TargetObject="{Binding $parent}" PropertyName="CornerRadius" Value="10" />
+                <ChangePropertyAction TargetObject="{Binding $parent[Border]}" PropertyName="CornerRadius" Value="{StaticResource CornerRadiusRoundCornersOn}" />
             </DataTriggerBehavior>
             <DataTriggerBehavior Binding="{Binding Source={x:Static cfg:Settings.Default}, Path=RoundCorners}" ComparisonCondition="Equal" Value="False">
-                <ChangePropertyAction TargetObject="{Binding $parent}" PropertyName="CornerRadius" Value="0" />
+                <ChangePropertyAction TargetObject="{Binding $parent[Border]}" PropertyName="CornerRadius" Value="{StaticResource CornerRadiusRoundCornersOff}" />
             </DataTriggerBehavior>
         </Interaction.Behaviors>
         <!-- TODO: Update: BoxShadow color with {Binding Source={x:Static stm:MenuDefines.ColorBackgroundBorder},Path=Color} and set fitting values -->
